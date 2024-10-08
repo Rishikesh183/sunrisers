@@ -36,7 +36,6 @@ const GetMatches = () => {
     return (
         <>
             <div className="scrolling-wrapper-flexbox">
-                
                 <div className="card"><ListCard/></div>
                 <div className="card"><ListCard/></div>
                 <div className="card"><ListCard/></div>
