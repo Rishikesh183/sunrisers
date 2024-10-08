@@ -1,0 +1,46 @@
+*{
+    text-transform: capitalize;
+}
+
+.matchCard{
+    background-color: white;
+    min-width: 20vw;
+    margin: 20px;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 10px;
+
+}
+
+.matchName{
+    display: flex;
+    justify-content: center;
+    
+}
+
+.TeamOne{
+    display: flex;
+    justify-content: space-between;
+    padding-top: 5px;
+    box-sizing: border-box;
+}
+
+.TeamTwo{
+    display: flex;
+    justify-content: space-between;
+    padding-top: 5px;
+    box-sizing: border-box;
+}
+
+.result{
+    display: flex;
+    justify-content: space-between;
+    padding-top: 15px;
+    justify-content: center;
+}
+
+.bottom{
+    display: flex;
+    
+}
+

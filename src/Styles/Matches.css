@@ -1,0 +1,16 @@
+.scrolling-wrapper-flexbox {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    background-color: rgb(255, 179, 39);
+    .card {
+      flex: 0 0 auto;
+
+    }
+  }
+
+  .scrolling-wrapper {
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
