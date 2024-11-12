@@ -67,38 +67,4 @@
   }
   
   /* Responsive Navbar */
-  @media (max-width: 768px) {
-    .navbar-container {
-        flex-direction: column;
-        align-items: flex-start;
-        max-height: 15vh;
-        overflow-y: auto; /* To prevent content overflow */
-        position: relative; /* To ensure the login button can be positioned absolutely within the container */
-    }
-
-    .navbar-menu {
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    .navbar-menu li {
-        width: 100%;
-        text-align: left;
-        padding: 10px 0;
-    }
-
-    .navbar-menu li a {
-        padding-left: 20px;
-    }
-
-    .login-btn {
-        position: absolute; /* Keep the button fixed in the same place */
-        bottom: 0; /* Positioned at the bottom of the navbar */
-        width: 100%;
-        text-align: center;
-    }
-}
-
-  
+ 

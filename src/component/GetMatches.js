@@ -1,50 +1,52 @@
-import React, { useEffect } from 'react'
-import { useState } from 'react';
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
 import ListCard from './ListCard';
-import '../Styles/Matches.css'
-const GetMatches = () => {
+import '../Styles/Matches.css';
+// import '../srh-bg.jpg';
+import NewsHome from './News/NewsHome';
+import NewsHomeMobile from './News/NewsHomeMobile';
 
+const GetMatches = () => {
     const [Matches, setMatches] = useState([]);
+    const [width, setWidth] = useState(window.innerWidth);
+
     useEffect(() => {
         async function fetchItems() {
             try {
-                const response = await axios.get(`https://react-guide-2024-9c920-default-rtdb.firebaseio.com/`)
-                const data = response.data
+                const response = await fetch('https://sunrisers-8841a-default-rtdb.firebaseio.com/.json');
+                const data = await response.json();
 
-                if(!data){
-                    return;
-                }
-                const transformedData = data.map((item, index) => {
-                    return {
-                        ...item,
-                        id: index
-                    }
-                })
-                setMatches(transformedData)
-            }
-            catch (error) {
-                console.log(error);
+                if (!data || !data.Details) return; // Ensure data and Details are available
+
+                const transformedData = data.Details.map((match, index) => ({
+                    ...match, 
+                    id: index, 
+                }));
+
+                setMatches(transformedData);
+            } catch (error) {
+                console.error('Fetch error:', error);
             }
         }
         fetchItems();
-        return () => {
-            setMatches([])
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, []);
+    useEffect(() => {
+        const handleResize = () => setWidth(window.innerWidth);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     return (
         <>
             <div className="scrolling-wrapper-flexbox">
-                <div className="card"><ListCard/></div>
-                <div className="card"><ListCard/></div>
-                <div className="card"><ListCard/></div>
-                <div className="card"><ListCard/></div>
-                <div className="card"><ListCard/></div>
-                <div className="card"><ListCard/></div>
+                {Matches.map(item => (
+                    <ListCard key={item.id} data={item} />
+                ))}
             </div>
+            {width > 1200 && <NewsHome />} 
+            {width<1200 && <NewsHomeMobile/>} 
+            
         </>
-    )
+    );
 }
 
-export default GetMatches
+export default GetMatches;

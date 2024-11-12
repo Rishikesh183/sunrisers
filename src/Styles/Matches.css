@@ -1,16 +1,23 @@
 .scrolling-wrapper-flexbox {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    background-color: rgb(255, 179, 39);
-    .card {
-      flex: 0 0 auto;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  background-image: url(https://www.sunrisershyderabad.in/dist/img/home/social_hub_bg.jpg);
+}
 
-    }
-  }
+.scrolling-wrapper-flexbox::-webkit-scrollbar {
+  display: none; 
+}
 
-  .scrolling-wrapper {
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
+.scrolling-wrapper-flexbox {
+  -ms-overflow-style: none;  
+  scrollbar-width: none;     
+}
+
+.card {
+  flex: 0 0 auto;
+}
+
+.container {
+  padding: 10px;
+}

@@ -1,26 +1,25 @@
 import React from "react";
-import "../Styles/ListCard.css"
+import "../Styles/ScheduleCard.css"
 
-function ListCard({ data }) {
-  // console.log("Data passed to ListCard:", JSON.stringify(data, null, 2)); // Check what data is being passed
+function ScheduleCard({ data }) {
 
   return (
-      <div className="matchCard">
-          <div className="matchName font-bold">IPL 2024</div>
-          <div className="TeamOne">
+      <div className="matchCardS">
+          <div className="matchNameS font-bold">IPL 2024</div>
+          <div className="TeamOneS">
               <div>{data.teamOne || 'Unknown Team 1'}</div>
               <div>{data.scoreOne || 'N/A'}</div>
           </div>
-          <div className="TeamTwo">
+          <div className="TeamTwoS">
               <div>{data.teamTwo || 'Unknown Team 2'}</div>
               <div>{data.scoreTwo || 'N/A'}</div>
           </div>
-          <div className="result">
+          <div className="resultS">
               <div>{data.result || 'No Result Yet'}</div>
           </div>
-          <div className="line"></div>
-          <div className="Bottom">
-              <div className="Depth">
+          <div className="lineS"></div>
+          <div className="BottomS">
+              <div className="DepthS">
                   <a href="https://www.iplt20.com/videos/highlights" style={{ textDecoration: 'none', color: "brown" }}>Highlights</a>
                   <div style={{ borderLeft: '3px solid black', height: '20px', margin: '0 10px' }}></div>
                   <a href="https://www.iplt20.com/matches/results" style={{ textDecoration: 'none', color: "brown" }}>Schedule</a>
@@ -32,7 +31,7 @@ function ListCard({ data }) {
 
 
 
-export default ListCard;
+export default ScheduleCard;
 
 
 

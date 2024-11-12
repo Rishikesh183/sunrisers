@@ -7,42 +7,37 @@
     /* font-size: small; */
 }
 
-.matchCard{
+.matchCardS{
     background-color: #fff;
     min-width: 25vw;
-    margin-top: 20px;
-    margin-bottom: 20px ;
-    margin-left: 20px;
-    margin-right: 10px;
+    margin-bottom: 4px;
     padding: 10px;
     box-sizing: border-box;
-    border-radius: 20px;
-    border: 1px solid orange;
     /* max-height: 22vh; */
 
 }
 
-.matchName{
+.matchNameS{
     display: flex;
     justify-content: center;
     
 }
 
-.TeamOne{
+.TeamOneS{
     display: flex;
     justify-content: space-between;
     padding: 3px;
     box-sizing: border-box;
 }
 
-.TeamTwo{
+.TeamTwoS{
     display: flex;
     justify-content: space-between;
     padding: 3px;
     box-sizing: border-box;
 }
 
-.result{
+.resultS{
     display: flex;
     justify-content: space-between;
     margin-top: 5px;
@@ -53,19 +48,19 @@
     font-weight: bold;
 }
 
-.bottom{
+.bottomS{
     display: flex;
     justify-content: space-around;
 }
 
-.Depth {
+.DepthS {
     display: flex;
     justify-content: space-around;
     padding-top: 10px;
     box-sizing: border-box;
 }
 
-.line{
+.lineS{
     background-color: black;
     height: 0.10rem;
     opacity: 1;
