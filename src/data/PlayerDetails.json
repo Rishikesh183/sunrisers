@@ -1,0 +1,268 @@
+{
+  "Players": [
+    {
+      "name": "Pat Cummins",
+      "url": "/SRH PLAYERS/Pat Cummins.webp",
+      "Age": "08-05-1993",
+      "Duty": "Captain",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Fast",
+      "role": "All-rounder",
+      "country": "Australia",
+      "debut": "2014"
+    },
+    {
+      "name": "Abhishek Sharma",
+      "url": "/SRH PLAYERS/Abhishek Sharma.webp",
+      "Age": "04-09-2000",
+      "Duty": "Vice Captain",
+      "batting": "Left hand Bat",
+      "bowling": "Slow Left arm Orthodox",
+      "role": "All-rounder",
+      "country": "India",
+      "debut": "2018"
+    },
+    {
+      "name": "Rahul Tripathi",
+      "url": "/SRH PLAYERS/Rahul Tripathi.webp",
+      "Age": "02-03-1991",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Medium",
+      "role": "Batsman",
+      "country": "India",
+      "debut": "2017"
+    },
+    {
+      "name": "Aiden Markram",
+      "url": "/SRH PLAYERS/Aiden Markram.webp",
+      "Age": "04-10-1994",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Offbreak",
+      "role": "Batsman",
+      "country": "South Africa",
+      "debut": "2022"
+    },
+    {
+      "name": "Glenn Phillips",
+      "url": "/SRH PLAYERS/Glenn Phillips.webp",
+      "Age": "06-12-1996",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Offbreak",
+      "role": "Wicketkeeper Batsman",
+      "country": "New Zealand",
+      "debut": "2021"
+    },
+    {
+      "name": "Heinrich Klaasen",
+      "url": "/SRH PLAYERS/Heinrich Klaasen.webp",
+      "Age": "30-07-1991",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Offbreak",
+      "role": "Wicketkeeper Batsman",
+      "country": "South Africa",
+      "debut": "2018"
+    },
+    {
+      "name": "Upendra Yadav",
+      "url": "/SRH PLAYERS/Upendra Yadav.webp",
+      "Age": "08-10-1996",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Offbreak",
+      "role": "Wicketkeeper Batsman",
+      "country": "India",
+      "debut": "2023"
+    },
+    {
+      "name": "Washington Sundar",
+      "url": "/SRH PLAYERS/Washington Sundar.webp",
+      "Age": "05-10-1999",
+      "Duty": "Player",
+      "batting": "Left hand Bat",
+      "bowling": "Right arm Offbreak",
+      "role": "All-rounder",
+      "country": "India",
+      "debut": "2017"
+    },
+    {
+      "name": "Marco Jansen",
+      "url": "/SRH PLAYERS/Marco Jansen.webp",
+      "Age": "01-05-2000",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Left arm Medium fast",
+      "role": "All-rounder",
+      "country": "South Africa",
+      "debut": "2022"
+    },
+    {
+      "name": "Bhuvneshwar Kumar",
+      "url": "/SRH PLAYERS/Bhuvneshwar Kumar.webp",
+      "Age": "05-02-1990",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Medium",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2011"
+    },
+    {
+      "name": "Umran Malik",
+      "url": "/SRH PLAYERS/Umran Malik.webp",
+      "Age": "22-11-1999",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Fast",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2021"
+    },
+    {
+      "name": "T Natarajan",
+      "url": "/SRH PLAYERS/T Natarajan.webp",
+      "Age": "27-05-1991",
+      "Duty": "Player",
+      "batting": "Left hand Bat",
+      "bowling": "Left arm Medium",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2017"
+    },
+    {
+      "name": "Abdul Samad",
+      "url": "/SRH PLAYERS/Abdul Samad.webp",
+      "Age": "28-10-2001",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Legbreak",
+      "role": "Batsman",
+      "country": "India",
+      "debut": "2020"
+    },
+    {
+      "name": "Mayank Agarwal",
+      "url": "/SRH PLAYERS/Mayank Agarwal.webp",
+      "Age": "16-02-1991",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Offbreak",
+      "role": "Batsman",
+      "country": "India",
+      "debut": "2011"
+    },
+    {
+      "name": "Anmolpreet Singh",
+      "url": "/SRH PLAYERS/Anmolpreet Singh.webp",
+      "Age": "28-03-1998",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Offbreak",
+      "role": "Batsman",
+      "country": "India",
+      "debut": "2019"
+    },
+    {
+      "name": "Travis Head",
+      "url": "/SRH PLAYERS/Travis Head.webp",
+      "Age": "29-12-1993",
+      "Duty": "Player",
+      "batting": "Left hand Bat",
+      "bowling": "Right arm Offbreak",
+      "role": "Top order Batsman",
+      "country": "Australia",
+      "debut": "2021"
+    },
+    {
+      "name": "Nitish Kumar Reddy",
+      "url": "/SRH PLAYERS/Nitish Kumar Reddy.webp",
+      "Age": "21-03-2003",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Medium fast",
+      "role": "Batting All-rounder",
+      "country": "India",
+      "debut": "2022"
+    },
+    {
+      "name": "Sanvir Singh",
+      "url": "/SRH PLAYERS/Sanvir Singh.webp",
+      "Age": "12-08-1997",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Right arm Medium",
+      "role": "All-rounder",
+      "country": "India",
+      "debut": "2023"
+    },
+    {
+      "name": "Shahbaz Ahmed",
+      "url": "/SRH PLAYERS/Shahbaz Ahmed.webp",
+      "Age": "11-12-1994",
+      "Duty": "Player",
+      "batting": "Left hand Bat",
+      "bowling": "Slow Left arm Orthodox",
+      "role": "All-rounder",
+      "country": "India",
+      "debut": "2020"
+    },
+    {
+      "name": "Jaydev Unadkat",
+      "url": "/SRH PLAYERS/Jaydev Unadkat.webp",
+      "Age": "18-10-1991",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Left arm Medium",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2010"
+    },
+    {
+      "name": "Akash Singh",
+      "url": "/SRH PLAYERS/Akash Singh.webp",
+      "Age": "26-04-2002",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Left arm Medium fast",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2021"
+    },
+    {
+      "name": "Fazalhaq Farooqi",
+      "url": "/SRH PLAYERS/Fazalhaq Farooqi.webp",
+      "Age": "22-09-2000",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Left arm Fast medium",
+      "role": "Bowler",
+      "country": "Afghanistan",
+      "debut": "2022"
+    },
+    {
+      "name": "Mayank Markande",
+      "url": "/SRH PLAYERS/Mayank Markande.webp",
+      "Age": "11-11-1997",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Legbreak",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2018"
+    },
+    {
+      "name": "J Subramanyan",
+      "url": "/SRH PLAYERS/Jhathavedh Subramanyan.webp",
+      "Age": "09-02-2003",
+      "Duty": "Player",
+      "batting": "Right hand Bat",
+      "bowling": "Left arm Orthodox",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2023"
+    }
+  ]
+}
