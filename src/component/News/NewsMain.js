@@ -1,48 +1,51 @@
-import React from 'react'
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import NewsCard from './NewsCard';
-
+import '../../Styles/NewsMain.css'
+import Loader from "../Loader"
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { db } from '../../firebase.config';
 const NewsMain = () => {
+    const [loader, setloader] = useState(true)
     const [News, setNews] = useState([]);
 
     useEffect(() => {
-        async function fetchItems() {
+        const fetchNews = async () => {
             try {
-                const response = await fetch('https://newssrh-default-rtdb.firebaseio.com/.json');
-                const data = await response.json();
+                const newsCollection = collection(db, "news");
+                const q = query(newsCollection, orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
 
-
-                // Check if Detail is defined and an array
-                if (!data || !Array.isArray(data.Detail)) {
-                    console.warn('Detail not found or not an array:', data);
-                    return;
-                }
-
-                const transformedData = data.Detail.map((item, index) => ({
-                    ...item,
-                    id: index,
+                const newsList = querySnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
                 }));
 
-                setNews(transformedData);
-            } catch (error) {
-                console.error('Fetch error:', error);
+                setNews(newsList);
             }
-        }
-        fetchItems();
+            catch (error) {
+                console.error('Fetch error:', error);
+            } finally {
+                setloader(false); // Stop loading once data is fetched
+            }
+        }  
+        fetchNews();
     }, []);
-
+    if (loader) {
+        return <Loader />
+    }
     return (
-        <div className=''> 
-            <div className='flex border-b-1 border-gray-200 pl-2 pt-1'>
-                <div className='flex justify-between  font-bold text-2xl p-2 w-full'>Top Stories For You Today</div>
+        <div className="news-main-container">
+            <div className="news-header w-full">
+                <h2 className="news-title">Orange Chronicles: Keeping Up with the Risers</h2>
+                <p className="news-subtitle">Stay updated with the latest news on SRH</p>
             </div>
-            <div >
+            <div className="news-grid">
                 {News.map(item => (
                     <NewsCard key={item.id} data={item} />
                 ))}
             </div>
         </div>
-    )
+    );
 }
 
-export default NewsMain
+export default NewsMain;

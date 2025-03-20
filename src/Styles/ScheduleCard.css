@@ -1,43 +1,48 @@
 @import url('https://fonts.googleapis.com/css2?family=Baloo+Bhai&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
-
-*{
-    text-transform: capitalize;
-    /* font-size: small; */
-}
-
-.matchCardS{
-    background-color: #fff;
+.matchCardS {
+    background-color: white;
     min-width: 25vw;
+    background: rgba(255, 255, 255, 0.5);
+    margin-top: 10px;
     margin-bottom: 4px;
     padding: 10px;
     box-sizing: border-box;
-    /* max-height: 22vh; */
-
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: #ddd;
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.matchNameS{
+.matchCardS:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 1);
+}
+
+.matchNameS {
     display: flex;
     justify-content: center;
-    
+
 }
 
-.TeamOneS{
+.TeamOneS {
     display: flex;
     justify-content: space-between;
     padding: 3px;
     box-sizing: border-box;
 }
 
-.TeamTwoS{
+.TeamTwoS {
     display: flex;
     justify-content: space-between;
     padding: 3px;
     box-sizing: border-box;
 }
 
-.resultS{
+.resultS {
     display: flex;
     justify-content: space-between;
     margin-top: 5px;
@@ -48,7 +53,7 @@
     font-weight: bold;
 }
 
-.bottomS{
+.bottomS {
     display: flex;
     justify-content: space-around;
 }
@@ -60,11 +65,27 @@
     box-sizing: border-box;
 }
 
-.lineS{
+.lineS {
     background-color: black;
     height: 0.10rem;
     opacity: 1;
 }
 
+@media screen and (max-width: 800px) {
+    .matchCardS {
+        min-width: 50vw;
+    }
+}
 
-
+@media screen and (max-width: 500px) {
+    .matchCardS {
+        min-width: 70vw;
+        padding: 0px;
+        
+    }
+}
+@media screen and (max-width: 250px) {
+    .matchCardS {
+        min-width: 90vw;
+    }
+}

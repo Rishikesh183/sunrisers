@@ -1,11 +1,11 @@
 import React from "react";
 import '../Styles/ScheduleCard.css'
 
-function ScheduleCard({ data }) {
+function UpcomingMatchCard({ data }) {
 
     return (
         <div className="matchCardS">
-            <div className="matchNameS font-bold">IPL 2024</div>
+            <div className="matchNameS font-bold">IPL 2025</div>
             <div className="TeamOneS">
                 <div>{data.teamOne || 'Unknown Team 1'}</div>
                 <div>{data.scoreOne || 'N/A'}</div>
@@ -15,14 +15,14 @@ function ScheduleCard({ data }) {
                 <div>{data.scoreTwo || 'N/A'}</div>
             </div>
             <div className="resultS">
-                <div>{data.result || 'No Result Yet'}</div>
+                <div>{data.venueDate || 'No Result Yet'}</div>
             </div>
             <div className="lineS"></div>
             <div className="BottomS">
                 <div className="DepthS">
-                    <a href="https://www.iplt20.com/videos/highlights" style={{ textDecoration: 'none', color: "brown" }}>Highlights</a>
+                    <a href="https://www.district.in/events/sunrisers-hyderabad-team">Book tickets</a>
                     <div style={{ borderLeft: '3px solid black', height: '20px', margin: '0 10px' }}></div>
-                    <a href="https://www.iplt20.com/matches/results" style={{ textDecoration: 'none', color: "brown" }}>Schedule</a>
+                    <p  style={{ textDecoration: 'none', color: "brown" }}>{data.HomeAway}</p>
                 </div>
             </div>
         </div>
@@ -30,5 +30,5 @@ function ScheduleCard({ data }) {
 }
 
 
-
-export default ScheduleCard;
+// style={{ textDecoration: 'none', color: "brown" }}
+export default UpcomingMatchCard;

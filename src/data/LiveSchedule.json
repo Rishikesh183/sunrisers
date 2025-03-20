@@ -1,0 +1,130 @@
+{
+  "Details": [
+    {
+      "HomeAway": "Home",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "RR",
+      "scoreTwo": "TBP",
+      "venueDate": "HYD, 23RD MARCH"
+    },
+    {
+      "HomeAway": "Home",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "LSG",
+      "scoreTwo": "TBP",
+      "venueDate": "HYD, 27TH MARCH"
+    },
+    {
+      "HomeAway": "Away",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "DC",
+      "scoreTwo": "TBP",
+      "venueDate": "VIZAG, 30TH MARCH"
+    },
+    {
+      "HomeAway": "Away",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "KKR",
+      "scoreTwo": "TBP",
+      "venueDate": "KOLKATA, 3RD APRIL"
+    },
+    {
+      "HomeAway": "Home",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "GT",
+      "scoreTwo": "TBP",
+      "venueDate": "HYD, 6TH APRIL"
+    },
+    {
+      "HomeAway": "Home",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "PBKS",
+      "scoreTwo": "TBP",
+      "venueDate": "HYD, 12TH APRIL"
+    },
+    {
+      "HomeAway": "Away",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "MI",
+      "scoreTwo": "TBP",
+      "venueDate": "MUMBAI, 17TH APRIL"
+    },
+    {
+      "HomeAway": "Home",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "MI",
+      "scoreTwo": "TBP",
+      "venueDate": "HYD, 23RD APRIL"
+    },
+    {
+      "HomeAway": "Away",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "CSK",
+      "scoreTwo": "TBP",
+      "venueDate": "CHENNAI, 25TH APRIL"
+    },
+    {
+      "HomeAway": "Away",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "GT",
+      "scoreTwo": "TBP",
+      "venueDate": "AHMEDABAD, 2ND MAY"
+    },
+    {
+      "HomeAway": "Home",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "DC",
+      "scoreTwo": "TBP",
+      "venueDate": "HYD, 5TH MAY"
+    },
+    {
+      "HomeAway": "Home",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "KKR",
+      "scoreTwo": "TBP",
+      "venueDate": "HYD, 10TH MAY"
+    },
+    {
+      "HomeAway": "Away",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "RCB",
+      "scoreTwo": "TBP",
+      "venueDate": "BENGALURU, 13TH MAY"
+    },
+    {
+      "HomeAway": "Away",
+      "GetTickets": "https://www.district.in/events/sunrisers-hyderabad-team",
+      "teamOne": "SRH",
+      "scoreOne": "TBP",
+      "teamTwo": "LSG",
+      "scoreTwo": "TBP",
+      "venueDate": "LUCKNOW, 18TH MAY"
+    }
+  ]
+}

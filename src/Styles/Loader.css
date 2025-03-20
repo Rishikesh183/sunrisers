@@ -1,0 +1,29 @@
+.loader-class {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url(https://www.sunrisershyderabad.in/dist/img/home/social_hub_bg.jpg);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it overlays everything */
+}
+
+.loader-class img {
+    width: 150px;
+    height: auto;
+    /* animation: spin 2s linear infinite; */
+}
+
+/* @keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+} */

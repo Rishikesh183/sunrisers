@@ -73,3 +73,19 @@
 
 
 
+@media screen and (max-width: 800px) {
+    .matchCard {
+        min-width: 50vw;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .matchCard {
+        min-width: 70vw;
+    }
+}
+@media screen and (max-width: 250px) {
+    .matchCard {
+        min-width: 90vw;
+    }
+}

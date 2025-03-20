@@ -7,7 +7,14 @@ export default function Players(props) {
     const [query, setQuery] = useState("");
     // eslint-disable-next-line
     const [Players, setPlayers] = useState(playersData.Players);
-    document.body.style.backgroundColor = '#e67e22';
+    
+    useEffect(() => {
+        document.body.style.backgroundColor = '#e67e22';
+        return () => {
+            // Clean up the body style when component unmounts
+            document.body.style.backgroundColor = '';
+        };
+    }, []);
 
     useEffect(() => {
         setQuery(text);
@@ -22,113 +29,71 @@ export default function Players(props) {
         }
     }
 
-    const styles = {
-        container: {
-            maxWidth: '95vw',
+    return (
+        <div className="players-container" style={{
+            maxWidth: '1200px',
             margin: '0 auto',
-            padding: '3vw',
+            padding: 'clamp(15px, 3vw, 40px)',
             fontFamily: 'Roboto, sans-serif',
             backgroundColor: '#e67e22',
             color: '#333',
-            borderRadius: '2vw',
+            borderRadius: 'clamp(10px, 2vw, 25px)',
             animation: 'fadeIn 1s ease-in-out'
-        },
-        heading: {
-            fontSize: '36px',
-            fontWeight: '700',
-            marginBottom: '20px',
-            color: 'black',
-            textAlign: 'center',
-            textTransform: 'uppercase',
-            letterSpacing: '3px',
-        },
-        subHeading: {
-            textAlign: "center",
-            fontSize: '24px',
-            fontWeight: '600',
-            marginTop: '30px',
-            marginBottom: '15px',
-            color: 'black',
-            borderBottom: `3px solid black`,
-            paddingBottom: '10px',
-        },
-        selectContainer: {
-            display: 'flex',
-            justifyContent: 'flex-end',
-            marginRight: '1vw',
-            flexWrap: 'wrap',
-            gap: '5px',
-        },
-        select: {
-            backgroundColor: '#FF4B33',
-            color: 'BLACK',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '5px 10px',
-            fontSize: '1rem',
-            fontWeight: '500',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s ease',
-            margin: '0 7px',
-            minWidth: '300px',
-            height: "45px",
-            width: 'auto',
-            marginRight: '15px'
-        },
-        highlights: {
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: '#ffab73',
-            padding: '20px',
-            borderRadius: '10px',
-            marginBottom: '20px',
-            borderLeft: `5px solid black`,
-            borderRight: `5px solid black`,
-        },
-        cardContainer: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '15px',
-            justifyContent: 'space-around',
-        },
-        cardWrapper: {
-            flex: '0 1 23%',
-            maxWidth: '23%',
-        },
-        '@media(max-width: 1200px)': {
-            cardWrapper: {
-                flex: '0 1 30%',
-                maxWidth: '30%',
-            }
-        },
-        '@media(max-width: 768px)': {
-            cardWrapper: {
-                flex: '0 1 45%',
-                maxWidth: '45%',
-            }
-        },
-        '@media(max-width: 576px)': {
-            cardWrapper: {
-                flex: '0 1 100%',
-                maxWidth: '100%',
-            },
-            heading: {
-                fontSize: '24px',
-            },
-            subHeading: {
-                fontSize: '18px',
-            },
-        }
-    };
+        }}>
+            <h1 style={{
+                fontSize: 'clamp(24px, 5vw, 36px)',
+                fontWeight: '700',
+                marginBottom: 'clamp(10px, 2vw, 20px)',
+                color: 'black',
+                textAlign: 'center',
+                textTransform: 'uppercase',
+                letterSpacing: 'clamp(1px, 0.3vw, 3px)',
+            }}>Sunrisers Hyderabad</h1>
+            
+            <h2 style={{
+                textAlign: "center",
+                fontSize: 'clamp(18px, 4vw, 24px)',
+                fontWeight: '600',
+                marginTop: 'clamp(15px, 3vw, 30px)',
+                marginBottom: 'clamp(10px, 1.5vw, 15px)',
+                color: 'black',
+                borderBottom: `3px solid black`,
+                paddingBottom: 'clamp(5px, 1vw, 10px)',
+            }}>THE RISERS OF 2024 CLASS</h2>
 
-    return (
-        <div style={styles.container}>
-            <h1 style={styles.heading}>Sunrisers Hyderabad</h1>
-            <h2 style={styles.subHeading}>THE RISERS OF 2024 CLASS</h2>
-
-            <div style={styles.highlights}>
-                <div style={styles.selectContainer}>
-                    <select style={styles.select} className="form-select me-2" onChange={capture}>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: '#ffab73',
+                padding: 'clamp(10px, 2vw, 20px)',
+                borderRadius: 'clamp(5px, 1vw, 10px)',
+                marginBottom: 'clamp(10px, 2vw, 20px)',
+                borderLeft: `5px solid black`,
+                borderRight: `5px solid black`,
+            }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    marginBottom: 'clamp(10px, 2vw, 20px)',
+                    width: '100%'
+                }}>
+                    <select 
+                        style={{
+                            backgroundColor: '#FF4B33',
+                            color: 'BLACK',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '5px 10px',
+                            fontSize: 'clamp(0.875rem, 2vw, 1rem)',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.3s ease',
+                            height: "clamp(35px, 5vw, 45px)",
+                            width: 'clamp(200px, 50%, 300px)',
+                        }} 
+                        className="form-select" 
+                        onChange={capture}
+                    >
                         <option value="">All Players</option>
                         <option value="Batsman">Batters</option>
                         <option value="Bowler">Bowlers</option>
@@ -136,10 +101,23 @@ export default function Players(props) {
                         <option value="Wicketkeeper">Wicketkeepers</option>
                     </select>
                 </div>
-                <div className="container my-3">
-                    <div style={styles.cardContainer}>
+                
+                <div className="container">
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(250px, 80%, 300px), 1fr))',
+                        gap: 'clamp(10px, 2vw, 20px)',
+                        justifyContent: 'center',
+                        margin: '0 auto'
+                    }}>
                         {Players.filter(player => player.role.includes(query)).map((player, index) => (
-                            <div style={styles.cardWrapper} key={index}>
+                            <div 
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'center'
+                                }} 
+                                key={index}
+                            >
                                 <Playercard
                                     title={player.name}
                                     captain={player.Duty}

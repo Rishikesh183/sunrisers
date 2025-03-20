@@ -1,0 +1,51 @@
+/* Main container styling */
+.matches-main-container {
+    /* padding: 20px; */
+    min-height: 100vh;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-image: url('/src/component/SRH IMAGES/Eagle_bgi.png');
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Header section */
+.matches-header {
+    text-align: center;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    /* width: 150vh; */
+    border-bottom: 2px solid black;
+}
+
+.matches-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2c3e50;
+    letter-spacing: 1px;
+}
+
+.matches-subtitle {
+    font-size: 16px;
+    color: #5d6d7e;
+    font-weight: 400;
+}
+
+/* matches grid for responsive layout */
+.matches-grid {
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    width: 60%;
+    max-width: 1200px;
+    place-self: center;
+}
+
+@media (min-width: 805px) {
+    .matches-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
