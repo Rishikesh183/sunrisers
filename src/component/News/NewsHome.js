@@ -15,7 +15,7 @@ const NewsHome = () => {
                 </div>
 
                 {/* News Section */}
-                <div className="flex flex-wrap bg-gradient-to-r from-orange-100 to-orange-300 rounded-xl p-4">
+                <div className="flex flex-wrap rounded-xl p-4">
                     {/* Main News Card */}
                     <div className="flex flex-1 h-[30vh] p-6 gap-4 border-r border-white">
                         <div className="w-[16vw] h-[22vh]">
@@ -25,15 +25,15 @@ const NewsHome = () => {
                                 alt=""
                             />
                         </div>
-                        <div className="flex flex-col justify-between">
+                        <div className="flex flex-col gap-2">
                             <h1 className="text-3xl font-bold text-black uppercase">
-                                Surprising Retentions for SRH
+                                Abki baar 300 paar?
                             </h1>
                             <div className="text-lg font-medium text-gray-700 space-y-2">
-                                <p>Klassen will be the first Retention For SRH at 23cr</p>
-                                <p>Captain Pat will be retained at 18cr</p>
-                                <p>Abhishek is all set for 14cr</p>
-                                <p>Head and NKR could be Remaining 2 Retentions</p>
+                                <p>Srh aiming for 300 this year </p>
+                                <p>With the explosive batting this year srh are looking more solid</p>
+                                <p>Additon of ishan Kishan makes our batting more explosive</p>
+                                <p>Young guns like Aniket and Abhinav spice up our batting more</p>
                             </div>
                         </div>
                     </div>
@@ -41,36 +41,36 @@ const NewsHome = () => {
                     {/* Side News Cards */}
                     <div className="flex flex-col w-[38vw] gap-4 pl-4">
                         <div className="flex gap-4 p-2">
-                            <div className="w-[10vw] h-[12vh]">
+                            <div className="w-[14vw] h-[12vh]">
                                 <img
                                     className="w-full h-full rounded-xl object-cover shadow-md"
-                                    src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_800,q_50/lsci/db/PICTURES/CMS/388700/388751.jpg"
+                                    src="https://images.mykhel.com/img/2025/03/ishan-kishan-srh-ft-1742092253.jpg"
                                     alt=""
                                 />
                             </div>
-                            <div className="flex flex-col justify-between">
+                            <div className="flex flex-col gap-1">
                                 <h1 className="font-bold text-xl uppercase text-black">
-                                    NKR to Australia
+                                    Ishan Mania in Srh
                                 </h1>
                                 <p className="text-gray-700 text-base font-medium">
-                                    NKR likely to travel to Australia as a pace bowling all-rounder.
+                                    Ishan kishan's starts with firey knocks in practice matches , Adds more power to risers batting
                                 </p>
                             </div>
                         </div>
                         <div className="flex gap-4 p-4bg-gradient-to-r from-orange-100 to-orange-300">
-                            <div className="w-[10vw] h-[12vh]">
+                            <div className="w-[12vw] h-[12vh]">
                                 <img
                                     className="w-full h-full rounded-xl object-cover shadow-md"
-                                    src="https://media.ahmedabadmirror.com/am/uploads/mediaGallery/image/1616855803220.jpg-org"
+                                    src="https://images.mykhel.com/fit-in/320x180/img/2025/02/pat-cummins-injury-update-ft-1740122017.jpg"
                                     alt=""
                                 />
                             </div>
-                            <div className="flex flex-col justify-between">
+                            <div className="flex flex-col gap-1">
                                 <h1 className="font-bold text-xl uppercase text-black">
-                                    Sundar for Remaining Tests
+                                    Meet & Greet with SRH  
                                 </h1>
                                 <p className="text-gray-700 text-base font-medium">
-                                    Washington Sundar has been added to the 2nd and 3rd Test vs NZ.
+                                    Risers are all set to meet with fans on 22nd march at Daspally convention 
                                 </p>
                             </div>
                         </div>

@@ -23,7 +23,6 @@ const GetMatches = () => {
                 if (!data || !data.Details) {
                     throw new Error('No data or Details field found'); // Error for invalid data
                 }
-
                 const transformedData = data.Details.map((match, index) => ({
                     ...match,
                     id: index,

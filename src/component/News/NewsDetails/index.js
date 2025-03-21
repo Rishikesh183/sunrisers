@@ -45,17 +45,21 @@ const NewsDetails = () => {
     }
 
     return (
-        <div>
-            <div className='bg-orange-500'>
-                <h1 className='p-2 font-bold text-xl text-white'>{NewsPage.title}</h1>
-            </div>
-            <div className='p-3 font-semibold'>
-                <p>
-                    {NewsPage.longDesc}
-                </p>
-            </div>
-
-        </div>
+        <div className="w-full">
+    <div className="bg-orange-500">
+        <h1 className="p-2 font-bold text-xl md:text-2xl text-white">{NewsPage.title}</h1>
+    </div>
+    <div className="p-3 w-full md:w-4/5 lg:w-2/5 mx-auto font-semibold">
+        <img 
+            className="h-[30vh] w-full objectcenter object-cover object-top mb-6 rounded-lg shadow-md" 
+            src={NewsPage.imageUrl} 
+            alt={NewsPage.title} 
+        />
+        <p className="text-base leading-relaxed">
+            {NewsPage.longDesc}
+        </p>
+    </div>
+</div>
     );
 }
 
