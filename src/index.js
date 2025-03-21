@@ -6,7 +6,9 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import reportWebVitals from './reportWebVitals';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { BrowserRouter } from 'react-router-dom';
-const PUBLISHABLE_KEY = "pk_test_cG93ZXJmdWwtbXV0dC00NC5jbGVyay5hY2NvdW50cy5kZXYk";
+const PUBLISHABLE_KEY = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+// const PUBLISHABLE_KEY = "pk_test_cG93ZXJmdWwtbXV0dC00NC5jbGVyay5hY2NvdW50cy5kZXYk";
+console.log(PUBLISHABLE_KEY)
 
 if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Publishable Key");
