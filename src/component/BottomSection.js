@@ -25,37 +25,37 @@ const BottomSection = () => {
 
                     <div className="bg-white shadow-md w-72 flex-shrink-0 rounded-lg mx-8 my-8 overflow-hidden">
                         <img
-                            src="https://images-cricketcom.imgix.net/news-1711607833937"
+                            src="https://img.etimg.com/thumb/width-420,height-315,imgsize-92402,resizemode-75,msid-120241000/news/sports/abhishek-sharmas-incredible-ton-powers-srh-to-eight-wicket-win-over-pbks/hyderabad-apr-12-ani-sunrisers-hyderabads-abhishek-sharma-celebrates-his-ma-.jpg"
                             alt="Abhishek Sharma"
                             className="w-full h-40 object-cover"
                         />
                         <div className="p-4 text-center">
                             <p className="text-xl font-semibold text-orange-800">Abhishek Sharma</p>
-                            <p className="text-gray-600">Most sixes - 42</p>
+                            <p className="text-gray-600">Most sixes(IND) - 42</p>
                         </div>
                     </div>
 
                     <div className="bg-white shadow-md w-72 flex-shrink-0 rounded-lg mx-8 my-8 overflow-hidden">
                         <img
-                            src="https://cdn.shopify.com/s/files/1/0278/4565/6649/files/WhatsApp_Image_2024-04-27_at_14.07.36.webp?v=1714207244"
-                            alt="Travis Head"
+                            src="https://img-s-msn-com.akamaized.net/tenant/amp/entityid/AA1Fs0GX.img?w=1280&h=720&m=4&q=70"
+                            alt="Henrich Klassen"
                             className="w-full h-40 object-cover"
                         />
                         <div className="p-4 text-center">
-                            <p className="text-xl font-semibold text-orange-800">Travis Head</p>
-                            <p className="text-gray-600">Most Runs - 567</p>
+                            <p className="text-xl font-semibold text-orange-800">Henrich Klassen</p>
+                            <p className="text-gray-600">Most Runs For SRH(2025) - 487</p>
                         </div>
                     </div>
 
                     <div className="bg-white shadow-md w-72 flex-shrink-0 rounded-lg mx-8 my-8 overflow-hidden">
                         <img
-                            src="https://d3lzcn6mbbadaf.cloudfront.net/media/details/ANI-20240406044225.jpg"
-                            alt="T Natarajan"
+                            src="https://www.hindustantimes.com/ht-img/img/2025/03/23/550x309/India-IPL-Cricket-7_1715190579507_1742716375086.jpg"
+                            alt="Pat Cummins"
                             className="w-full h-40 object-cover"
                         />
                         <div className="p-4 text-center">
-                            <p className="text-xl font-semibold text-orange-800">T Natarajan</p>
-                            <p className="text-gray-600">Most wickets - 19</p>
+                            <p className="text-xl font-semibold text-orange-800">Pat Cummins</p>
+                            <p className="text-gray-600">Most wickets For SRH(2025) - 16</p>
                         </div>
                     </div>
                     <div className="bg-white shadow-md w-72 flex-shrink-0 rounded-lg mx-8 my-8 overflow-hidden">
@@ -91,17 +91,6 @@ const BottomSection = () => {
                             <p className="text-gray-600">167-0 [9.4] vs LSG</p>
                         </div>
                     </div>
-                    <div className="bg-white shadow-md w-72 flex-shrink-0 rounded-lg mx-8 my-8 overflow-hidden">
-                        <img
-                            src="https://images.firstpost.com/uploads/2024/03/Pat-Cummins-IPL-SRH-Sportzpics-2024-03-c34f3532f2aa677d59767c5552cd9425-1200x675.jpeg?im=FitAndFill=(1200,675)"
-                            alt="T Natarajan"
-                            className="w-full h-40 object-cover"
-                        />
-                        <div className="p-4 text-center">
-                            <p className="text-xl font-semibold text-orange-800">Best Captain</p>
-                            <p className="text-gray-600">Pat Cummins</p>
-                        </div>
-                    </div>
                     </Marquee>
                 </div>
             </div>
@@ -121,19 +110,19 @@ const BottomSection = () => {
                             <h4 className="text-lg font-semibold">Follow Us</h4>
                             <div className="flex justify-center space-x-4 mt-2">
                                 <a
-                                    href="https://facebook.com" target="blank"
+                                    href="https://www.facebook.com/sunrisershyderabad/" target="blank"
                                     className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-orange-700 hover:bg-orange-500 hover:text-white transition"
                                 >
-                                    <i className="fab fa-whatsapp"></i>
+                                    <i className="fab fa-facebook"></i>
                                 </a>
                                 <a
-                                    href="https://x.com/cricmawa?t=goRbu8TnVV3QSHFlMfjCwg&s=09" target="blank"
+                                    href="https://x.com/SunRisers?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor" target="blank"
                                     className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-orange-700 hover:bg-orange-500 hover:text-white transition"
                                 >
                                     <i className="fab fa-twitter"></i>
                                 </a>
                                 <a
-                                    href="...." target="blank"
+                                    href="https://www.instagram.com/sunrisershyd/?hl=en" target="blank"
                                     className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-orange-700 hover:bg-orange-500 hover:text-white transition"
                                 >
                                     <i className="fab fa-instagram"></i>

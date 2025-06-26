@@ -31,7 +31,7 @@
       "bowling": "Right arm Medium fast",
       "role": "All-rounder",
       "country": "India",
-      "debut": "2022"
+      "debut": "2024"
     },
     {
       "name": "Heinrich Klaasen",
@@ -53,11 +53,11 @@
       "bowling": "Right arm Offbreak",
       "role": "Top order Batsman",
       "country": "Australia",
-      "debut": "2021"
+      "debut": "2017"
     },
     {
       "name": "Mohammed Shami",
-      "url": "/SRH PLAYERS/Mohammed Shami.webp",
+      "url": "/SRH PLAYERS/shami.webp",
       "Age": "03-09-1990",
       "Duty": "Player",
       "batting": "Right hand Batsman",
@@ -86,7 +86,7 @@
       "bowling": "Right arm Medium",
       "role": "Wicketkeeper Batsman",
       "country": "India",
-      "debut": "2021"
+      "debut": "2016"
     },
     {
       "name": "Rahul Chahar",
@@ -152,7 +152,7 @@
       "bowling": "Legbreak",
       "role": "Bowler",
       "country": "India",
-      "debut": "2023"
+      "debut": "2025"
     },
     {
       "name": "Jaydev Unadkat",
@@ -174,7 +174,7 @@
       "bowling": "Right arm Fast",
       "role": "All-rounder",
       "country": "England",
-      "debut": "2021"
+      "debut": ""
     },
     {
       "name": "Kamindu Mendis",
@@ -185,7 +185,7 @@
       "bowling": "Right arm Offbreak",
       "role": "All-rounder",
       "country": "Sri Lanka",
-      "debut": "2018"
+      "debut": "2025"
     },
     {
       "name": "Aniket Verma",
@@ -196,7 +196,7 @@
       "bowling": "Right arm Medium",
       "role": "Batsman",
       "country": "India",
-      "debut": "2023"
+      "debut": "2025"
     },
     {
       "name": "Eshan Malinga",
@@ -207,7 +207,7 @@
       "bowling": "Right arm Fast",
       "role": "Bowler",
       "country": "Sri Lanka",
-      "debut": "2023"
+      "debut": "2025"
     },
     {
       "name": "Sachin Baby",
@@ -219,6 +219,39 @@
       "role": "Batsman",
       "country": "India",
       "debut": "2013"
+    },
+    {
+      "name": "Wiaan Mulder",
+      "url": "/SRH PLAYERS/Wiaan Mulder.webp",
+      "Age": "19-02-1998",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Medium",
+      "role": "All-rounder",
+      "country": "South Africa",
+      "debut": "2025"
+    },
+    {
+      "name": "Ravichandran Smaran",
+      "url": "/SRH PLAYERS/Ravichandran Smaran.webp",
+      "Age": "05-05-2003",
+      "Duty": "Player",
+      "batting": "Left hand Batsman",
+      "bowling": "Right arm Offbreak",
+      "role": "Batsman",
+      "country": "India",
+      "debut": ""
+    },
+    {
+      "name": "Harsh Dubey",
+      "url": "/SRH PLAYERS/Harsh Dubey.webp",
+      "Age": "23-07-2002",
+      "Duty": "Player",
+      "batting": "Left hand Batsman",
+      "bowling": "Slow Left arm Orthodox",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2025"
     }
   ]
 }

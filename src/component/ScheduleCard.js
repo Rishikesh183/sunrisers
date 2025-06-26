@@ -5,7 +5,7 @@ function ScheduleCard({ data }) {
 
     return (
         <div className="matchCardS">
-            <div className="matchNameS font-bold">IPL 2024</div>
+            <div className="matchNameS font-bold">IPL 2025</div>
             <div className="TeamOneS">
                 <div>{data.teamOne || 'Unknown Team 1'}</div>
                 <div>{data.scoreOne || 'N/A'}</div>

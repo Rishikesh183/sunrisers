@@ -6,7 +6,7 @@ function ListCard({ data }) {
 
   return (
       <div className="matchCard">
-          <div className="matchName font-bold">IPL 2024</div>
+          <div className="matchName font-bold">IPL 2025</div>
           <div className="TeamOne">
               <div>{data.teamOne || 'Unknown Team 1'}</div>
               <div>{data.scoreOne || 'N/A'}</div>

@@ -21,19 +21,19 @@ const NewsHome = () => {
                         <div className="w-[16vw] h-[22vh]">
                             <img
                                 className="w-full h-full rounded-xl object-cover shadow-md"
-                                src="https://static.tnn.in/thumb/msid-109168042,thumbsize-43388,width-1280,height-720,resizemode-75/109168042.jpg?quality=100"
+                                src="https://static.cricketaddictor.com/images/SRH.jpg?q=80"
                                 alt=""
                             />
                         </div>
                         <div className="flex flex-col gap-2">
                             <h1 className="text-3xl font-bold text-black uppercase">
-                                Abki baar 300 paar?
+                                Bowling Failure or Batting?
                             </h1>
                             <div className="text-lg font-medium text-gray-700 space-y-2">
-                                <p>Srh aiming for 300 this year </p>
-                                <p>With the explosive batting this year srh are looking more solid</p>
-                                <p>Additon of ishan Kishan makes our batting more explosive</p>
-                                <p>Young guns like Aniket and Abhinav spice up our batting more</p>
+                                <p>Shami , Nitish have been a minus this season</p>
+                                <p>Batting looked confused after LSG's Second Game</p>
+                                <p>Risers made a great comeback at the end</p>
+                                <p>Harsh , Aniket , Zeeshan , Malinga are find of the season</p>
                             </div>
                         </div>
                     </div>
@@ -50,10 +50,10 @@ const NewsHome = () => {
                             </div>
                             <div className="flex flex-col gap-1">
                                 <h1 className="font-bold text-xl uppercase text-black">
-                                    Ishan Mania in Srh
+                                    Ishan & Nitish misfired
                                 </h1>
                                 <p className="text-gray-700 text-base font-medium">
-                                    Ishan kishan's starts with firey knocks in practice matches , Adds more power to risers batting
+                                    After Ishan kishan's century in the first game ishan looked clueless till RCB's Game and Nitish was low in confidence 
                                 </p>
                             </div>
                         </div>
@@ -61,16 +61,16 @@ const NewsHome = () => {
                             <div className="w-[12vw] h-[12vh]">
                                 <img
                                     className="w-full h-full rounded-xl object-cover shadow-md"
-                                    src="https://images.mykhel.com/fit-in/320x180/img/2025/02/pat-cummins-injury-update-ft-1740122017.jpg"
+                                    src="https://akm-img-a-in.tosshub.com/indiatoday/images/story/202505/mohammed-shami-ap-photo-12265746-16x9_0.jpg?VersionId=Lomk8lqptOVFE5tjEpjqNxK0d4mPrJYx&size=690:388"
                                     alt=""
                                 />
                             </div>
                             <div className="flex flex-col gap-1">
                                 <h1 className="font-bold text-xl uppercase text-black">
-                                    Meet & Greet with SRH  
+                                    Shami's Future Doubtful in ornage ?  
                                 </h1>
                                 <p className="text-gray-700 text-base font-medium">
-                                    Risers are all set to meet with fans on 22nd march at Daspally convention 
+                                    With the kind of form shami is having and the price tag he carries it looks difficult to retain shami for next year  
                                 </p>
                             </div>
                         </div>

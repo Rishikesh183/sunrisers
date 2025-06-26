@@ -45,7 +45,7 @@ const Schedule = () => {
                     </ul>
                 </div>
                 <div className="matches-header">
-                    <h2 className="matches-title">SRH SCHEDULE 2024 - schedule & results</h2>
+                    <h2 className="matches-title">SRH 2025 Results - schedule & results</h2>
                     <p className="matches-subtitle">Stay updated with the latest matches of SRH</p>
                 </div>
                 <div className="matches-grid">

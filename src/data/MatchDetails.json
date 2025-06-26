@@ -2,45 +2,44 @@
     "Details": [
       {
         "teamOne": "SRH",
-        "scoreOne": "113-10  [18.4]",
+        "scoreOne": "278-3 [20.0]",
         "teamTwo": "KKR",
-        "scoreTwo": "114-2 [12.2]",
-        "result": "KKR won by 8 wickets"
+        "scoreTwo": "168-10 [18.4]",
+        "result": "SRH won by 110 runs"
       },
       {
         "teamOne": "SRH",
-        "scoreOne": "175-9  [20.0]",
-        "teamTwo": "RR",
-        "scoreTwo": "139-7 [20.0]",
-        "result": "SRH won by 36 runs"
-      },
-      {
-        "teamOne": "SRH",
-        "scoreOne": "159-10  [19.3]",
-        "teamTwo": "KKR",
-        "scoreTwo": "164-2 [13.4]",
-        "result": "KKR won by 8 wickets"
-      },
-      {
-        "teamOne": "PBKS",
-        "scoreOne": "214-5  [20.0]",
-        "teamTwo": "SRH",
-        "scoreTwo": "215-6 [19.1]",
-        "result": "SRH won by 4 wickets"
-      },
-      {
-        "teamOne": "SRH",
-        "scoreOne": "0-0  [0.0]",
-        "teamTwo": "GT",
-        "scoreTwo": "0-0 [0.0]",
-        "result": "Match abondoned without a ball bowled"
+        "scoreOne": "231-6 [20.0]",
+        "teamTwo": "Rcb",
+        "scoreTwo": "189-10 [19.5]",
+        "result": "SRH won by 42 runs"
       },
       {
         "teamOne": "LSG",
-        "scoreOne": "165-4  [20.0]",
+        "scoreOne": "205-7 [20.0]",
         "teamTwo": "SRH",
-        "scoreTwo": "167-0 [9.4]",
-        "result": "SRH won by 10 wickets"
+        "scoreTwo": "206-4 [18.2]",
+        "result": "SRH won by 6 wickets"
+      },
+      {
+        "teamOne": "CSK",
+        "scoreOne": "154-10  [19.5]",
+        "teamTwo": "SRH",
+        "scoreTwo": "155-5 [18.4]",
+        "result": "SRH won by 5 wickets"
+      },{
+        "teamOne": "PBKS",
+        "scoreOne": "245-6  [20.0]",
+        "teamTwo": "SRH",
+        "scoreTwo": "247-2 [18.3]",
+        "result": "SRH won by 8 wickets"
+      },
+      {
+        "teamOne": "SRH",
+        "scoreOne": "286-6  [20.0]",
+        "teamTwo": "RR",
+        "scoreTwo": "242-6 [20]",
+        "result": "SRH won by 40 Runs"
       }
     ]
   }

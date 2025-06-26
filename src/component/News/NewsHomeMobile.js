@@ -9,17 +9,18 @@ const NewsHomeMobile = () => {
             <div className='flex w-full'>
                 <div className='flex flex-col p-4 pt-6 gap-6 w-full border-2 border-gray-100'>
                     <div className='w-full'>
-                        <img className='w-[90vw] m-auto rounded-xl object-cover items-center justify-center' src="https://static.tnn.in/thumb/msid-109168042,thumbsize-43388,width-1280,height-720,resizemode-75/109168042.jpg?quality=100" alt="" />
+                        <img className='w-[90vw] m-auto rounded-xl object-cover items-center justify-center' src="https://static.cricketaddictor.com/images/SRH.jpg?q=80" alt="" />
                     </div>
                     <div className='flex flex-col pb-3'>
                         <div>
                             <h1 className="font-bold text-lg uppercase text-orange-600">
-                                Abki baar 300 paar?
+                                Bowling Failure or Batting?
                             </h1>
                         </div>
                         <div className='flex gap-1 text-sm flex-col font-semibold overflow-auto '>
-                            <p>Srh aiming for 300 this year </p>
-                            <p>Kishan makes batting more explosive</p>
+                            <p>Shami , Nitish have been a minus this season</p>
+                            <p>Batting looked confused after LSG's Second Game</p>
+                            <p>Risers made a great comeback at the end</p>
                         </div>
                     </div>
                 </div>
@@ -42,12 +43,12 @@ const NewsHomeMobile = () => {
                     <div className=' gap-0 flex flex-col overflow-auto'>
                         <div>
                             <h1 className="font-bold text-lg uppercase text-orange-600">
-                                Ishan Mania in Srh
+                                Ishan & Nitish misfired
                             </h1>
                         </div>
                         <div className='flex gap-1 flex-col font-medium'>
                             <p className="text-black text-base font-medium">
-                                Ishan kishan's starts with firey knocks in practice matches , Adds more power to risers batting
+                                After Ishan kishan's century in the first game ishan looked clueless till RCB's Game and Nitish was low in confidence
                             </p>
                         </div>
                     </div>
@@ -57,14 +58,14 @@ const NewsHomeMobile = () => {
             <div className='flex flex-col '>
                 <div className='flex flex-col p-6 pt-2 gap-2 border-2 border-gray-100 bg-slate-50 w-full'>
                     <div className='w-full h-[20vh]'>
-                        <img className='w-[90vw] h-[20vh] m-auto rounded-xl object-cover object-[0_30%] items-center justify-center' src="https://media.ahmedabadmirror.com/am/uploads/mediaGallery/image/1616855803220.jpg-org" alt="" />
+                        <img className='w-[90vw] h-[20vh] m-auto rounded-xl object-cover object-[0_30%] items-center justify-center' src="https://akm-img-a-in.tosshub.com/indiatoday/images/story/202505/mohammed-shami-ap-photo-12265746-16x9_0.jpg?VersionId=Lomk8lqptOVFE5tjEpjqNxK0d4mPrJYx&size=690:388" alt="" />
                     </div>
                     <div className=' gap-0 flex flex-col'>
                         <div>
-                            <h1 className=' font-bold text-lg uppercase text-orange-600'>Meet & Greet with SRH </h1>
+                            <h1 className=' font-bold text-lg uppercase text-orange-600'>Shami's Future Doubtful in ornage ?</h1>
                         </div>
                         <div className='flex gap-1 flex-col font-medium text-sm'>
-                            <p>Risers are all set to meet with fans on 22nd march at Daspally convention</p>
+                            <p>With the kind of form shami is having and the price tag he carries it looks difficult to retain shami for next year</p>
                         </div>
                     </div>
                 </div>
