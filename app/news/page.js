@@ -1,40 +1,10 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import NewsCard from '../../components/News/NewsCard';
+import { getNews } from '../../lib/data/news';
 import '../../styles/NewsMain.css';
-import Loader from '../../components/Loader';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
 
-const NewsMain = () => {
-    const [loader, setloader] = useState(true);
-    const [News, setNews] = useState([]);
+export default async function NewsMain() {
+    const news = await getNews();
 
-    useEffect(() => {
-        const fetchNews = async () => {
-            try {
-                const newsCollection = collection(db, 'news');
-                const q = query(newsCollection, orderBy('timestamp', 'desc'));
-                const querySnapshot = await getDocs(q);
-
-                const newsList = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-
-                setNews(newsList);
-            } catch (error) {
-                console.error('Fetch error:', error);
-            } finally {
-                setloader(false);
-            }
-        };
-        fetchNews();
-    }, []);
-    if (loader) {
-        return <Loader />;
-    }
     return (
         <div className="news-main-container">
             <div className="news-header w-full">
@@ -42,12 +12,10 @@ const NewsMain = () => {
                 <p className="news-subtitle">Stay updated with the latest news on SRH</p>
             </div>
             <div className="news-grid">
-                {News.map(item => (
+                {news.map(item => (
                     <NewsCard key={item.id} data={item} />
                 ))}
             </div>
         </div>
     );
-};
-
-export default NewsMain;
+}

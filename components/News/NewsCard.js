@@ -1,20 +1,12 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const NewsCard = ({ data }) => {
-    const router = useRouter();
-
-    const handleClick = () => {
-        router.push(`/news/${encodeURIComponent(data.title)}`);
-    };
-
     return (
-        <div
-            className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer overflow-hidden
+        <Link
+            href={`/news/${encodeURIComponent(data.title)}`}
+            className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer overflow-hidden
                        w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl
                        mx-auto mb-4 sm:mb-6"
-            onClick={handleClick}
         >
             <div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-72 overflow-hidden">
                 <img
@@ -34,7 +26,7 @@ const NewsCard = ({ data }) => {
                     {data.description || "News Description"}
                 </p>
             </div>
-        </div>
+        </Link>
     );
 };
 

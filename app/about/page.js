@@ -1,6 +1,3 @@
-'use client';
-
-import { useEffect } from 'react';
 import images from '../../components/images.js';
 
 const styles = {
@@ -84,13 +81,6 @@ const styles = {
 };
 
 export default function About() {
-    useEffect(() => {
-        document.body.style.backgroundColor = '#e67e22';
-        return () => {
-            document.body.style.backgroundColor = '';
-        };
-    }, []);
-
     return (
         <div style={styles.container}>
             <h1 style={styles.heading}>Sunrisers Hyderabad</h1>

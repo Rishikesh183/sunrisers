@@ -17,7 +17,6 @@ export default function RootLayout({ children }) {
             <Navbar />
             {children}
           </div>
-          <div id="portal-root" />
         </body>
       </html>
     </ClerkProvider>

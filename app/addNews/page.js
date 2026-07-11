@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { db } from '../../lib/firebase';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
 const AddNews = () => {
   const [title, setTitle] = useState('');
@@ -17,13 +15,13 @@ const AddNews = () => {
     }
 
     try {
-      await addDoc(collection(db, 'news'), {
-        title,
-        description,
-        imageUrl,
-        longDesc,
-        timestamp: Timestamp.now(),
+      const res = await fetch('/api/news', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, imageUrl, longDesc }),
       });
+
+      if (!res.ok) throw new Error('Request failed');
 
       alert('News added successfully!');
       setTitle('');
