@@ -37,7 +37,7 @@ export default function MatchCard({ data, variant = 'home' }) {
 
     return (
         <div className={s.card}>
-            <div className={`${s.name} font-bold`}>IPL 2025</div>
+            <div className={`${s.name} font-bold`}>IPL 2026</div>
             <div className={s.teamOne}>
                 <div>{data.teamOne || 'Unknown Team 1'}</div>
                 <div>{data.scoreOne || 'N/A'}</div>
