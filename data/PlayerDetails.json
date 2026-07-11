@@ -1,0 +1,257 @@
+{
+  "Players": [
+    {
+      "name": "Pat Cummins",
+      "url": "/images/players/Pat-Cummins.webp",
+      "Age": "08-05-1993",
+      "Duty": "Captain",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Fast",
+      "role": "All-rounder",
+      "country": "Australia",
+      "debut": "2014"
+    },
+    {
+      "name": "Abhishek Sharma",
+      "url": "/images/players/Abhishek-Sharma.webp",
+      "Age": "04-09-2000",
+      "Duty": "Vice Captain",
+      "batting": "Left hand Batsman",
+      "bowling": "Slow Left arm Orthodox",
+      "role": "All-rounder",
+      "country": "India",
+      "debut": "2018"
+    },
+    {
+      "name": "Nitish Kumar Reddy",
+      "url": "/images/players/Nitish-Kumar-Reddy.webp",
+      "Age": "26-05-2003",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Medium fast",
+      "role": "All-rounder",
+      "country": "India",
+      "debut": "2024"
+    },
+    {
+      "name": "Heinrich Klaasen",
+      "url": "/images/players/Heinrich-Klaasen.webp",
+      "Age": "30-07-1991",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Offbreak",
+      "role": "Wicketkeeper Batsman",
+      "country": "South Africa",
+      "debut": "2018"
+    },
+    {
+      "name": "Travis Head",
+      "url": "/images/players/Travis-Head.webp",
+      "Age": "29-12-1993",
+      "Duty": "Player",
+      "batting": "Left hand Batsman",
+      "bowling": "Right arm Offbreak",
+      "role": "Top order Batsman",
+      "country": "Australia",
+      "debut": "2017"
+    },
+    {
+      "name": "Mohammed Shami",
+      "url": "/images/players/shami.webp",
+      "Age": "03-09-1990",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Fast",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2013"
+    },
+    {
+      "name": "Harshal Patel",
+      "url": "/images/players/Harshal-Patel.webp",
+      "Age": "23-11-1990",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Medium",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2012"
+    },
+    {
+      "name": "Ishan Kishan",
+      "url": "/images/players/Ishan-Kishan.webp",
+      "Age": "18-07-1998",
+      "Duty": "Player",
+      "batting": "Left hand Batsman",
+      "bowling": "Right arm Medium",
+      "role": "Wicketkeeper Batsman",
+      "country": "India",
+      "debut": "2016"
+    },
+    {
+      "name": "Rahul Chahar",
+      "url": "/images/players/Rahul-Chahar.webp",
+      "Age": "04-08-1999",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Legbreak",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2019"
+    },
+    {
+      "name": "Adam Zampa",
+      "url": "/images/players/Adam-Zampa.webp",
+      "Age": "31-03-1992",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Legbreak",
+      "role": "Bowler",
+      "country": "Australia",
+      "debut": "2016"
+    },
+    {
+      "name": "Atharva Taide",
+      "url": "/images/players/Atharva-Taide.webp",
+      "Age": "26-04-2000",
+      "Duty": "Player",
+      "batting": "Left hand Batsman",
+      "bowling": "Slow Left arm Orthodox",
+      "role": "All-rounder",
+      "country": "India",
+      "debut": "2023"
+    },
+    {
+      "name": "Abhinav Manohar",
+      "url": "/images/players/Abhinav-Manohar.webp",
+      "Age": "16-09-1993",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Legbreak",
+      "role": "Batsman",
+      "country": "India",
+      "debut": "2022"
+    },
+    {
+      "name": "Simarjeet Singh",
+      "url": "/images/players/Simarjeet-Singh.webp",
+      "Age": "17-01-1998",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Fast",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2022"
+    },
+    {
+      "name": "Zeeshan Ansari",
+      "url": "/images/players/Zeeshan-Ansari.webp",
+      "Age": "16-12-2001",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Legbreak",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2025"
+    },
+    {
+      "name": "Jaydev Unadkat",
+      "url": "/images/players/Jaydev-Unadkat.webp",
+      "Age": "18-10-1991",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Left arm Medium",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2010"
+    },
+    {
+      "name": "Brydon Carse",
+      "url": "/images/players/Brydon-Carse.webp",
+      "Age": "31-07-1995",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Fast",
+      "role": "All-rounder",
+      "country": "England",
+      "debut": ""
+    },
+    {
+      "name": "Kamindu Mendis",
+      "url": "/images/players/Kamindu-Mendis.webp",
+      "Age": "30-09-1998",
+      "Duty": "Player",
+      "batting": "Left hand Batsman",
+      "bowling": "Right arm Offbreak",
+      "role": "All-rounder",
+      "country": "Sri Lanka",
+      "debut": "2025"
+    },
+    {
+      "name": "Aniket Verma",
+      "url": "/images/players/Aniket-Verma.webp",
+      "Age": "05-02-2002",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Medium",
+      "role": "Batsman",
+      "country": "India",
+      "debut": "2025"
+    },
+    {
+      "name": "Eshan Malinga",
+      "url": "/images/players/Eshan-Malinga.webp",
+      "Age": "04-02-2001",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Fast",
+      "role": "Bowler",
+      "country": "Sri Lanka",
+      "debut": "2025"
+    },
+    {
+      "name": "Sachin Baby",
+      "url": "/images/players/Sachin-Baby.webp",
+      "Age": "18-12-1988",
+      "Duty": "Player",
+      "batting": "Left hand Batsman",
+      "bowling": "Right arm Offbreak",
+      "role": "Batsman",
+      "country": "India",
+      "debut": "2013"
+    },
+    {
+      "name": "Wiaan Mulder",
+      "url": "/images/players/Wiaan-Mulder.webp",
+      "Age": "19-02-1998",
+      "Duty": "Player",
+      "batting": "Right hand Batsman",
+      "bowling": "Right arm Medium",
+      "role": "All-rounder",
+      "country": "South Africa",
+      "debut": "2025"
+    },
+    {
+      "name": "Ravichandran Smaran",
+      "url": "/images/players/Ravichandran-Smaran.webp",
+      "Age": "05-05-2003",
+      "Duty": "Player",
+      "batting": "Left hand Batsman",
+      "bowling": "Right arm Offbreak",
+      "role": "Batsman",
+      "country": "India",
+      "debut": ""
+    },
+    {
+      "name": "Harsh Dubey",
+      "url": "/images/players/Harsh-Dubey.webp",
+      "Age": "23-07-2002",
+      "Duty": "Player",
+      "batting": "Left hand Batsman",
+      "bowling": "Slow Left arm Orthodox",
+      "role": "Bowler",
+      "country": "India",
+      "debut": "2025"
+    }
+  ]
+}
