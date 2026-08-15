@@ -1,0 +1,107 @@
+[
+  {
+    "teamOne": "SRH",
+    "teamTwo": "RCB",
+    "scoreOne": "201-9 [20.0]",
+    "scoreTwo": "203-4 [15.4]",
+    "result": "RCB won by 6 wickets"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "KKR",
+    "scoreOne": "226-8 [20.0]",
+    "scoreTwo": "161-10 [16.0]",
+    "result": "SRH won by 65 runs"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "LSG",
+    "scoreOne": "156-9 [20.0]",
+    "scoreTwo": "160-5 [19.5]",
+    "result": "LSG won by 5 wickets"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "PBKS",
+    "scoreOne": "219-6 [20.0]",
+    "scoreTwo": "223-4 [18.5]",
+    "result": "PBKS won by 6 wickets"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "RR",
+    "scoreOne": "216-6 [20.0]",
+    "scoreTwo": "159-10 [18.3]",
+    "result": "SRH won by 57 runs"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "CSK",
+    "scoreOne": "194-9 [20.0]",
+    "scoreTwo": "184-8 [20.0]",
+    "result": "SRH won by 10 runs"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "DC",
+    "scoreOne": "242-2 [20.0]",
+    "scoreTwo": "195-9 [20.0]",
+    "result": "SRH won by 47 runs"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "RR",
+    "scoreOne": "229-5 [18.3]",
+    "scoreTwo": "228-6 [20.0]",
+    "result": "SRH won by 5 wickets"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "MI",
+    "scoreOne": "249-4 [18.4]",
+    "scoreTwo": "243-5 [20.0]",
+    "result": "SRH won by 6 wickets"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "KKR",
+    "scoreOne": "165-10 [20.0]",
+    "scoreTwo": "169-3 [18.2]",
+    "result": "KKR won by 7 wickets"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "PBKS",
+    "scoreOne": "235-4 [20.0]",
+    "scoreTwo": "202-7 [20.0]",
+    "result": "SRH won by 33 runs"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "GT",
+    "scoreOne": "86-10 [14.5]",
+    "scoreTwo": "168-5 [20.0]",
+    "result": "GT won by 82 runs"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "CSK",
+    "scoreOne": "181-5 [19.4]",
+    "scoreTwo": "180-7 [20.0]",
+    "result": "SRH won by 5 wickets"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "RCB",
+    "scoreOne": "255-4 [20.0]",
+    "scoreTwo": "200-4 [20.0]",
+    "result": "SRH won by 55 runs"
+  },
+  {
+    "teamOne": "SRH",
+    "teamTwo": "RR",
+    "scoreOne": "192-10 [19.0]",
+    "scoreTwo": "243-8 [20.0]",
+    "result": "RR won by 51 runs (Eliminator)"
+  }
+]

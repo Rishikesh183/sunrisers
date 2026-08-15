@@ -1,0 +1,23 @@
+.scrolling-wrapper-flexbox {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+
+.scrolling-wrapper-flexbox::-webkit-scrollbar {
+  display: none;
+}
+
+.scrolling-wrapper-flexbox {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.card {
+  flex: 0 0 auto;
+}
+
+.container {
+  padding: 10px;
+}

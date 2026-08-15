@@ -1,0 +1,83 @@
+/* News card container */
+.news-card {
+    display: flex;
+    min-height: 20vh;
+    min-width: 35vw;
+    align-items: center;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Hover effect for the news card */
+.news-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+    background: var(--surface-hover);
+    border-color: var(--accent);
+}
+
+.news-image-container {
+    width: 13vw;
+    height: 15vh;
+    flex-shrink: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.news-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Content styling */
+.news-content {
+    margin-left: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+/* Card title */
+.news-card-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+.news-card:hover .news-card-title {
+    color: var(--accent-hover);
+}
+
+/* Card description */
+.news-card-description {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-height: 3.5em;
+    text-overflow: ellipsis;
+}
+
+/* Button for more details */
+.news-card-button {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--accent);
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.news-card-button:hover {
+    color: var(--accent-hover);
+}

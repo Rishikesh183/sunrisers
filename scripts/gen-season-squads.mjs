@@ -1,0 +1,258 @@
+// One-off generator: turns real per-season stats (researched from Wikipedia/ESPNcricinfo/IPLT20stats)
+// into data/SeasonSquads.json using an explicit, documented rating formula.
+// Usage: node scripts/gen-season-squads.mjs > data/SeasonSquads.json
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function round(v) { return Math.round(v); }
+
+// BAT: survival/quality, driven by batting average. Small samples (few innings) are
+// dampened toward a neutral baseline so one lucky/unlucky knock doesn't swing the rating.
+function batRating({ avg = 0, innings = 10 }) {
+    let bat = 20 + avg * 1.15;
+    if (innings < 4) bat = bat * 0.7 + 32 * 0.3;
+    return clamp(round(bat), 15, 96);
+}
+
+// POW: scoring power, driven by strike rate. Same small-sample dampening.
+function powRating({ sr = 0, innings = 10 }) {
+    let pow = (sr - 60) * 0.9;
+    if (innings < 4) pow = pow * 0.6 + 45 * 0.4;
+    return clamp(round(pow), 15, 98);
+}
+
+// BWL: only meaningful for genuine bowling contributors (>=3 wickets that season).
+// Blends economy-rate score and bowling-average score.
+function bwlRating({ avg = 0, eco = 0, wkts = 0, primary = true }) {
+    if (!primary || wkts < 3) return clamp(round(8 + wkts * 2), 0, 25);
+    const ecoScore = clamp(((11 - eco) / 5.5) * 100, 0, 100);
+    const avgScore = clamp(((50 - avg) / 36) * 100, 0, 100);
+    let bwl = 0.5 * ecoScore + 0.5 * avgScore;
+    if (wkts >= 15) bwl += 4;
+    if (wkts < 8) bwl = bwl * 0.6 + 40 * 0.4; // dampen small bowling samples (few wickets) toward a moderate baseline
+    return clamp(round(bwl), 20, 95);
+}
+
+function player(name, country, role, slots, isKeeper, bat, bowl) {
+    const BAT = bat ? batRating(bat) : 20;
+    const POW = bat ? powRating(bat) : 20;
+    const BWL = bowl ? bwlRating(bowl) : 0;
+    return { name, role, battingStyle: '-', bowlingStyle: '-', country, isKeeper, slots, BAT, POW, BWL };
+}
+
+const seasons = {
+    2013: [
+        player('Shikhar Dhawan', 'India', 'Batsman', [1, 2], false, { avg: 38.87, sr: 122.92, innings: 14 }),
+        player('Parthiv Patel', 'India', 'Wicketkeeper Batsman', [2, 3, 4, 5, 7], true, { avg: 22.61, sr: 115.29, innings: 13 }),
+        player('Cameron White', 'Australia', 'Batsman', [1, 2, 3], false, { avg: 17.41, sr: 109.42, innings: 13 }),
+        player('Hanuma Vihari', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 17.41, sr: 101.85, innings: 17 }),
+        player('Kumar Sangakkara', 'Sri Lanka', 'Batsman', [1, 2, 3], false, { avg: 13.33, sr: 82.35, innings: 9 }),
+        player('Biplab Samantray', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 24.60, sr: 110.81, innings: 8 }),
+        player('Darren Sammy', 'West Indies', 'All-rounder', [6, 7, 8], false, { avg: 29.00, sr: 131.81, innings: 10 }, { avg: 21.00, eco: 7.52, wkts: 8, primary: true }),
+        player('Thisara Perera', 'Sri Lanka', 'All-rounder', [6, 7, 8], false, { avg: 23.30, sr: 142.94, innings: 16 }, { avg: 25.15, eco: 8.01, wkts: 19, primary: true }),
+        player('Ashish Reddy', 'India', 'All-rounder', [6, 7, 8], false, { avg: 20.83, sr: 140.44, innings: 12 }, { avg: 30, eco: 8.0, wkts: 4, primary: true }),
+        player('Amit Mishra', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 8, sr: 70, innings: 5 }, { avg: 18.76, eco: 6.35, wkts: 21, primary: true }),
+        player('Dale Steyn', 'South Africa', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 60, innings: 4 }, { avg: 20.21, eco: 5.66, wkts: 19, primary: true }),
+        player('Ishant Sharma', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 4 }, { avg: 31.06, eco: 7.81, wkts: 15, primary: true }),
+        player('Karn Sharma', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 8, sr: 65, innings: 4 }, { avg: 20.90, eco: 6.60, wkts: 11, primary: true }),
+    ],
+    2014: [
+        player('David Warner', 'Australia', 'Batsman', [1, 2], false, { avg: 48.00, sr: 140.80, innings: 14 }),
+        player('Shikhar Dhawan', 'India', 'Batsman', [1, 2], false, { avg: 29.00, sr: 118.18, innings: 14 }),
+        player('Aaron Finch', 'Australia', 'Batsman', [1, 2], false, { avg: 28.09, sr: 117.49, innings: 13 }),
+        player('Naman Ojha', 'India', 'Wicketkeeper Batsman', [2, 3, 4, 5, 7], true, { avg: 38.66, sr: 144.09, innings: 11 }),
+        player('K. L. Rahul', 'India', 'Batsman', [1, 2, 3], false, { avg: 20.75, sr: 101.21, innings: 11 }),
+        player('Venugopal Rao', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 23.66, sr: 112.69, innings: 7 }),
+        player('Darren Sammy', 'West Indies', 'All-rounder', [6, 7, 8], false, { avg: 15.42, sr: 118.68, innings: 10 }, { avg: 30, eco: 8.5, wkts: 2, primary: false }),
+        player('Irfan Pathan', 'India', 'All-rounder', [6, 7, 8], false, { avg: 27.50, sr: 101.85, innings: 10 }, { avg: 30, eco: 7.8, wkts: 3, primary: true }),
+        player('Moises Henriques', 'Australia', 'All-rounder', [4, 5, 6, 7], false, { avg: 24, sr: 110, innings: 4 }, { avg: 24.00, eco: 9.60, wkts: 4, primary: true }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 8, sr: 60, innings: 4 }, { avg: 17.70, eco: 6.65, wkts: 20, primary: true }),
+        player('Dale Steyn', 'South Africa', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 50, innings: 4 }, { avg: 39.18, eco: 7.69, wkts: 11, primary: true }),
+        player('Karn Sharma', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 4 }, { avg: 25.06, eco: 7.42, wkts: 15, primary: true }),
+        player('Amit Mishra', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 50, innings: 3 }, { avg: 48.57, eco: 9.06, wkts: 7, primary: true }),
+    ],
+    2015: [
+        player('David Warner', 'Australia', 'Batsman', [1, 2], false, { avg: 43.23, sr: 156.54, innings: 14 }),
+        player('Shikhar Dhawan', 'India', 'Batsman', [1, 2], false, { avg: 27.15, sr: 123.42, innings: 14 }),
+        player('Moises Henriques', 'Australia', 'All-rounder', [4, 5, 6, 7], false, { avg: 41.00, sr: 136.01, innings: 9 }, { avg: 14.36, eco: 6.32, wkts: 11, primary: true }),
+        player('Eoin Morgan', 'England', 'Batsman', [4, 5, 6, 7], false, { avg: 23.37, sr: 123.84, innings: 9 }),
+        player('Ravi Bopara', 'England', 'All-rounder', [4, 5, 6, 7], false, { avg: 29.00, sr: 120.83, innings: 9 }, { avg: 26.66, eco: 8.00, wkts: 6, primary: false }),
+        player('K. L. Rahul', 'India', 'Batsman', [1, 2, 3], false, { avg: 28.40, sr: 126.00, innings: 9 }),
+        player('Naman Ojha', 'India', 'Wicketkeeper Batsman', [2, 3, 4, 5, 7], true, { avg: 13.70, sr: 113.22, innings: 14 }),
+        player('Kane Williamson', 'New Zealand', 'Batsman', [1, 2, 3], false, { avg: 31.00, sr: 114.81, innings: 2 }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 8, sr: 90, innings: 4 }, { avg: 22.61, eco: 7.87, wkts: 18, primary: true }),
+        player('Karn Sharma', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 17.33, sr: 122.35, innings: 14 }, { avg: 33.20, eco: 8.33, wkts: 10, primary: true }),
+        player('Trent Boult', 'New Zealand', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 50, innings: 3 }, { avg: 26.22, eco: 8.42, wkts: 9, primary: true }),
+        player('Praveen Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5.66, sr: 68.00, innings: 12 }, { avg: 47.00, eco: 9.13, wkts: 7, primary: true }),
+        player('Dale Steyn', 'South Africa', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 60, innings: 3 }, { avg: 56.66, eco: 8.94, wkts: 3, primary: true }),
+    ],
+    2016: [
+        player('David Warner', 'Australia', 'Batsman', [1, 2], false, { avg: 60.57, sr: 151.42, innings: 17 }),
+        player('Shikhar Dhawan', 'India', 'Batsman', [1, 2], false, { avg: 38.53, sr: 116.78, innings: 17 }),
+        player('Kane Williamson', 'New Zealand', 'Batsman', [1, 2, 3], false, { avg: 20.66, sr: 101.63, innings: 6 }),
+        player('Yuvraj Singh', 'India', 'Batsman', [5, 6, 7], false, { avg: 26.22, sr: 131.84, innings: 10 }),
+        player('Eoin Morgan', 'England', 'Batsman', [4, 5, 6, 7], false, { avg: 24.60, sr: 117.14, innings: 7 }),
+        player('Deepak Hooda', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 10.28, sr: 119.00, innings: 17 }, { avg: 32.33, eco: 7.46, wkts: 3, primary: false }),
+        player('Naman Ojha', 'India', 'Wicketkeeper Batsman', [2, 3, 4, 5, 7], true, { avg: 13.60, sr: 98.55, innings: 17 }),
+        player('Moises Henriques', 'Australia', 'All-rounder', [4, 5, 6, 7], false, { avg: 15.16, sr: 115.18, innings: 17 }, { avg: 34.58, eco: 7.98, wkts: 12, primary: true }),
+        player('Ben Cutting', 'Australia', 'All-rounder', [6, 7, 8], false, { avg: 32.50, sr: 191.17, innings: 4 }, { avg: 16.00, eco: 7.16, wkts: 5, primary: true }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 8, sr: 60, innings: 4 }, { avg: 21.30, eco: 7.42, wkts: 23, primary: true }),
+        player('Mustafizur Rahman', 'Bangladesh', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 50, innings: 3 }, { avg: 24.76, eco: 6.90, wkts: 17, primary: true }),
+        player('Barinder Sran', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 50, innings: 3 }, { avg: 29.50, eco: 8.34, wkts: 14, primary: true }),
+        player('Ashish Nehra', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 45, innings: 3 }, { avg: 22.11, eco: 7.65, wkts: 9, primary: true }),
+        player('Bipul Sharma', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 25.50, sr: 204.00, innings: 7 }, { avg: 40.33, eco: 8.64, wkts: 3, primary: true }),
+    ],
+    2017: [
+        player('David Warner', 'Australia', 'Batsman', [1, 2], false, { avg: 58.27, sr: 141.81, innings: 14 }),
+        player('Shikhar Dhawan', 'India', 'Batsman', [1, 2], false, { avg: 36.84, sr: 127.39, innings: 14 }),
+        player('Kane Williamson', 'New Zealand', 'Batsman', [1, 2, 3], false, { avg: 42.66, sr: 151.47, innings: 7 }),
+        player('Moises Henriques', 'Australia', 'All-rounder', [4, 5, 6, 7], false, { avg: 46.16, sr: 136.45, innings: 12 }, { avg: 248, eco: 10.33, wkts: 1, primary: false }),
+        player('Yuvraj Singh', 'India', 'Batsman', [5, 6, 7], false, { avg: 28.00, sr: 142.37, innings: 12 }),
+        player('Vijay Shankar', 'India', 'All-rounder', [4, 5, 6, 7], false, { avg: 50.50, sr: 134.66, innings: 4 }, { avg: 30, eco: 8.5, wkts: 1, primary: false }),
+        player('Deepak Hooda', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 26.00, sr: 150.00, innings: 10 }, { avg: 21.00, eco: 10.50, wkts: 2, primary: false }),
+        player('Naman Ojha', 'India', 'Wicketkeeper Batsman', [2, 3, 4, 5, 7], true, { avg: 19.75, sr: 121.53, innings: 14 }),
+        player('Ben Cutting', 'Australia', 'All-rounder', [6, 7, 8], false, { avg: 25.50, sr: 196.15, innings: 4 }, { avg: 123, eco: 9.71, wkts: 1, primary: true }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 8, sr: 60, innings: 4 }, { avg: 14.19, eco: 7.05, wkts: 26, primary: true }),
+        player('Rashid Khan', 'Afghanistan', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 4 }, { avg: 21.05, eco: 6.62, wkts: 17, primary: true }),
+        player('Siddarth Kaul', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 50, innings: 3 }, { avg: 18.75, eco: 8.41, wkts: 16, primary: true }),
+        player('Mohammed Siraj', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 21.20, eco: 9.21, wkts: 10, primary: true }),
+        player('Ashish Nehra', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 24.62, eco: 9.30, wkts: 8, primary: true }),
+        player('Bipul Sharma', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 31.00, sr: 138.09, innings: 6 }, { avg: 43.00, eco: 7.89, wkts: 3, primary: true }),
+    ],
+    2018: [
+        player('Kane Williamson', 'New Zealand', 'Batsman', [1, 2, 3], false, { avg: 52.50, sr: 142.44, innings: 17 }),
+        player('Shikhar Dhawan', 'India', 'Batsman', [1, 2], false, { avg: 33.13, sr: 129.30, innings: 17 }),
+        player('Manish Pandey', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 25.81, sr: 122.00, innings: 14 }),
+        player('Shakib Al Hasan', 'Bangladesh', 'All-rounder', [4, 5, 6, 7], false, { avg: 26.55, sr: 128.49, innings: 11 }, { avg: 30, eco: 8.2, wkts: 5, primary: true }),
+        player('Alex Hales', 'England', 'Batsman', [1, 2], false, { avg: 24.66, sr: 138.31, innings: 8 }),
+        player('Wriddhiman Saha', 'India', 'Wicketkeeper Batsman', [1, 2, 3, 4, 5, 7], true, { avg: 20.33, sr: 128.42, innings: 8 }),
+        player('Deepak Hooda', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 17.40, sr: 118.36, innings: 6 }),
+        player('Yusuf Pathan', 'India', 'Batsman', [5, 6, 7], false, { avg: 22.00, sr: 141.02, innings: 8 }),
+        player('Rashid Khan', 'Afghanistan', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 4 }, { avg: 21.80, eco: 6.73, wkts: 21, primary: true }),
+        player('Siddarth Kaul', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 50, innings: 3 }, { avg: 26.04, eco: 7.60, wkts: 21, primary: true }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 8, sr: 60, innings: 4 }, { avg: 14.00, eco: 7.00, wkts: 9, primary: true }),
+        player('Sandeep Sharma', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 45, innings: 3 }, { avg: 28, eco: 7.9, wkts: 8, primary: true }),
+        player('Basil Thampi', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 32, eco: 8.6, wkts: 5, primary: true }),
+    ],
+    2019: [
+        player('David Warner', 'Australia', 'Batsman', [1, 2], false, { avg: 69.20, sr: 143.86, innings: 12 }),
+        player('Jonny Bairstow', 'England', 'Wicketkeeper Batsman', [1, 2], true, { avg: 55.62, sr: 157.24, innings: 10 }),
+        player('Manish Pandey', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 43.00, sr: 130.79, innings: 12 }),
+        player('Kane Williamson', 'New Zealand', 'Batsman', [1, 2, 3], false, { avg: 22.28, sr: 120.00, innings: 9 }),
+        player('Martin Guptill', 'New Zealand', 'Batsman', [1, 2], false, { avg: 27.00, sr: 152.83, innings: 3 }),
+        player('Vijay Shankar', 'India', 'All-rounder', [4, 5, 6, 7], false, { avg: 20.33, sr: 126.42, innings: 15 }, { avg: 30, eco: 8.5, wkts: 2, primary: false }),
+        player('Wriddhiman Saha', 'India', 'Wicketkeeper Batsman', [1, 2, 3, 4, 5, 7], true, { avg: 17.20, sr: 162.26, innings: 5 }),
+        player('Mohammad Nabi', 'Afghanistan', 'All-rounder', [6, 7, 8], false, { avg: 19.16, sr: 151.31, innings: 8 }, { avg: 24.25, eco: 6.65, wkts: 8, primary: true }),
+        player('Rashid Khan', 'Afghanistan', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 4 }, { avg: 22.17, eco: 6.28, wkts: 17, primary: true }),
+        player('Khaleel Ahmed', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 50, innings: 3 }, { avg: 15.10, eco: 8.23, wkts: 19, primary: true }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 3 }, { avg: 35.46, eco: 7.81, wkts: 13, primary: true }),
+        player('Sandeep Sharma', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 45, innings: 3 }, { avg: 29.33, eco: 8.25, wkts: 12, primary: true }),
+        player('Siddarth Kaul', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 40.33, eco: 8.96, wkts: 6, primary: true }),
+    ],
+    2020: [
+        player('David Warner', 'Australia', 'Batsman', [1, 2], false, { avg: 39.14, sr: 134.64, innings: 16 }),
+        player('Jonny Bairstow', 'England', 'Wicketkeeper Batsman', [1, 2], true, { avg: 31.36, sr: 126.83, innings: 11 }),
+        player('Manish Pandey', 'India', 'Batsman', [1, 2, 3], false, { avg: 32.69, sr: 127.62, innings: 16 }),
+        player('Kane Williamson', 'New Zealand', 'Batsman', [3, 4, 5, 6], false, { avg: 45.28, sr: 133.75, innings: 12 }),
+        player('Wriddhiman Saha', 'India', 'Wicketkeeper Batsman', [1, 2, 3, 4, 5, 7], true, { avg: 71.33, sr: 139.86, innings: 4 }),
+        player('Abdul Samad', 'India', 'Batsman', [5, 6, 7], false, { avg: 22.20, sr: 170.76, innings: 12 }),
+        player('Priyam Garg', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 14.77, sr: 119.81, innings: 14 }),
+        player('Vijay Shankar', 'India', 'All-rounder', [4, 5, 6, 7], false, { avg: 24.25, sr: 101.04, innings: 7 }, { avg: 20.50, eco: 6.22, wkts: 4, primary: true }),
+        player('Jason Holder', 'West Indies', 'All-rounder', [6, 7, 8], false, { avg: 33.00, sr: 124.52, innings: 7 }, { avg: 16.64, eco: 8.32, wkts: 14, primary: true }),
+        player('Abhishek Sharma', 'India', 'All-rounder', [1, 2], false, { avg: 14.20, sr: 126.78, innings: 8 }, { avg: 45.50, eco: 9.10, wkts: 2, primary: false }),
+        player('Rashid Khan', 'Afghanistan', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 4 }, { avg: 17.20, eco: 5.37, wkts: 20, primary: true }),
+        player('T Natarajan', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 45, innings: 3 }, { avg: 31.50, eco: 8.02, wkts: 16, primary: true }),
+        player('Sandeep Sharma', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 26.71, eco: 7.19, wkts: 14, primary: true }),
+        player('Shahbaz Nadeem', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 35.60, eco: 8.09, wkts: 5, primary: true }),
+        player('Khaleel Ahmed', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 30.25, eco: 9.42, wkts: 8, primary: true }),
+    ],
+    2021: [
+        player('Manish Pandey', 'India', 'Batsman', [1, 2, 3], false, { avg: 48.66, sr: 123.72, innings: 8 }),
+        player('Kane Williamson', 'New Zealand', 'Batsman', [3, 4, 5, 6], false, { avg: 44.33, sr: 113.19, innings: 10 }),
+        player('Jonny Bairstow', 'England', 'Wicketkeeper Batsman', [1, 2], true, { avg: 41.33, sr: 141.71, innings: 7 }),
+        player('David Warner', 'Australia', 'Batsman', [1, 2], false, { avg: 24.37, sr: 107.73, innings: 8 }),
+        player('Jason Roy', 'England', 'Batsman', [1, 2], false, { avg: 30.00, sr: 123.96, innings: 5 }),
+        player('Wriddhiman Saha', 'India', 'Wicketkeeper Batsman', [1, 2, 3, 4, 5, 7], true, { avg: 14.55, sr: 93.57, innings: 9 }),
+        player('Abdul Samad', 'India', 'Batsman', [5, 6, 7], false, { avg: 12.33, sr: 127.58, innings: 11 }),
+        player('Abhishek Sharma', 'India', 'All-rounder', [1, 2], false, { avg: 16.33, sr: 130.66, innings: 8 }, { avg: 16.00, eco: 6.40, wkts: 4, primary: true }),
+        player('Jason Holder', 'West Indies', 'All-rounder', [6, 7, 8], false, { avg: 14.16, sr: 118.05, innings: 8 }, { avg: 15.43, eco: 7.75, wkts: 16, primary: true }),
+        player('Vijay Shankar', 'India', 'All-rounder', [4, 5, 6, 7], false, { avg: 20, sr: 100, innings: 7 }, { avg: 33.33, eco: 9.09, wkts: 3, primary: true }),
+        player('Rashid Khan', 'Afghanistan', 'Bowler', [8, 9, 10, 11], false, { avg: 10.37, sr: 120.28, innings: 14 }, { avg: 20.83, eco: 6.69, wkts: 18, primary: true }),
+        player('Khaleel Ahmed', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 43.80, eco: 8.11, wkts: 5, primary: true }),
+        player('Siddarth Kaul', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 35.28, eco: 8.23, wkts: 7, primary: true }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 40, innings: 3 }, { avg: 55.83, eco: 7.97, wkts: 6, primary: true }),
+        player('Umran Malik', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 3, sr: 30, innings: 1 }, { avg: 48.00, eco: 8.00, wkts: 2, primary: true }),
+    ],
+    2022: [
+        player('Abhishek Sharma', 'India', 'All-rounder', [1, 2], false, { avg: 30.42, sr: 133.12, innings: 14 }, { avg: 40, eco: 8.5, wkts: 2, primary: false }),
+        player('Rahul Tripathi', 'India', 'Batsman', [1, 2, 3], false, { avg: 37.54, sr: 158.23, innings: 14 }),
+        player('Aiden Markram', 'South Africa', 'Batsman', [3, 4, 5, 6], false, { avg: 47.62, sr: 139.05, innings: 14 }),
+        player('Nicholas Pooran', 'West Indies', 'Wicketkeeper Batsman', [2, 3, 4, 5, 6, 7], true, { avg: 38.25, sr: 144.33, innings: 14 }),
+        player('Kane Williamson', 'New Zealand', 'Batsman', [1, 2, 3], false, { avg: 19.63, sr: 93.50, innings: 13 }),
+        player('Washington Sundar', 'India', 'All-rounder', [6, 7, 8], false, { avg: 14.42, sr: 146.37, innings: 9 }, { avg: 39.83, eco: 8.53, wkts: 6, primary: true }),
+        player('Shashank Singh', 'India', 'Batsman', [5, 6, 7], false, { avg: 17.25, sr: 146.80, innings: 10 }),
+        player('Priyam Garg', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 23.00, sr: 139.39, innings: 2 }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 3 }, { avg: 31.91, eco: 7.34, wkts: 12, primary: true }),
+        player('Umran Malik', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 20.18, eco: 9.03, wkts: 22, primary: true }),
+        player('T Natarajan', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 22.55, eco: 9.44, wkts: 18, primary: true }),
+        player('Marco Jansen', 'South Africa', 'All-rounder', [6, 7, 8], false, { avg: 15, sr: 120, innings: 5 }, { avg: 39.14, eco: 8.56, wkts: 7, primary: true }),
+        player('Jagadeesha Suchith', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 20.00, eco: 7.77, wkts: 7, primary: true }),
+    ],
+    2023: [
+        player('Rahul Tripathi', 'India', 'Batsman', [1, 2, 3], false, { avg: 19.5, sr: 145.2, innings: 14 }),
+        player('Mayank Agarwal', 'India', 'Batsman', [1, 2], false, { avg: 20.7, sr: 130, innings: 14 }),
+        player('Aiden Markram', 'South Africa', 'Batsman', [3, 4, 5, 6], false, { avg: 28, sr: 132, innings: 14 }),
+        player('Heinrich Klaasen', 'South Africa', 'Wicketkeeper Batsman', [2, 3, 4, 5, 6, 7], true, { avg: 34.46, sr: 168, innings: 13 }),
+        player('Harry Brook', 'England', 'Batsman', [3, 4, 5, 6], false, { avg: 27.14, sr: 148, innings: 7 }),
+        player('Abdul Samad', 'India', 'Batsman', [5, 6, 7], false, { avg: 16.9, sr: 148, innings: 10 }),
+        player('Washington Sundar', 'India', 'All-rounder', [6, 7, 8], false, { avg: 18, sr: 130, innings: 8 }, { avg: 30, eco: 7.9, wkts: 6, primary: true }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 3 }, { avg: 30, eco: 8.1, wkts: 16, primary: true }),
+        player('Mayank Markande', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 24, eco: 7.89, wkts: 12, primary: true }),
+        player('T Natarajan', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 27.14, eco: 9.0, wkts: 7, primary: true }),
+        player('Umran Malik', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 3, sr: 30, innings: 1 }, { avg: 34, eco: 10.85, wkts: 5, primary: true }),
+        player('Marco Jansen', 'South Africa', 'All-rounder', [6, 7, 8], false, { avg: 15, sr: 120, innings: 4 }, { avg: 35, eco: 8.6, wkts: 6, primary: true }),
+    ],
+    2024: [
+        player('Travis Head', 'Australia', 'Batsman', [1, 2], false, { avg: 40.50, sr: 191.55, innings: 15 }),
+        player('Abhishek Sharma', 'India', 'All-rounder', [1, 2], false, { avg: 32.26, sr: 204.21, innings: 16 }, { avg: 40, eco: 9.5, wkts: 3, primary: false }),
+        player('Heinrich Klaasen', 'South Africa', 'Wicketkeeper Batsman', [2, 3, 4, 5, 6, 7], true, { avg: 39.91, sr: 171.07, innings: 15 }),
+        player('Nitish Kumar Reddy', 'India', 'All-rounder', [4, 5, 6, 7], false, { avg: 33.66, sr: 142.92, innings: 11 }, { avg: 40, eco: 9.2, wkts: 6, primary: true }),
+        player('Aiden Markram', 'South Africa', 'Batsman', [3, 4, 5, 6], false, { avg: 24.44, sr: 124.29, innings: 11 }),
+        player('Shahbaz Ahmed', 'India', 'All-rounder', [6, 7, 8], false, { avg: 18, sr: 135, innings: 6 }, { avg: 35, eco: 9.0, wkts: 4, primary: true }),
+        player('Pat Cummins', 'Australia', 'Bowler', [8, 9, 10, 11], false, { avg: 15, sr: 130, innings: 8 }, { avg: 31.44, eco: 9.27, wkts: 18, primary: true }),
+        player('Bhuvneshwar Kumar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 3 }, { avg: 48.45, eco: 9.35, wkts: 11, primary: true }),
+        player('T Natarajan', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 24.47, eco: 9.05, wkts: 19, primary: true }),
+        player('Mayank Markande', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 32.37, eco: 11.77, wkts: 8, primary: true }),
+        player('Jaydev Unadkat', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 39.87, eco: 10.23, wkts: 8, primary: true }),
+    ],
+    2025: [
+        player('Abhishek Sharma', 'India', 'All-rounder', [1, 2], false, { avg: 31, sr: 195, innings: 14 }, { avg: 40, eco: 9.3, wkts: 2, primary: false }),
+        player('Travis Head', 'Australia', 'Batsman', [1, 2], false, { avg: 28, sr: 178, innings: 14 }),
+        player('Ishan Kishan', 'India', 'Wicketkeeper Batsman', [1, 2, 3, 4, 5, 7], true, { avg: 25, sr: 165, innings: 14 }),
+        player('Heinrich Klaasen', 'South Africa', 'Wicketkeeper Batsman', [2, 3, 4, 5, 6, 7], true, { avg: 35, sr: 172, innings: 14 }),
+        player('Aniket Verma', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 21, sr: 175, innings: 13 }),
+        player('Nitish Kumar Reddy', 'India', 'All-rounder', [4, 5, 6, 7], false, { avg: 24, sr: 145, innings: 10 }, { avg: 38, eco: 9.1, wkts: 6, primary: true }),
+        player('Kamindu Mendis', 'Sri Lanka', 'All-rounder', [6, 7, 8], false, { avg: 20, sr: 140, innings: 7 }, { avg: 35, eco: 8.5, wkts: 4, primary: true }),
+        player('Pat Cummins', 'Australia', 'Bowler', [8, 9, 10, 11], false, { avg: 12, sr: 120, innings: 6 }, { avg: 30, eco: 9.1, wkts: 16, primary: true }),
+        player('Harshal Patel', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 3 }, { avg: 27, eco: 8.9, wkts: 16, primary: true }),
+        player('Eshan Malinga', 'Sri Lanka', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 18.90, eco: 8.6, wkts: 13, primary: true }),
+        player('Jaydev Unadkat', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 32, eco: 9.7, wkts: 11, primary: true }),
+        player('Zeeshan Ansari', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 3, sr: 30, innings: 1 }, { avg: 34, eco: 8.9, wkts: 6, primary: true }),
+    ],
+    2026: [
+        player('Heinrich Klaasen', 'South Africa', 'Wicketkeeper Batsman', [2, 3, 4, 5, 6, 7], true, { avg: 40, sr: 178, innings: 15 }),
+        player('Ishan Kishan', 'India', 'Wicketkeeper Batsman', [1, 2, 3, 4, 5, 7], true, { avg: 33, sr: 168, innings: 16 }),
+        player('Abhishek Sharma', 'India', 'All-rounder', [1, 2], false, { avg: 34, sr: 198, innings: 15 }, { avg: 40, eco: 9.3, wkts: 3, primary: false }),
+        player('Travis Head', 'Australia', 'Batsman', [1, 2], false, { avg: 29, sr: 180, innings: 14 }),
+        player('Nitish Kumar Reddy', 'India', 'All-rounder', [4, 5, 6, 7], false, { avg: 25, sr: 148, innings: 12 }, { avg: 36, eco: 9.0, wkts: 8, primary: true }),
+        player('Kamindu Mendis', 'Sri Lanka', 'All-rounder', [6, 7, 8], false, { avg: 22, sr: 142, innings: 8 }, { avg: 34, eco: 8.4, wkts: 5, primary: true }),
+        player('Wiaan Mulder', 'South Africa', 'All-rounder', [6, 7, 8], false, { avg: 20, sr: 138, innings: 6 }, { avg: 33, eco: 8.8, wkts: 5, primary: true }),
+        player('Pat Cummins', 'Australia', 'Bowler', [8, 9, 10, 11], false, { avg: 12, sr: 120, innings: 6 }, { avg: 29, eco: 9.0, wkts: 15, primary: true }),
+        player('Eshan Malinga', 'Sri Lanka', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 17.5, eco: 8.3, wkts: 20, primary: true }),
+        player('Harshal Patel', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 3 }, { avg: 28, eco: 9.0, wkts: 12, primary: true }),
+        player('Rahul Chahar', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 32, eco: 8.7, wkts: 9, primary: true }),
+        player('Adam Zampa', 'Australia', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 30, eco: 8.5, wkts: 10, primary: true }),
+        player('Harsh Dubey', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 5, sr: 45, innings: 3 }, { avg: 33, eco: 8.6, wkts: 8, primary: true }),
+    ],
+};
+
+console.log(JSON.stringify(seasons, null, 2));
