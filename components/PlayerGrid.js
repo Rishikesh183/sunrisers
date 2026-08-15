@@ -10,27 +10,9 @@ export default function PlayerGrid({ players }) {
 
     return (
         <>
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                marginBottom: 'clamp(10px, 2vw, 20px)',
-                width: '100%'
-            }}>
+            <div className="flex justify-center mb-4 sm:mb-5 w-full">
                 <select
-                    style={{
-                        backgroundColor: '#FF4B33',
-                        color: 'BLACK',
-                        border: 'none',
-                        borderRadius: '8px',
-                        padding: '5px 10px',
-                        fontSize: 'clamp(0.875rem, 2vw, 1rem)',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s ease',
-                        height: 'clamp(35px, 5vw, 45px)',
-                        width: 'clamp(200px, 50%, 300px)',
-                    }}
-                    className="form-select"
+                    className="form-select bg-accent text-white border-none rounded-lg px-3 py-2 text-sm sm:text-base font-medium cursor-pointer transition-colors hover:bg-accentHover h-[38px] sm:h-[45px] w-[200px] sm:w-[260px]"
                     onChange={capture}
                 >
                     <option value="">All Players</option>
@@ -42,16 +24,10 @@ export default function PlayerGrid({ players }) {
             </div>
 
             <div className="container">
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(250px, 80%, 300px), 1fr))',
-                    gap: 'clamp(10px, 2vw, 20px)',
-                    justifyContent: 'center',
-                    margin: '0 auto'
-                }}>
+                <div className="grid gap-4 sm:gap-5 justify-center mx-auto grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
                     {players.filter(player => player.role.includes(query)).map((player, index) => (
                         <div
-                            style={{ display: 'flex', justifyContent: 'center' }}
+                            className="flex justify-center"
                             key={index}
                         >
                             <Playercard

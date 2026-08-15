@@ -4,7 +4,7 @@ const NewsCard = ({ data }) => {
     return (
         <Link
             href={`/news/${encodeURIComponent(data.title)}`}
-            className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer overflow-hidden
+            className="block bg-surface border border-border rounded-xl hover:border-accent/40 hover:bg-surfaceHover transition-colors duration-300 cursor-pointer overflow-hidden
                        w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl
                        mx-auto mb-4 sm:mb-6"
         >
@@ -17,12 +17,12 @@ const NewsCard = ({ data }) => {
             </div>
 
             <div className="p-4 sm:p-5 md:p-6">
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2 sm:mb-3
-                              line-clamp-2 hover:text-blue-600 transition-colors duration-200">
+                <h1 className="font-display text-lg sm:text-xl md:text-2xl text-text mb-2 sm:mb-3
+                              line-clamp-2 hover:text-accent transition-colors duration-200">
                     {data.title || "News Title"}
                 </h1>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-3">
+                <p className="text-sm sm:text-base text-textMuted leading-relaxed line-clamp-3">
                     {data.description || "News Description"}
                 </p>
             </div>

@@ -2,16 +2,16 @@
   display: flex;
   flex-wrap: nowrap;
   overflow-x: auto;
-  background-image: url(https://www.sunrisershyderabad.in/dist/img/home/social_hub_bg.jpg);
+  padding: 8px 0;
 }
 
 .scrolling-wrapper-flexbox::-webkit-scrollbar {
-  display: none; 
+  display: none;
 }
 
 .scrolling-wrapper-flexbox {
-  -ms-overflow-style: none;  
-  scrollbar-width: none;     
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .card {

@@ -9,11 +9,11 @@ export default async function Schedule() {
 
     return (
         <div className="matches-main-container">
-            <div className='bg-orange-500 w-full '>
-                <ul className='flex text-white mx-3 p-1 px-4 justify-around text-xl'>
-                    <Link href="/Matches/live">Live</Link>
-                    <Link href="/Matches/upcoming">Upcoming</Link>
-                    <Link href="/Matches">recent</Link>
+            <div className="w-full border-b border-border bg-surface">
+                <ul className="flex mx-auto max-w-2xl gap-2 p-3 px-4 justify-around text-base font-semibold">
+                    <li className="px-4 py-1.5 rounded-full text-textMuted hover:text-accent transition-colors"><Link href="/Matches/live">Live</Link></li>
+                    <li className="px-4 py-1.5 rounded-full text-textMuted hover:text-accent transition-colors"><Link href="/Matches/upcoming">Upcoming</Link></li>
+                    <li className="px-4 py-1.5 rounded-full bg-accent text-white"><Link href="/Matches">Recent</Link></li>
                 </ul>
             </div>
             <div className="matches-header">

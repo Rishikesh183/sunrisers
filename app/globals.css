@@ -2,14 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@400..800&display=swap');
-
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --surface-hover: #232f42;
+  --border: #2a3548;
+  --text: #e8ecf1;
+  --text-muted: #8b96a8;
+  --accent: #ff6b1a;
+  --accent-hover: #ff8433;
+  --accent-muted: #ff6b1a1a;
+  --win: #3ecf8e;
+  --loss: #ef4a4a;
+}
 
 body {
   margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif , 'bal';
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -18,8 +31,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-.bg-Image{
-  background-image: url(https://www.sunrisershyderabad.in/dist/img/home/social_hub_bg.jpg);
-}
-

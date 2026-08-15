@@ -12,8 +12,8 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider afterSignOutUrl="/">
       <html lang="en">
-        <body>
-          <div className="app">
+        <body className="bg-bg text-text">
+          <div className="app min-h-screen bg-bg">
             <Navbar />
             {children}
           </div>

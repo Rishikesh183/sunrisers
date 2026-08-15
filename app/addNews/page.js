@@ -35,14 +35,14 @@ const AddNews = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-gradient-to-r from-cyan-500 to-teal-600 rounded-xl shadow-xl w-full max-w-xl overflow-hidden">
+    <div className="flex justify-center items-center min-h-screen bg-bg px-4">
+      <div className="bg-surface border border-border rounded-xl shadow-xl w-full max-w-xl overflow-hidden">
         <div className="flex flex-col gap-6 p-8">
-          <h2 className="font-bold capitalize text-3xl text-white">Add News</h2>
+          <h2 className="font-display capitalize text-2xl sm:text-3xl text-accent">Add News</h2>
 
           <div className="space-y-4 w-full">
             <input
-              className="rounded-lg w-full h-10 px-4 shadow-sm focus:ring-2 focus:ring-cyan-300 focus:outline-none"
+              className="rounded-lg w-full h-10 px-4 bg-bg border border-border text-text placeholder:text-textMuted shadow-sm focus:ring-2 focus:ring-accent focus:outline-none"
               type="text"
               placeholder="Title"
               value={title}
@@ -50,21 +50,21 @@ const AddNews = () => {
             />
 
             <textarea
-              className="rounded-lg w-full p-4 h-24 shadow-sm resize-none focus:ring-2 focus:ring-cyan-300 focus:outline-none"
+              className="rounded-lg w-full p-4 h-24 bg-bg border border-border text-text placeholder:text-textMuted shadow-sm resize-none focus:ring-2 focus:ring-accent focus:outline-none"
               placeholder="Description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
 
             <textarea
-              className="rounded-lg w-full p-4 h-32 shadow-sm resize-none focus:ring-2 focus:ring-cyan-300 focus:outline-none"
+              className="rounded-lg w-full p-4 h-32 bg-bg border border-border text-text placeholder:text-textMuted shadow-sm resize-none focus:ring-2 focus:ring-accent focus:outline-none"
               placeholder="Long Description"
               value={longDesc}
               onChange={(e) => setLongDesc(e.target.value)}
             />
 
             <input
-              className="rounded-lg w-full h-10 px-4 shadow-sm focus:ring-2 focus:ring-cyan-300 focus:outline-none"
+              className="rounded-lg w-full h-10 px-4 bg-bg border border-border text-text placeholder:text-textMuted shadow-sm focus:ring-2 focus:ring-accent focus:outline-none"
               type="text"
               placeholder="Image URL"
               value={imageUrl}
@@ -72,7 +72,7 @@ const AddNews = () => {
             />
 
             <button
-              className="bg-white text-teal-600 font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-gray-50 transition duration-200 focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:outline-none w-full mt-2"
+              className="bg-accent text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-accentHover transition duration-200 focus:ring-2 focus:ring-accent focus:ring-opacity-50 focus:outline-none w-full mt-2"
               onClick={handleUpload}
             >
               Add News

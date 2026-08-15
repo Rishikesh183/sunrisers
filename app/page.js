@@ -21,19 +21,22 @@ export default async function Home() {
 
     return (
         <>
-            <div className="scrolling-wrapper-flexbox">
-                {matches.map((item) => (
-                    <MatchCard key={item.id} data={item} variant="home" />
-                ))}
+            <div className="px-2 pt-4">
+                <h2 className="font-display text-xl text-text tracking-wide px-3 pb-1">Recent Matches</h2>
+                <div className="scrolling-wrapper-flexbox">
+                    {matches.map((item) => (
+                        <MatchCard key={item.id} data={item} variant="home" />
+                    ))}
+                </div>
             </div>
-            <div className="flex justify-center py-4">
+            {/* <div className="flex justify-center py-6">
                 <Link
                     href="/Matches"
-                    className="px-6 py-2 text-white bg-orange-600 rounded-lg shadow-md hover:bg-orange-700 transition duration-300 font-semibold"
+                    className="px-6 py-2 text-white bg-accent rounded-lg shadow-md hover:bg-accentHover transition duration-300 font-semibold"
                 >
                     View more matches
                 </Link>
-            </div>
+            </div> */}
             <NewsHome />
             <BottomSection />
         </>
