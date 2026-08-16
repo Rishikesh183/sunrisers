@@ -12,16 +12,32 @@ import { getBestScore, hasShownLoginPrompt, markLoginPromptShown, saveResult } f
 
 const MAX_FOREIGNERS = 4;
 
-function randomYear(years, exclude) {
-    const pool = exclude != null && years.length > 1 ? years.filter((y) => y !== exclude) : years;
-    return pool[Math.floor(Math.random() * pool.length)];
+// A year is "playable" if at least one of its players can still legally be picked
+// (not already drafted, has an empty eligible slot, and isn't blocked by the foreigner cap).
+// Landing on an unplayable year would strand the draft with a turn showing zero pickable
+// players and no way forward, so year selection always filters down to playable years first.
+function yearIsPlayable(squad, pickedNames, filledSlots, foreignersLocked) {
+    return squad.some(
+        (p) => !pickedNames.has(p.name) && isPlayerPickable(p, filledSlots) && !(p.country !== 'India' && foreignersLocked)
+    );
 }
 
-export default function DraftGame({ seasonSquads }) {
-    const { isSignedIn } = useUser();
-    const years = useMemo(() => Object.keys(seasonSquads).map(Number).sort(), [seasonSquads]);
+function pickPlayableYear(years, seasonSquads, pickedNames, filledSlots, foreignersLocked, exclude) {
+    const pool = exclude != null && years.length > 1 ? years.filter((y) => y !== exclude) : years;
+    const playable = pool.filter((y) => yearIsPlayable(seasonSquads[String(y)] || [], pickedNames, filledSlots, foreignersLocked));
+    const source = playable.length ? playable : pool;
+    return source[Math.floor(Math.random() * source.length)];
+}
 
-    const [currentYear, setCurrentYear] = useState(years[0]);
+export default function DraftGame({ teams, seasonSquadsByTeam }) {
+    const { isSignedIn } = useUser();
+
+    const [teamCode, setTeamCode] = useState(teams.length === 1 ? teams[0].code : null);
+    const seasonSquads = teamCode ? seasonSquadsByTeam[teamCode] : {};
+    const years = useMemo(() => Object.keys(seasonSquads).map(Number).sort(), [seasonSquads]);
+    const team = teams.find((t) => t.code === teamCode);
+
+    const [currentYear, setCurrentYear] = useState(null);
     const [filled, setFilled] = useState({});
     const [pickedNames, setPickedNames] = useState(new Set());
     const [selectedPlayer, setSelectedPlayer] = useState(null);
@@ -31,9 +47,11 @@ export default function DraftGame({ seasonSquads }) {
     const [skipUsed, setSkipUsed] = useState(false);
 
     useEffect(() => {
-        setCurrentYear(randomYear(years));
+        if (teamCode && years.length) {
+            setCurrentYear(pickPlayableYear(years, seasonSquads, new Set(), new Set(), false));
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [teamCode]);
 
     const pickedCount = Object.keys(filled).length;
     const currentSquad = seasonSquads[String(currentYear)] || [];
@@ -62,12 +80,16 @@ export default function DraftGame({ seasonSquads }) {
         if (!selectedPlayer.slots.includes(slot)) return;
 
         const nextFilled = { ...filled, [slot]: { player: selectedPlayer, year: currentYear } };
+        const nextPickedNames = new Set([...pickedNames, selectedPlayer.name]);
         setFilled(nextFilled);
-        setPickedNames(new Set([...pickedNames, selectedPlayer.name]));
+        setPickedNames(nextPickedNames);
         setSelectedPlayer(null);
 
         if (Object.keys(nextFilled).length < TOTAL_SLOTS) {
-            setCurrentYear(randomYear(years));
+            const nextFilledSlots = new Set(Object.keys(nextFilled).map(Number));
+            const nextForeignersPicked = Object.values(nextFilled).filter((f) => f.player.country !== 'India').length;
+            const nextForeignersLocked = nextForeignersPicked >= MAX_FOREIGNERS;
+            setCurrentYear(pickPlayableYear(years, seasonSquads, nextPickedNames, nextFilledSlots, nextForeignersLocked));
         }
     }
 
@@ -78,6 +100,7 @@ export default function DraftGame({ seasonSquads }) {
             score: result.finalScore,
             wickets: result.wickets,
             won: result.won,
+            team: teamCode,
             xi: order.map((p) => p.name),
         });
         if (!hasShownLoginPrompt() && !isSignedIn) {
@@ -95,17 +118,45 @@ export default function DraftGame({ seasonSquads }) {
         if (skipUsed) return;
         setSkipUsed(true);
         setSelectedPlayer(null);
-        setCurrentYear(randomYear(years, currentYear));
+        setCurrentYear(pickPlayableYear(years, seasonSquads, pickedNames, filledSlots, foreignersLocked, currentYear));
     }
 
-    function handlePlayAgain() {
+    function resetDraft() {
         setFilled({});
         setPickedNames(new Set());
         setSelectedPlayer(null);
         setSimResult(null);
         setPhase('drafting');
         setSkipUsed(false);
-        setCurrentYear(randomYear(years));
+    }
+
+    function handlePlayAgain() {
+        resetDraft();
+        setCurrentYear(pickPlayableYear(years, seasonSquads, new Set(), new Set(), false));
+    }
+
+    function handleChangeTeam() {
+        resetDraft();
+        setCurrentYear(null);
+        setTeamCode(null);
+    }
+
+    if (!teamCode) {
+        return (
+            <div className="flex flex-col items-center gap-4 bg-surface border border-border rounded-xl p-6 sm:p-10 max-w-md mx-auto">
+                <p className="font-display text-text text-lg uppercase tracking-wide">Choose a franchise</p>
+                <select
+                    onChange={(e) => setTeamCode(e.target.value)}
+                    defaultValue=""
+                    className="form-select bg-accent text-white border-none rounded-lg px-4 py-2 text-base font-medium cursor-pointer transition-colors hover:bg-accentHover w-full"
+                >
+                    <option value="" disabled>Select a team…</option>
+                    {teams.map((t) => (
+                        <option key={t.code} value={t.code}>{t.name} ({t.founded}-{t.lastYear})</option>
+                    ))}
+                </select>
+            </div>
+        );
     }
 
     if (phase === 'result' && simResult) {
@@ -128,9 +179,19 @@ export default function DraftGame({ seasonSquads }) {
     return (
         <div className="flex flex-col gap-5">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-2 bg-surface border border-border rounded-xl p-3 sm:p-4">
-                <p className="font-display text-text text-sm sm:text-base">
-                    {draftComplete ? 'Squad complete' : `Turn ${pickedCount + 1} / ${TOTAL_SLOTS}`}
-                </p>
+                <div className="flex items-center gap-3">
+                    <p className="font-display text-text text-sm sm:text-base">
+                        {team.name} · {draftComplete ? 'Squad complete' : `Turn ${pickedCount + 1} / ${TOTAL_SLOTS}`}
+                    </p>
+                    {teams.length > 1 && (
+                        <button
+                            onClick={handleChangeTeam}
+                            className="text-xs px-3 py-1 rounded-lg border border-border text-textMuted hover:text-text hover:border-accent transition-colors font-semibold"
+                        >
+                            Change Team
+                        </button>
+                    )}
+                </div>
                 {!draftComplete && (
                     <div className="flex items-center gap-3">
                         <p className="text-accent font-display text-lg sm:text-xl">{currentYear} Squad</p>

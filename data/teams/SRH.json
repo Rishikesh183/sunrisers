@@ -214,6 +214,39 @@
       "BAT": 29,
       "POW": 15,
       "BWL": 80
+    },
+    {
+      "name": "JP Duminy",
+      "role": "Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "South Africa",
+      "isKeeper": false,
+      "slots": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "BAT": 52,
+      "POW": 52,
+      "BWL": 0
+    },
+    {
+      "name": "Akshath Reddy",
+      "role": "Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        1,
+        2,
+        3
+      ],
+      "BAT": 43,
+      "POW": 41,
+      "BWL": 0
     }
   ],
   "2014": [
@@ -429,6 +462,39 @@
       "BAT": 28,
       "POW": 15,
       "BWL": 28
+    },
+    {
+      "name": "Ricky Bhui",
+      "role": "Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "BAT": 41,
+      "POW": 41,
+      "BWL": 0
+    },
+    {
+      "name": "Jason Holder",
+      "role": "All-rounder",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "West Indies",
+      "isKeeper": false,
+      "slots": [
+        6,
+        7,
+        8
+      ],
+      "BAT": 37,
+      "POW": 36,
+      "BWL": 53
     }
   ],
   "2015": [
@@ -647,6 +713,39 @@
       "BAT": 28,
       "POW": 18,
       "BWL": 27
+    },
+    {
+      "name": "Ricky Bhui",
+      "role": "Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "BAT": 37,
+      "POW": 40,
+      "BWL": 0
+    },
+    {
+      "name": "Parvez Rasool",
+      "role": "All-rounder",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        6,
+        7,
+        8
+      ],
+      "BAT": 37,
+      "POW": 32,
+      "BWL": 58
     }
   ],
   "2016": [
@@ -1212,7 +1311,7 @@
         2
       ],
       "BAT": 48,
-      "POW": 70,
+      "POW": 59,
       "BWL": 0
     },
     {
@@ -1351,6 +1450,39 @@
       "BAT": 27,
       "POW": 15,
       "BWL": 44
+    },
+    {
+      "name": "Carlos Brathwaite",
+      "role": "All-rounder",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "West Indies",
+      "isKeeper": false,
+      "slots": [
+        6,
+        7,
+        8
+      ],
+      "BAT": 43,
+      "POW": 77,
+      "BWL": 44
+    },
+    {
+      "name": "T Natarajan",
+      "role": "Bowler",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "BAT": 27,
+      "POW": 15,
+      "BWL": 49
     }
   ],
   "2019": [
@@ -1568,6 +1700,40 @@
       "BAT": 27,
       "POW": 15,
       "BWL": 35
+    },
+    {
+      "name": "Ricky Bhui",
+      "role": "Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "BAT": 36,
+      "POW": 40,
+      "BWL": 0
+    },
+    {
+      "name": "Shahbaz Nadeem",
+      "role": "Bowler",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "BAT": 27,
+      "POW": 15,
+      "BWL": 50
     }
   ],
   "2020": [
@@ -2284,6 +2450,24 @@
       "BAT": 27,
       "POW": 15,
       "BWL": 59
+    },
+    {
+      "name": "Glenn Phillips",
+      "role": "Wicketkeeper Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "New Zealand",
+      "isKeeper": true,
+      "slots": [
+        2,
+        3,
+        4,
+        5,
+        7
+      ],
+      "BAT": 45,
+      "POW": 77,
+      "BWL": 0
     }
   ],
   "2023": [
@@ -2486,6 +2670,40 @@
       "BAT": 37,
       "POW": 54,
       "BWL": 42
+    },
+    {
+      "name": "Adil Rashid",
+      "role": "Bowler",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "England",
+      "isKeeper": false,
+      "slots": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "BAT": 27,
+      "POW": 15,
+      "BWL": 55
+    },
+    {
+      "name": "Fazalhaq Farooqi",
+      "role": "Bowler",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "Afghanistan",
+      "isKeeper": false,
+      "slots": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "BAT": 27,
+      "POW": 15,
+      "BWL": 57
     }
   ],
   "2024": [
@@ -2672,6 +2890,55 @@
       "BAT": 27,
       "POW": 15,
       "BWL": 21
+    },
+    {
+      "name": "Glenn Phillips",
+      "role": "Wicketkeeper Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "New Zealand",
+      "isKeeper": true,
+      "slots": [
+        2,
+        3,
+        4,
+        5,
+        7
+      ],
+      "BAT": 43,
+      "POW": 72,
+      "BWL": 0
+    },
+    {
+      "name": "Mayank Agarwal",
+      "role": "Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        1,
+        2
+      ],
+      "BAT": 41,
+      "POW": 59,
+      "BWL": 0
+    },
+    {
+      "name": "Anmolpreet Singh",
+      "role": "Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        1,
+        2,
+        3
+      ],
+      "BAT": 36,
+      "POW": 45,
+      "BWL": 0
     }
   ],
   "2025": [
@@ -2877,6 +3144,40 @@
       "BAT": 26,
       "POW": 15,
       "BWL": 41
+    },
+    {
+      "name": "Mohammed Shami",
+      "role": "Bowler",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "BAT": 27,
+      "POW": 15,
+      "BWL": 57
+    },
+    {
+      "name": "Rahul Chahar",
+      "role": "Bowler",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "BAT": 27,
+      "POW": 15,
+      "BWL": 49
     }
   ],
   "2026": [
@@ -3098,6 +3399,23 @@
       "BAT": 28,
       "POW": 15,
       "BWL": 45
+    },
+    {
+      "name": "Aniket Verma",
+      "role": "Batsman",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "BAT": 55,
+      "POW": 86,
+      "BWL": 0
     }
   ]
 }
