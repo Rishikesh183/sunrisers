@@ -20,6 +20,8 @@ import TossPanel from '../../../../components/Duel/TossPanel';
 import DuelDraftBoard from '../../../../components/Duel/DuelDraftBoard';
 import DuelResult from '../../../../components/Duel/DuelResult';
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://bleedorangism.vercel.app';
+
 function buildBattingOrder(picks, uid, seasonSquads) {
     const bySlot = {};
     for (const pick of picks) {
@@ -32,6 +34,7 @@ function buildBattingOrder(picks, uid, seasonSquads) {
 
 export default function DuelRoomPage({ params }) {
     const { roomId } = params;
+    const shareLink = `${APP_URL}/300par/duel/${roomId}`;
     const { user, isSignedIn, isLoaded } = useUser();
     const [room, setRoom] = useState(undefined); // undefined = loading, null = not found
     const [picks, setPicks] = useState([]);
@@ -108,7 +111,7 @@ export default function DuelRoomPage({ params }) {
             myUid === room.hostUid ? (
                 <div className="flex flex-col items-center gap-3 bg-surface border border-border rounded-xl p-6 sm:p-10">
                     <p className="text-text text-center">Waiting for an opponent to join…</p>
-                    <p className="text-xs text-textMuted text-center break-all">Share this link: {typeof window !== 'undefined' ? window.location.href : ''}</p>
+                    <p className="text-xs text-textMuted text-center break-all">Share this link: {shareLink}</p>
                 </div>
             ) : (
                 <div className="flex flex-col items-center gap-4 bg-surface border border-border rounded-xl p-6 sm:p-10">
