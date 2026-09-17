@@ -1,8 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { slotLabel } from '../../lib/game/positions';
+import CommentaryFeed from './CommentaryFeed';
 
 export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgain }) {
+    const [showCommentary, setShowCommentary] = useState(false);
+
     return (
         <div className="flex flex-col gap-5">
             <div className={`rounded-xl border p-5 sm:p-6 text-center ${result.won ? 'border-win bg-win/10' : 'border-loss bg-loss/10'}`}>
@@ -40,6 +44,21 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                         </div>
                     ))}
                 </div>
+            </div>
+
+            <div className="bg-surface border border-border rounded-xl p-3 sm:p-5">
+                <button
+                    onClick={() => setShowCommentary((v) => !v)}
+                    className="w-full flex justify-between items-center font-display text-text uppercase tracking-wide text-sm"
+                >
+                    Ball-by-Ball Commentary
+                    <span className="text-textMuted text-xs normal-case tracking-normal">{showCommentary ? 'Hide' : 'Show'}</span>
+                </button>
+                {showCommentary && (
+                    <div className="mt-3">
+                        <CommentaryFeed ballLog={result.ballLog} />
+                    </div>
+                )}
             </div>
 
             <div className="flex justify-center">
