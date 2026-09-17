@@ -43,7 +43,7 @@ export default function CommentaryFeed({ ballLog }) {
                                         : 'text-text'
                                 }`}
                             >
-                                <span className="text-textMuted text-xs w-10 shrink-0">{group.over + 1}.{entry.ballInOver}</span>
+                                <span className="text-textMuted text-xs w-10 shrink-0">{entry.over}.{entry.ballInOver}</span>
                                 <span className="flex-1 truncate">{ballCommentary(entry)}</span>
                                 <span className="text-textMuted text-xs shrink-0">{entry.score}/{entry.wickets}</span>
                             </div>

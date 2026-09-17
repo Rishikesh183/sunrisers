@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
 import SeasonPlayerCard from './SeasonPlayerCard';
 import BattingOrderStrip from './BattingOrderStrip';
 import ScoreBoard from './ScoreBoard';
-import LoginNudgeModal from './LoginNudgeModal';
+import LivePlayback from './LivePlayback';
 import { TOTAL_SLOTS, eligibleEmptySlots, isPlayerPickable } from '../../lib/game/positions';
 import { simulateChase } from '../../lib/game/simulate';
-import { getBestScore, hasShownLoginPrompt, markLoginPromptShown, saveResult } from '../../lib/game/localHistory';
+import { getBestScore, saveResult } from '../../lib/game/localHistory';
 
 const MAX_FOREIGNERS = 4;
 
@@ -30,8 +29,6 @@ function pickPlayableYear(years, seasonSquads, pickedNames, filledSlots, foreign
 }
 
 export default function DraftGame({ teams, seasonSquadsByTeam }) {
-    const { isSignedIn } = useUser();
-
     const [teamCode, setTeamCode] = useState(teams.length === 1 ? teams[0].code : null);
     const seasonSquads = teamCode ? seasonSquadsByTeam[teamCode] : {};
     const years = useMemo(() => Object.keys(seasonSquads).map(Number).sort(), [seasonSquads]);
@@ -43,7 +40,6 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
     const [selectedPlayer, setSelectedPlayer] = useState(null);
     const [phase, setPhase] = useState('drafting');
     const [simResult, setSimResult] = useState(null);
-    const [showLoginModal, setShowLoginModal] = useState(false);
     const [skipUsed, setSkipUsed] = useState(false);
 
     useEffect(() => {
@@ -93,24 +89,20 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
         }
     }
 
-    function runSimulationAndSave(order) {
-        const result = simulateChase(order);
+    function handleSimulate() {
+        const result = simulateChase(battingOrder);
         setSimResult(result);
         saveResult({
             score: result.finalScore,
             wickets: result.wickets,
             won: result.won,
             team: teamCode,
-            xi: order.map((p) => p.name),
+            xi: battingOrder.map((p) => p.name),
         });
-        if (!hasShownLoginPrompt() && !isSignedIn) {
-            setShowLoginModal(true);
-            markLoginPromptShown();
-        }
+        setPhase('playback');
     }
 
-    function handleSimulate() {
-        runSimulationAndSave(battingOrder);
+    function handlePlaybackDone() {
         setPhase('result');
     }
 
@@ -159,17 +151,25 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
         );
     }
 
+    if (phase === 'playback' && simResult) {
+        return (
+            <LivePlayback
+                result={simResult}
+                battingOrder={battingOrder}
+                teamName={team.name}
+                onDone={handlePlaybackDone}
+            />
+        );
+    }
+
     if (phase === 'result' && simResult) {
         return (
-            <>
-                {showLoginModal && <LoginNudgeModal onDismiss={() => setShowLoginModal(false)} />}
-                <ScoreBoard
-                    battingOrder={battingOrder}
-                    result={simResult}
-                    bestScore={getBestScore()}
-                    onPlayAgain={handlePlayAgain}
-                />
-            </>
+            <ScoreBoard
+                battingOrder={battingOrder}
+                result={simResult}
+                bestScore={getBestScore()}
+                onPlayAgain={handlePlayAgain}
+            />
         );
     }
 
