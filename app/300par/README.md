@@ -231,10 +231,9 @@ console.log(wins / n); // target ~0.20 for an elite XI
 
 `localStorage` only, key `srh300par:history` — capped list of the last 20 runs
 (`{ score, wickets, won, team, xi, timestamp }`). `getBestScore()` reads from it (currently
-best-across-all-teams; scope it by `team` if per-team bests are wanted later). Separately,
-`sessionStorage` key `srh300par:loginPromptShown` gates the one-per-session
-`LoginNudgeModal` (shown once, after the first result of the session, only if the user
-isn't signed in via Clerk).
+best-across-all-teams; scope it by `team` if per-team bests are wanted later). No login
+gate exists on solo play — it was removed along with the one-time sign-in nudge modal that
+used to show after a result (see commit history); solo mode has zero auth dependency.
 
 ## Adding a new team
 
@@ -257,6 +256,117 @@ isn't signed in via Clerk).
      same-season collisions (a player can't be on two teams in one real season) — see
      "Roster depth" above for the bug this caught during RCB's addition.
 
+## 1v1 Duel (`app/300par/duel/`)
+
+A second, separate mode: two signed-in users draft their own XIs from the same team's
+history in alternating turns (22 picks total), then their innings are compared head-to-head
+(the second team chases the first team's actual score, not a fixed 300). Unlike solo mode,
+this **requires a backend** — real-time turn sync between two browsers and a user directory
+to find an opponent. Full design/decisions/data-model are in the plan this was built from;
+this section documents what's actually shipped as it lands, phase by phase.
+
+**Why Firestore, not a new realtime vendor**: this app already has Firebase wired in
+(`lib/firebase.js`). Firestore's free tier has no hard concurrent-connection ceiling (the
+limit is a daily read/write quota, which comfortably covers this app's realistic scale) and
+avoids running a second user-identity system alongside Clerk. See git history around this
+feature's introduction for the fuller comparison against Supabase Realtime.
+
+**Status: Phases 1-2 shipped and verified.** User directory, full room lifecycle
+(create/join/toss), alternating 22-turn draft sync, dual simulation, and a dashboard are all
+live. Firestore rules are published (open rules for `users`/`duelRooms`/`duelRooms/{id}/picks`/
+`duelResults`, alongside the pre-existing `matches`/`news` rules). A full transaction-level
+flow test (room create → join/toss race guards → all 22 picks → dual `simulateChase` →
+concurrent `finalizeResult` race) passed against the live rules; only a composite index
+(below) and a manual two-browser UI pass remain.
+
+### Phase 1 — user directory
+
+- `app/api/webhooks/clerk/route.js` — verifies the request via `@clerk/nextjs/webhooks`'s
+  `verifyWebhook()` (reads `CLERK_WEBHOOK_SIGNING_SECRET`), and on a `user.created` event
+  writes `{ displayName, displayNameLower, photoURL, createdAt }` to Firestore
+  `users/{clerkUserId}` via the Admin SDK. Configure this URL in the Clerk Dashboard →
+  Webhooks once deployed (needs a real public URL — a local dev server can't receive it
+  without a tunnel). Only fires for *new* sign-ups; existing users need a one-time backfill
+  (see `scripts/` git history for the throwaway script used to do this once — it wasn't kept
+  in the repo since it embeds no secrets but has no reason to be run twice).
+- `lib/firebaseAdmin.js` — server-only Admin SDK init (`getAdminDb()`), reads
+  `FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` (from a Firebase
+  service-account key — Project Settings → Service Accounts → Generate new private key,
+  free, same project/quota as everything else).
+- `lib/data/users.js` — `getOpponentCandidates()`, a **client-SDK** read of `users`,
+  `orderBy('createdAt', 'desc').limit(200)`, fetched once per page visit.
+- `components/Duel/OpponentList.js` — renders that list, filters/searches **entirely
+  client-side** (debounced 200ms for UI smoothness only — zero additional Firestore reads
+  per keystroke). Revisit only if the user base grows past a few hundred and fetch-all stops
+  being cheap; the upgrade path is a server-side prefix-range query on `displayNameLower`.
+
+### Phase 2 — room lifecycle, draft sync, dual simulation, dashboard
+
+- `lib/duel/room.js` — every state transition is a Firestore transaction: `createRoom`,
+  `joinRoom` (also computes the coin-flip toss atomically, so two guests racing to open the
+  same link can't both "win" it), `chooseFirstPicker`, `submitPick` (checks it's genuinely
+  this uid's turn and this turn index hasn't already been played — guards double-clicks and
+  turn-order violations), `finalizeResult` (checks `status` is still `'simulating'` before
+  writing, so if both clients race to finalize, only the first one's write sticks — the
+  loser's locally-computed result is discarded, and that client picks up the authoritative
+  result via its existing `onSnapshot` subscription instead of trusting its own computation).
+- Picks are **exclusive across the whole room** — once either player has drafted a given
+  player-season, the other can't also draft it (`allPickedNames` in
+  `components/Duel/DuelDraftBoard.js` is built from *all* picks, not just the current
+  player's). This was a judgment call, not explicitly specified — it's what makes watching
+  the opponent's picks matter strategically instead of two isolated solo drafts running side
+  by side.
+- `pickPlayableYear()`/`yearIsPlayable()` moved from being private to `DraftGame.js` into
+  `lib/game/positions.js` as shared exports — both solo mode and `DuelDraftBoard.js` need the
+  exact same "don't offer a year with zero legal picks" logic, and it needs to stay identical
+  between them rather than drift as two copies.
+- `simulateChase()` (`lib/game/simulate.js`) gained a third, optional `target` param
+  (defaults to `300`, solo mode's call sites are unchanged) — the room page runs it twice:
+  once for the host with the default target, once for the guest with `target =
+  hostResult.finalScore`, so `won` on the guest's result IS the duel's win condition.
+- `components/Duel/TossPanel.js`, `DuelDraftBoard.js` (reuses `SeasonPlayerCard` +
+  `BattingOrderStrip` from solo mode, shows both players' boards live), `DuelResult.js`
+  (reuses `LivePlayback` twice in sequence — host's innings, then guest's chasing it — then a
+  winner banner).
+- `app/300par/duel/[roomId]/page.js` — the room itself, one big phase switch on
+  `room.status`: `waiting` (join or share-link view, `isRoomExpired()` gates a stale invite)
+  → `toss` → `drafting` → `simulating` (exactly one client's browser actually runs the
+  simulation, guarded by a `useRef` so it only attempts once per page load; `finalizeResult`
+  is what actually decides whose result "wins" the race) → `complete`.
+- `lib/data/duelResults.js` + `app/dashboard/page.js` — `duelResults` queried by
+  `where('participants', 'array-contains', uid)`. New "Dashboard" nav link in
+  `components/Navbar.js`, shown only when signed in.
+
+### Rules — published, with one regression caught and fixed
+
+Confirmed empirically (not just "no rules file exists") that an unauthenticated Firestore
+client read/write to a brand-new collection was denied, and critically, **Clerk sessions
+never populate Firestore's `request.auth`** (no Clerk↔Firebase-Auth bridge in this app), so a
+rule written as `if request.auth != null` would deny every request from this app, signed in or
+not. Consistent with the client-trusted model, the new collections got open rules:
+```
+match /users/{uid} { allow read, write: if true; }
+match /duelRooms/{roomId} {
+  allow read, write: if true;
+  match /picks/{turnIndex} { allow read, write: if true; }
+}
+match /duelResults/{id} { allow read, write: if true; }
+```
+First publish accidentally dropped the pre-existing `matches`/`news` rules (`npm run build`
+caught this — both pages failed static prerender with `permission-denied`). Re-published with
+`matches`/`news` open rules restored alongside the new ones; a follow-up probe confirmed reads
+succeed on all five collections and `npm run build` is clean.
+
+### Still open
+
+- **Composite index** for the dashboard's query (`array-contains` + `orderBy` on a different
+  field always needs one). The first time `getDuelHistory()` runs against live data with
+  enough rows to trip it, Firestore throws an error containing a direct console link to create
+  the exact index needed — click it once, no manual configuration.
+- **Manual two-browser UI pass** (join via shared link, real toss/draft/result UI end to end)
+  — the transaction logic itself is verified (see Status above), but nobody has clicked
+  through the actual pages with two signed-in accounts yet.
+
 ## Likely future enhancements
 
 - Hard-enforce squad composition (exactly 1 keeper, exactly 4 bowlers) instead of the
@@ -264,8 +374,9 @@ isn't signed in via Clerk).
 - Re-source the weak-confidence years (noted above, per team) with exact stats once fuller
   tables are published.
 - Expand rosters beyond ~13-15 players/season if more real contributors surface.
-- Leaderboard (would need a backend — currently explicitly out of scope, local-only by
-  design).
+- Leaderboard for solo mode (would need a backend — still explicitly out of scope for solo
+  play, which stays local-only by design; the 1v1 Duel mode above is a separate, deliberately
+  backend-dependent feature and doesn't change this).
 - Ball-by-ball commentary feed using `overSummaries` (currently computed but unused in the UI).
 - Per-team theming (logo, accent color) — currently every team uses the site's fixed
   orange/dark theme; `data/teams/index.js` would be the place to add a `color` field.

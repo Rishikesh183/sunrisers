@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { slotLabel } from '../../lib/game/positions';
 import CommentaryFeed from './CommentaryFeed';
 
-export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgain }) {
+export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgain, resultText }) {
     const [showCommentary, setShowCommentary] = useState(false);
 
     return (
@@ -15,9 +15,10 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                     {result.finalScore}/{result.wickets} <span className="text-lg text-textMuted">({result.oversUsed} ov)</span>
                 </p>
                 <p className="mt-2 font-semibold text-text">
-                    {result.won
-                        ? `Impossible? Not for this XI. ${result.target} chased down.`
-                        : `Fell short of the ${result.target} par score.`}
+                    {resultText ||
+                        (result.won
+                            ? `Impossible? Not for this XI. ${result.target} chased down.`
+                            : `Fell short of the ${result.target} par score.`)}
                 </p>
                 {result.moraleBonus !== 0 && (
                     <p className="text-xs text-textMuted mt-1">
@@ -61,14 +62,16 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                 )}
             </div>
 
-            <div className="flex justify-center">
-                <button
-                    onClick={onPlayAgain}
-                    className="py-2 px-5 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold"
-                >
-                    Play Again
-                </button>
-            </div>
+            {onPlayAgain && (
+                <div className="flex justify-center">
+                    <button
+                        onClick={onPlayAgain}
+                        className="py-2 px-5 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold"
+                    >
+                        Play Again
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

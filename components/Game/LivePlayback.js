@@ -54,7 +54,7 @@ function computeLiveState(ballLog, uptoIndex, openers) {
     };
 }
 
-export default function LivePlayback({ result, battingOrder, teamName, onDone }) {
+export default function LivePlayback({ result, battingOrder, teamName, subtitle, inningsLabel, onDone }) {
     const { ballLog } = result;
     const [ballIdx, setBallIdx] = useState(-1);
     const [ticker, setTicker] = useState([]);
@@ -82,16 +82,31 @@ export default function LivePlayback({ result, battingOrder, teamName, onDone })
     const totalOvers = 20;
     const progressPct = Math.min(100, ((ballIdx + 1) / ballLog.length) * 100);
 
+    const ballsBowled = ballIdx + 1;
+    const ballsRemaining = Math.max(0, 120 - ballsBowled);
+    const runsRequired = result.target - live.score;
+    const oversRemaining = ballsRemaining / 6;
+    const showChaseStats = ballIdx >= 0 && ballsRemaining > 0 && live.wickets < 10 && runsRequired > 0;
+    const rrr = showChaseStats ? runsRequired / oversRemaining : null;
+
     return (
         <div className="flex flex-col items-center gap-5 bg-surface border border-border rounded-xl p-6 sm:p-10">
             <div className="flex flex-col items-center gap-1">
-                <p className="text-xs text-textMuted uppercase tracking-wide">{teamName} chasing 300</p>
+                {inningsLabel && (
+                    <p className="text-[11px] text-accent uppercase tracking-widest font-semibold">{inningsLabel}</p>
+                )}
+                <p className="text-xs text-textMuted uppercase tracking-wide">{subtitle || `${teamName} chasing ${result.target}`}</p>
                 <p className="font-display text-text uppercase tracking-wide text-sm">Simulating the chase…</p>
             </div>
 
             <div className="flex flex-col items-center gap-1">
                 <p className="font-display text-4xl sm:text-5xl text-accent tabular-nums">{live.score}/{live.wickets}</p>
                 <p className="text-xs text-textMuted tabular-nums">Over {live.over}.{live.ballInOver} / {totalOvers}.0</p>
+                {showChaseStats && (
+                    <p className="text-xs text-accent tabular-nums mt-1">
+                        Need {runsRequired} off {ballsRemaining} · RRR {rrr.toFixed(2)}
+                    </p>
+                )}
             </div>
 
             <div className="w-full max-w-md h-1.5 rounded-full bg-border overflow-hidden">

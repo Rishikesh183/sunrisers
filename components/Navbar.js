@@ -29,6 +29,9 @@ const Navbar = () => {
                     <li className='hover:text-accent hover:bg-surface transition-colors rounded-lg p-2 px-3'><Link href="/Matches">Matches</Link></li>
                     <li className='hover:text-accent hover:bg-surface transition-colors rounded-lg p-2 px-3'><Link href="/players">Players</Link></li>
                     <li className='hover:text-accent hover:bg-surface transition-colors rounded-lg p-2 px-3'><Link href="/300par">300 Par</Link></li>
+                    {isSignedIn && (
+                        <li className='hover:text-accent hover:bg-surface transition-colors rounded-lg p-2 px-3'><Link href="/dashboard">Dashboard</Link></li>
+                    )}
                 </ul>
 
                 <div className='md:block'>

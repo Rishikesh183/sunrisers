@@ -5,28 +5,16 @@ import SeasonPlayerCard from './SeasonPlayerCard';
 import BattingOrderStrip from './BattingOrderStrip';
 import ScoreBoard from './ScoreBoard';
 import LivePlayback from './LivePlayback';
-import { TOTAL_SLOTS, eligibleEmptySlots, isPlayerPickable } from '../../lib/game/positions';
+import {
+    TOTAL_SLOTS,
+    eligibleEmptySlots,
+    isPlayerPickable,
+    pickPlayableYear,
+} from '../../lib/game/positions';
 import { simulateChase } from '../../lib/game/simulate';
 import { getBestScore, saveResult } from '../../lib/game/localHistory';
 
 const MAX_FOREIGNERS = 4;
-
-// A year is "playable" if at least one of its players can still legally be picked
-// (not already drafted, has an empty eligible slot, and isn't blocked by the foreigner cap).
-// Landing on an unplayable year would strand the draft with a turn showing zero pickable
-// players and no way forward, so year selection always filters down to playable years first.
-function yearIsPlayable(squad, pickedNames, filledSlots, foreignersLocked) {
-    return squad.some(
-        (p) => !pickedNames.has(p.name) && isPlayerPickable(p, filledSlots) && !(p.country !== 'India' && foreignersLocked)
-    );
-}
-
-function pickPlayableYear(years, seasonSquads, pickedNames, filledSlots, foreignersLocked, exclude) {
-    const pool = exclude != null && years.length > 1 ? years.filter((y) => y !== exclude) : years;
-    const playable = pool.filter((y) => yearIsPlayable(seasonSquads[String(y)] || [], pickedNames, filledSlots, foreignersLocked));
-    const source = playable.length ? playable : pool;
-    return source[Math.floor(Math.random() * source.length)];
-}
 
 export default function DraftGame({ teams, seasonSquadsByTeam }) {
     const [teamCode, setTeamCode] = useState(teams.length === 1 ? teams[0].code : null);
