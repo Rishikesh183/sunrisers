@@ -130,7 +130,7 @@ export default function DuelRoomPage({ params }) {
     } else if (room.status === 'simulating') {
         body = <p className="text-sm text-textMuted text-center">Both squads are set — simulating the duel…</p>;
     } else if (room.status === 'complete') {
-        body = <DuelResult room={room} />;
+        body = <DuelResult room={room} myUid={myUid} />;
     }
 
     return (

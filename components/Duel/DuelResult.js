@@ -16,7 +16,7 @@ function marginText(room) {
     return `${room.hostName} won by ${runMargin} run${runMargin === 1 ? '' : 's'}`;
 }
 
-export default function DuelResult({ room }) {
+export default function DuelResult({ room, myUid }) {
     const [stage, setStage] = useState('host'); // 'host' | 'targetReveal' | 'guest' | 'final'
 
     const hostOpeners = room.resultHost.batsmen.slice(0, 2).map((b) => ({ name: b.name }));
@@ -40,6 +40,7 @@ export default function DuelResult({ room }) {
                 battingOrder={hostOpeners}
                 inningsLabel="First Innings"
                 subtitle={`${room.hostName}'s ${room.team}`}
+                canSkip={myUid === room.hostUid}
                 onDone={() => setStage('targetReveal')}
             />
         );
@@ -66,6 +67,7 @@ export default function DuelResult({ room }) {
                 battingOrder={guestOpeners}
                 inningsLabel="Second Innings"
                 subtitle={`${room.guestName}'s ${room.team} — target ${target}`}
+                canSkip={myUid === room.guestUid}
                 onDone={() => setStage('final')}
             />
         );

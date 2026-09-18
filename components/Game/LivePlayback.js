@@ -54,7 +54,7 @@ function computeLiveState(ballLog, uptoIndex, openers) {
     };
 }
 
-export default function LivePlayback({ result, battingOrder, teamName, subtitle, inningsLabel, onDone }) {
+export default function LivePlayback({ result, battingOrder, teamName, subtitle, inningsLabel, canSkip = true, onDone }) {
     const { ballLog } = result;
     const [ballIdx, setBallIdx] = useState(-1);
     const [ticker, setTicker] = useState([]);
@@ -143,9 +143,13 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
                 ))}
             </div>
 
-            <button onClick={onDone} className="text-xs text-textMuted underline hover:text-text transition-colors">
-                Skip to result
-            </button>
+            {canSkip ? (
+                <button onClick={onDone} className="text-xs text-textMuted underline hover:text-text transition-colors">
+                    Skip to result
+                </button>
+            ) : (
+                <p className="text-xs text-textMuted">Watching…</p>
+            )}
         </div>
     );
 }
