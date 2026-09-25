@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { X } from 'lucide-react';
 import SeasonPlayerCard from '../Game/SeasonPlayerCard';
 import BattingOrderStrip from '../Game/BattingOrderStrip';
 import {
@@ -82,19 +83,25 @@ export default function DuelDraftBoard({ room, myUid, seasonSquads, picks, onSub
 
     return (
         <div className="flex flex-col gap-5">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-2 bg-surface border border-border rounded-xl p-3 sm:p-4">
-                <p className="font-display text-text text-sm sm:text-base">
-                    Turn {room.currentTurnIndex + 1} / {TOTAL_SLOTS * 2}
-                </p>
-                <p className={`font-display text-sm sm:text-base ${isMyTurn ? 'text-accent' : 'text-textMuted'}`}>
-                    {isMyTurn ? 'Your pick' : `${opponentName}'s pick`}
-                </p>
-                {isMyTurn && currentYear && (
-                    <p className="text-accent font-display text-lg sm:text-xl">{currentYear} Squad</p>
-                )}
-                <p className="text-xs text-textMuted">
-                    {myName}: {myFilledSlots.size}/{TOTAL_SLOTS} · Foreigners: {myForeignersPicked}/{MAX_FOREIGNERS}
-                </p>
+            <div className="flex flex-col gap-2 bg-surface border border-border rounded-xl p-3 sm:p-4">
+                <div className="flex flex-wrap justify-between items-center gap-2">
+                    <p className="font-display text-text text-sm">
+                        Turn {room.currentTurnIndex + 1} / {TOTAL_SLOTS * 2}
+                    </p>
+                    <p className={`font-display text-sm ${isMyTurn ? 'text-accent' : 'text-textMuted'}`}>
+                        {isMyTurn ? 'Your pick' : `${opponentName}'s pick`}
+                    </p>
+                </div>
+                <div className="flex flex-wrap justify-between items-center gap-2">
+                    {isMyTurn && currentYear ? (
+                        <p className="text-accent font-display text-base sm:text-lg">{currentYear} Squad</p>
+                    ) : (
+                        <div />
+                    )}
+                    <p className="text-xs text-textMuted">
+                        {myName}: {myFilledSlots.size}/{TOTAL_SLOTS} · Foreigners: {myForeignersPicked}/{MAX_FOREIGNERS}
+                    </p>
+                </div>
             </div>
 
             <div>
@@ -107,9 +114,18 @@ export default function DuelDraftBoard({ room, myUid, seasonSquads, picks, onSub
             </div>
 
             {selectedPlayer && (
-                <p className="text-center text-sm text-textMuted">
-                    Pick an open, highlighted slot above for <span className="text-accent font-semibold">{selectedPlayer.name}</span>.
-                </p>
+                <div className="fixed top-20 left-1/2 -translate-x-1/2 z-30 bg-surface border border-accent rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 max-w-[92vw]">
+                    <p className="text-sm text-text">
+                        Select a position to place <span className="text-accent font-semibold">{selectedPlayer.name}</span>
+                    </p>
+                    <button
+                        onClick={() => setSelectedPlayer(null)}
+                        className="text-textMuted hover:text-text transition-colors shrink-0"
+                        aria-label="Cancel selection"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
             )}
 
             {isMyTurn && (

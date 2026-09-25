@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { X } from 'lucide-react';
 import SeasonPlayerCard from './SeasonPlayerCard';
 import BattingOrderStrip from './BattingOrderStrip';
 import ScoreBoard from './ScoreBoard';
@@ -29,6 +30,12 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
     const [phase, setPhase] = useState('drafting');
     const [simResult, setSimResult] = useState(null);
     const [skipUsed, setSkipUsed] = useState(false);
+    const [difficulty, setDifficulty] = useState('hard');
+    const [pendingDifficulty, setPendingDifficulty] = useState(null);
+
+    const themeStyle = team
+        ? { '--accent': team.color, '--accent-hover': team.colorHover, '--accent-muted': team.colorMuted }
+        : undefined;
 
     useEffect(() => {
         if (teamCode && years.length) {
@@ -78,7 +85,7 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
     }
 
     function handleSimulate() {
-        const result = simulateChase(battingOrder);
+        const result = simulateChase(battingOrder, Math.random, 300, difficulty);
         setSimResult(result);
         saveResult({
             score: result.finalScore,
@@ -121,6 +128,22 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
         setTeamCode(null);
     }
 
+    function handleDifficultyChange(next) {
+        if (next === difficulty) return;
+        if (pickedCount === 0) {
+            setDifficulty(next);
+        } else {
+            setPendingDifficulty(next);
+        }
+    }
+
+    function confirmDifficultyChange() {
+        setDifficulty(pendingDifficulty);
+        setPendingDifficulty(null);
+        resetDraft();
+        setCurrentYear(pickPlayableYear(years, seasonSquads, new Set(), new Set(), false));
+    }
+
     if (!teamCode) {
         return (
             <div className="flex flex-col items-center gap-4 bg-surface border border-border rounded-xl p-6 sm:p-10 max-w-md mx-auto">
@@ -141,23 +164,27 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
 
     if (phase === 'playback' && simResult) {
         return (
-            <LivePlayback
-                result={simResult}
-                battingOrder={battingOrder}
-                teamName={team.name}
-                onDone={handlePlaybackDone}
-            />
+            <div style={themeStyle}>
+                <LivePlayback
+                    result={simResult}
+                    battingOrder={battingOrder}
+                    teamName={team.name}
+                    onDone={handlePlaybackDone}
+                />
+            </div>
         );
     }
 
     if (phase === 'result' && simResult) {
         return (
-            <ScoreBoard
-                battingOrder={battingOrder}
-                result={simResult}
-                bestScore={getBestScore()}
-                onPlayAgain={handlePlayAgain}
-            />
+            <div style={themeStyle}>
+                <ScoreBoard
+                    battingOrder={battingOrder}
+                    result={simResult}
+                    bestScore={getBestScore()}
+                    onPlayAgain={handlePlayAgain}
+                />
+            </div>
         );
     }
 
@@ -165,45 +192,95 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
     const draftComplete = pickedCount === TOTAL_SLOTS;
 
     return (
-        <div className="flex flex-col gap-5">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-2 bg-surface border border-border rounded-xl p-3 sm:p-4">
-                <div className="flex items-center gap-3">
-                    <p className="font-display text-text text-sm sm:text-base">
-                        {team.name} · {draftComplete ? 'Squad complete' : `Turn ${pickedCount + 1} / ${TOTAL_SLOTS}`}
-                    </p>
-                    {teams.length > 1 && (
-                        <button
-                            onClick={handleChangeTeam}
-                            className="text-xs px-3 py-1 rounded-lg border border-border text-textMuted hover:text-text hover:border-accent transition-colors font-semibold"
-                        >
-                            Change Team
-                        </button>
-                    )}
-                </div>
-                {!draftComplete && (
+        <div className="flex flex-col gap-5" style={themeStyle}>
+            <div className="flex flex-col gap-3 bg-surface border border-border rounded-xl p-3 sm:p-4">
+                <div className="flex flex-wrap justify-between items-center gap-2">
                     <div className="flex items-center gap-3">
-                        <p className="text-accent font-display text-lg sm:text-xl">{currentYear} Squad</p>
-                        <button
-                            onClick={handleSkipYear}
-                            disabled={skipUsed}
-                            className={`text-xs px-3 py-1 rounded-lg border transition-colors font-semibold
-                                ${skipUsed ? 'border-border text-textMuted opacity-40 cursor-not-allowed' : 'border-accent text-accent hover:bg-accentMuted cursor-pointer'}`}
-                        >
-                            {skipUsed ? 'Skip Used' : 'Skip Year'}
-                        </button>
+                        <p className="font-display text-text text-sm">
+                            {team.name} · {draftComplete ? 'Squad complete' : `Turn ${pickedCount + 1} / ${TOTAL_SLOTS}`}
+                        </p>
+                        {teams.length > 1 && (
+                            <button
+                                onClick={handleChangeTeam}
+                                className="text-xs px-3 py-1 rounded-lg border border-border text-textMuted hover:text-text hover:border-accent transition-colors font-semibold"
+                            >
+                                Change Team
+                            </button>
+                        )}
                     </div>
-                )}
-                <p className="text-xs text-textMuted">
-                    Bowlers: {bowlersPicked}/4 · Keeper: {keeperPicked ? 'Yes' : 'No'} · Foreigners: {foreignersPicked}/{MAX_FOREIGNERS}
-                </p>
+                    <label className="flex items-center gap-2 text-xs text-textMuted">
+                        Difficulty:
+                        <select
+                            value={difficulty}
+                            onChange={(e) => handleDifficultyChange(e.target.value)}
+                            className="bg-bg border border-border rounded-lg px-2 py-1 text-xs text-text font-semibold capitalize cursor-pointer"
+                        >
+                            <option value="hard">Hard</option>
+                            <option value="easy">Easy</option>
+                        </select>
+                    </label>
+                </div>
+                <div className="flex flex-wrap justify-between items-center gap-2">
+                    {!draftComplete ? (
+                        <div className="flex items-center gap-3">
+                            <p className="text-accent font-display text-base sm:text-lg">{currentYear} Squad</p>
+                            <button
+                                onClick={handleSkipYear}
+                                disabled={skipUsed}
+                                className={`text-xs px-3 py-1 rounded-lg border transition-colors font-semibold
+                                    ${skipUsed ? 'border-border text-textMuted opacity-40 cursor-not-allowed' : 'border-accent text-accent hover:bg-accentMuted cursor-pointer'}`}
+                            >
+                                {skipUsed ? 'Skip Used' : 'Skip Year'}
+                            </button>
+                        </div>
+                    ) : (
+                        <div />
+                    )}
+                    <p className="text-xs text-textMuted">
+                        Bowlers: {bowlersPicked}/4 · Keeper: {keeperPicked ? 'Yes' : 'No'} · Foreigners: {foreignersPicked}/{MAX_FOREIGNERS}
+                    </p>
+                </div>
             </div>
 
             <BattingOrderStrip filled={filled} eligibleSlots={eligibleSlotsForSelection} onSlotClick={handleSlotClick} />
 
             {selectedPlayer && (
-                <p className="text-center text-sm text-textMuted">
-                    Pick an open, highlighted slot above for <span className="text-accent font-semibold">{selectedPlayer.name}</span>.
-                </p>
+                <div className="fixed top-20 left-1/2 -translate-x-1/2 z-30 bg-surface border border-accent rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 max-w-[92vw]">
+                    <p className="text-sm text-text">
+                        Select a position to place <span className="text-accent font-semibold">{selectedPlayer.name}</span>
+                    </p>
+                    <button
+                        onClick={() => setSelectedPlayer(null)}
+                        className="text-textMuted hover:text-text transition-colors shrink-0"
+                        aria-label="Cancel selection"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
+            )}
+
+            {pendingDifficulty && (
+                <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4">
+                    <div className="bg-surface border border-border rounded-xl p-5 max-w-sm w-full flex flex-col gap-3">
+                        <p className="text-text text-sm">
+                            Switching difficulty will start a new draft and discard your current picks. Continue?
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setPendingDifficulty(null)}
+                                className="text-xs px-3 py-1.5 rounded-lg border border-border text-textMuted hover:text-text transition-colors font-semibold"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDifficultyChange}
+                                className="text-xs px-3 py-1.5 rounded-lg bg-accent hover:bg-accentHover text-white transition-colors font-semibold"
+                            >
+                                Start New Draft
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {!draftComplete && (

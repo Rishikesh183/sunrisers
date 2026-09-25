@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const BALL_DELAY_MS = 45;
 const HIGHLIGHT_DELAY_MS = 550;
@@ -58,10 +58,27 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
     const { ballLog } = result;
     const [ballIdx, setBallIdx] = useState(-1);
     const [ticker, setTicker] = useState([]);
+    const [pausedAt300, setPausedAt300] = useState(false);
+    const hasPausedRef = useRef(false);
 
     const openers = [battingOrder?.[0]?.name, battingOrder?.[1]?.name];
 
     useEffect(() => {
+        if (pausedAt300 && !canSkip) {
+            const t = setTimeout(() => setPausedAt300(false), 1500);
+            return () => clearTimeout(t);
+        }
+        if (pausedAt300) return;
+
+        // Once the 300 par score is reached, pause for a celebratory checkpoint instead of
+        // auto-continuing - only fires once (hasPausedRef), and only for an actual 300 chase
+        // (not a duel guest chasing some other target).
+        if (!hasPausedRef.current && result.target === 300 && ballIdx >= 0 && ballLog[ballIdx].score >= 300) {
+            hasPausedRef.current = true;
+            setPausedAt300(true);
+            return;
+        }
+
         if (ballIdx >= ballLog.length - 1) {
             const t = setTimeout(onDone, END_PAUSE_MS);
             return () => clearTimeout(t);
@@ -76,7 +93,7 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
         }, delay);
         return () => clearTimeout(t);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ballIdx]);
+    }, [ballIdx, pausedAt300]);
 
     const live = computeLiveState(ballLog, ballIdx, openers);
     const totalOvers = 20;
@@ -129,26 +146,52 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
                 {!live.striker && <p className="text-sm text-textMuted text-center">Openers walking out…</p>}
             </div>
 
-            <div className="w-full max-w-md flex flex-col gap-2 min-h-[9rem]">
-                {ticker.length === 0 && (
-                    <p className="text-sm text-textMuted text-center">Quiet start to the chase…</p>
-                )}
-                {ticker.map((entry) => (
-                    <p
-                        key={`${entry.over}.${entry.ballInOver}`}
-                        className={`text-sm text-center font-semibold ${entry.isWicket ? 'text-loss' : 'text-win'}`}
-                    >
-                        {entry.over}.{entry.ballInOver} — {highlightText(entry)}
-                    </p>
-                ))}
-            </div>
-
-            {canSkip ? (
-                <button onClick={onDone} className="text-xs text-textMuted underline hover:text-text transition-colors">
-                    Skip to result
-                </button>
+            {pausedAt300 ? (
+                <div className="flex flex-col items-center gap-3 w-full max-w-md">
+                    <p className="font-display text-win uppercase tracking-wide">300 completed!</p>
+                    {canSkip ? (
+                        <div className="flex gap-3">
+                            <button
+                                onClick={onDone}
+                                className="py-2 px-5 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold text-sm"
+                            >
+                                See Result
+                            </button>
+                            <button
+                                onClick={() => setPausedAt300(false)}
+                                className="py-2 px-5 rounded-lg border border-accent text-accent hover:bg-accentMuted transition-colors font-semibold text-sm"
+                            >
+                                Want to Play More?
+                            </button>
+                        </div>
+                    ) : (
+                        <p className="text-xs text-textMuted">Waiting for the other player…</p>
+                    )}
+                </div>
             ) : (
-                <p className="text-xs text-textMuted">Watching…</p>
+                <>
+                    <div className="w-full max-w-md flex flex-col gap-2 min-h-[9rem]">
+                        {ticker.length === 0 && (
+                            <p className="text-sm text-textMuted text-center">Quiet start to the chase…</p>
+                        )}
+                        {ticker.map((entry) => (
+                            <p
+                                key={`${entry.over}.${entry.ballInOver}`}
+                                className={`text-sm text-center font-semibold ${entry.isWicket ? 'text-loss' : 'text-win'}`}
+                            >
+                                {entry.over}.{entry.ballInOver} — {highlightText(entry)}
+                            </p>
+                        ))}
+                    </div>
+
+                    {canSkip ? (
+                        <button onClick={onDone} className="text-xs text-textMuted underline hover:text-text transition-colors">
+                            Skip to result
+                        </button>
+                    ) : (
+                        <p className="text-xs text-textMuted">Watching…</p>
+                    )}
+                </>
             )}
         </div>
     );

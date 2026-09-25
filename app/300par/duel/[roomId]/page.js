@@ -16,6 +16,7 @@ import {
 import { getSeasonSquads } from '../../../../lib/data/seasonSquads';
 import { simulateChase } from '../../../../lib/game/simulate';
 import { TOTAL_SLOTS } from '../../../../lib/game/positions';
+import { TEAMS } from '../../../../data/teams';
 import TossPanel from '../../../../components/Duel/TossPanel';
 import DuelDraftBoard from '../../../../components/Duel/DuelDraftBoard';
 import DuelResult from '../../../../components/Duel/DuelResult';
@@ -49,6 +50,10 @@ export default function DuelRoomPage({ params }) {
 
     const myUid = user?.id;
     const seasonSquads = room ? getSeasonSquads(room.team) : {};
+    const teamInfo = room ? TEAMS.find((t) => t.code === room.team) : null;
+    const themeStyle = teamInfo
+        ? { '--accent': teamInfo.color, '--accent-hover': teamInfo.colorHover, '--accent-muted': teamInfo.colorMuted }
+        : undefined;
 
     useEffect(() => {
         if (!room || room.status !== 'simulating' || simulateAttempted.current) return;
@@ -134,7 +139,7 @@ export default function DuelRoomPage({ params }) {
     }
 
     return (
-        <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-10 bg-bg min-h-screen">
+        <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-10 bg-bg min-h-screen" style={themeStyle}>
             <h1 className="text-2xl sm:text-3xl font-display text-text text-center uppercase tracking-wide mb-2">
                 300 Par · 1v1 Duel
             </h1>
