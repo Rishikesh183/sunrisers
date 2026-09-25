@@ -1,20 +1,32 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const BALL_DELAY_MS = 45;
 const HIGHLIGHT_DELAY_MS = 550;
 const END_PAUSE_MS = 700;
 
 function highlightText(entry) {
-    if (entry.isWicket) return `OUT! ${entry.batter} departs.`;
+    if (entry.isWicket) return `OUT! ${entry.batter} departs for ${entry.batterRuns}(${entry.batterBalls}).`;
     if (entry.runs === 6) return `${entry.batter} — SIX!`;
     if (entry.runs === 4) return `${entry.batter} — FOUR!`;
     return `${entry.batter} — ${entry.runs} runs.`;
 }
 
-function isHighlight(entry) {
-    return entry.isWicket || entry.runs >= 4;
+function isHighlight(entry, fast) {
+    return entry.isWicket || entry.runs === 6 || (!fast && entry.runs === 4);
+}
+
+// Attaches each ball's batter with their cumulative runs(balls) at that point, so the "departs
+// for X(Y)" ticker line matches CommentaryFeed's ball-by-ball breakdown exactly.
+function annotateBallLog(ballLog) {
+    const tally = {};
+    return ballLog.map((entry) => {
+        if (!tally[entry.batter]) tally[entry.batter] = { runs: 0, balls: 0 };
+        tally[entry.batter].balls++;
+        if (!entry.isWicket) tally[entry.batter].runs += entry.runs;
+        return { ...entry, batterRuns: tally[entry.batter].runs, batterBalls: tally[entry.batter].balls };
+    });
 }
 
 // Replays the full ball-by-ball log up to `uptoIndex` to derive live state: score/wickets/
@@ -55,10 +67,11 @@ function computeLiveState(ballLog, uptoIndex, openers) {
 }
 
 export default function LivePlayback({ result, battingOrder, teamName, subtitle, inningsLabel, canSkip = true, onDone }) {
-    const { ballLog } = result;
+    const ballLog = useMemo(() => annotateBallLog(result.ballLog), [result.ballLog]);
     const [ballIdx, setBallIdx] = useState(-1);
     const [ticker, setTicker] = useState([]);
     const [pausedAt300, setPausedAt300] = useState(false);
+    const [fastMode, setFastMode] = useState(false);
     const hasPausedRef = useRef(false);
 
     const openers = [battingOrder?.[0]?.name, battingOrder?.[1]?.name];
@@ -84,16 +97,17 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
             return () => clearTimeout(t);
         }
         const nextEntry = ballLog[ballIdx + 1];
-        const delay = ballIdx === -1 ? BALL_DELAY_MS : isHighlight(ballLog[ballIdx]) ? HIGHLIGHT_DELAY_MS : BALL_DELAY_MS;
+        const prevIsHighlight = ballIdx >= 0 && isHighlight(ballLog[ballIdx], fastMode);
+        const delay = ballIdx === -1 ? BALL_DELAY_MS : prevIsHighlight ? (fastMode ? HIGHLIGHT_DELAY_MS / 3 : HIGHLIGHT_DELAY_MS) : BALL_DELAY_MS;
         const t = setTimeout(() => {
             setBallIdx((i) => i + 1);
-            if (isHighlight(nextEntry)) {
+            if (isHighlight(nextEntry, fastMode)) {
                 setTicker((prev) => [nextEntry, ...prev].slice(0, 6));
             }
         }, delay);
         return () => clearTimeout(t);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ballIdx, pausedAt300]);
+    }, [ballIdx, pausedAt300, fastMode]);
 
     const live = computeLiveState(ballLog, ballIdx, openers);
     const totalOvers = 20;
@@ -185,9 +199,21 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
                     </div>
 
                     {canSkip ? (
-                        <button onClick={onDone} className="text-xs text-textMuted underline hover:text-text transition-colors">
-                            Skip to result
-                        </button>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setFastMode((v) => !v)}
+                                className={`py-1.5 px-4 rounded-lg border text-xs font-semibold transition-colors
+                                    ${fastMode ? 'bg-accent text-white border-accent' : 'border-border text-textMuted hover:text-text hover:border-accent'}`}
+                            >
+                                {fastMode ? 'Fast: On' : 'Fast Forward'}
+                            </button>
+                            <button
+                                onClick={onDone}
+                                className="py-1.5 px-4 rounded-lg border border-border text-textMuted hover:text-text hover:border-accent transition-colors text-xs font-semibold"
+                            >
+                                Skip to Result
+                            </button>
+                        </div>
                     ) : (
                         <p className="text-xs text-textMuted">Watching…</p>
                     )}

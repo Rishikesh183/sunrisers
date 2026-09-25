@@ -9,6 +9,7 @@ import {
     eligibleEmptySlots,
     isPlayerPickable,
     pickPlayableYear,
+    slotLabel,
 } from '../../lib/game/positions';
 import { turnUid, otherPlayerUid, teamOf, isSameTeam } from '../../lib/duel/room';
 
@@ -127,17 +128,33 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
             </div>
 
             {selectedPlayer && (
-                <div className="fixed top-20 left-1/2 -translate-x-1/2 z-30 bg-surface border border-accent rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 max-w-[92vw]">
-                    <p className="text-sm text-text">
-                        Select a position to place <span className="text-accent font-semibold">{selectedPlayer.name}</span>
-                    </p>
-                    <button
-                        onClick={() => setSelectedPlayer(null)}
-                        className="text-textMuted hover:text-text transition-colors shrink-0"
-                        aria-label="Cancel selection"
-                    >
-                        <X size={16} />
-                    </button>
+                <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-4 sm:pb-6 pointer-events-none">
+                    <div className="pointer-events-auto w-full max-w-md bg-surface border-2 border-accent rounded-xl shadow-2xl px-4 py-3 flex flex-col items-center gap-3">
+                        <div className="flex items-center gap-3 w-full">
+                            <p className="text-sm text-text flex-1">
+                                Select a position for <span className="text-white font-semibold">{selectedPlayer.name}</span>
+                            </p>
+                            <button
+                                onClick={() => setSelectedPlayer(null)}
+                                className="text-textMuted hover:text-text transition-colors shrink-0"
+                                aria-label="Cancel selection"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-2">
+                            {eligibleSlotsForSelection.map((slot) => (
+                                <button
+                                    key={slot}
+                                    onClick={() => handleSlotClick(slot)}
+                                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg bg-accent text-white hover:bg-accentHover transition-colors"
+                                >
+                                    <span className="font-display text-sm">{slot}</span>
+                                    <span className="text-[10px] leading-none">{slotLabel(slot)}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             )}
 
