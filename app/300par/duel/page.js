@@ -24,7 +24,9 @@ export default function DuelLobby() {
             const roomId = await createRoom({
                 hostUid: user.id,
                 hostName: user.fullName || user.username || 'Player',
-                team,
+                hostTeam: team,
+                opponentUid: opponent.uid,
+                opponentName: opponent.displayName,
             });
             router.push(`/300par/duel/${roomId}`);
         } catch (err) {

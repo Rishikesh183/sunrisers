@@ -31,11 +31,16 @@ function DuelHistory({ uid }) {
                 const isHost = duel.hostUid === uid;
                 const myScore = isHost ? duel.hostScore : duel.guestScore;
                 const opponentScore = isHost ? duel.guestScore : duel.hostScore;
+                const myTeam = isHost ? duel.hostTeam : duel.guestTeam;
+                const opponentTeam = isHost ? duel.guestTeam : duel.hostTeam;
 
                 return (
                     <div key={duel.id} className="flex justify-between items-center gap-3 py-3">
                         <div className="min-w-0">
-                            <p className={`font-semibold ${won ? 'text-win' : 'text-loss'}`}>{won ? 'Won' : 'Lost'} · {duel.team}</p>
+                            <p className={`font-semibold ${won ? 'text-win' : 'text-loss'}`}>
+                                {won ? 'Won' : 'Lost'} · {myTeam}
+                                {opponentTeam !== myTeam && <span className="text-textMuted font-normal"> vs {opponentTeam}</span>}
+                            </p>
                             <p className="text-xs text-textMuted">{formatDate(duel.completedAt)}</p>
                         </div>
                         <p className="text-text tabular-nums shrink-0">{myScore} – {opponentScore}</p>

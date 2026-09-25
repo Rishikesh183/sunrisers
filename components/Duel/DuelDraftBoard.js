@@ -10,7 +10,7 @@ import {
     isPlayerPickable,
     pickPlayableYear,
 } from '../../lib/game/positions';
-import { turnUid, otherPlayerUid } from '../../lib/duel/room';
+import { turnUid, otherPlayerUid, teamOf, isSameTeam } from '../../lib/duel/room';
 
 const MAX_FOREIGNERS = 4;
 
@@ -28,19 +28,32 @@ function buildFilled(picks, uid, seasonSquads) {
     return filled;
 }
 
-export default function DuelDraftBoard({ room, myUid, seasonSquads, picks, onSubmitPick }) {
-    const years = useMemo(() => Object.keys(seasonSquads).map(Number).sort(), [seasonSquads]);
-    const otherUid = otherPlayerUid(room, room.firstPickerUid);
-    const isMyTurn = turnUid(room.currentTurnIndex, room.firstPickerUid, otherUid) === myUid;
+export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSeasonSquads, picks, onSubmitPick }) {
     const opponentUid = room.hostUid === myUid ? room.guestUid : room.hostUid;
     const opponentName = room.hostUid === myUid ? room.guestName : room.hostName;
     const myName = room.hostUid === myUid ? room.hostName : room.guestName;
+    const myTeam = teamOf(room, myUid);
+    const opponentTeam = teamOf(room, opponentUid);
+    const mySeasonSquads = myUid === room.hostUid ? hostSeasonSquads : guestSeasonSquads;
+    const opponentSeasonSquads = myUid === room.hostUid ? guestSeasonSquads : hostSeasonSquads;
+    const sameTeam = isSameTeam(room);
 
-    const myFilled = useMemo(() => buildFilled(picks, myUid, seasonSquads), [picks, myUid, seasonSquads]);
-    const opponentFilled = useMemo(() => buildFilled(picks, opponentUid, seasonSquads), [picks, opponentUid, seasonSquads]);
-    // Picks are exclusive across the whole room - once either player has a player-season, the
-    // other can't also draft it. Keeps both sides watching each other's picks matter strategically.
-    const allPickedNames = useMemo(() => new Set(picks.map((p) => p.playerName)), [picks]);
+    const years = useMemo(() => Object.keys(mySeasonSquads).map(Number).sort(), [mySeasonSquads]);
+    const otherUid = otherPlayerUid(room, room.firstPickerUid);
+    const isMyTurn = turnUid(room.currentTurnIndex, room.firstPickerUid, otherUid) === myUid;
+
+    const myFilled = useMemo(() => buildFilled(picks, myUid, mySeasonSquads), [picks, myUid, mySeasonSquads]);
+    const opponentFilled = useMemo(
+        () => buildFilled(picks, opponentUid, opponentSeasonSquads),
+        [picks, opponentUid, opponentSeasonSquads]
+    );
+    // Picks only need to stay exclusive when both players drafted the SAME franchise - if they
+    // picked different teams, the rosters are already disjoint, so cross-checking names would
+    // wrongly block, say, a player who appears in both franchises' histories in different years.
+    const allPickedNames = useMemo(() => {
+        const names = picks.filter((p) => sameTeam || p.uid === myUid).map((p) => p.playerName);
+        return new Set(names);
+    }, [picks, sameTeam, myUid]);
     const myFilledSlots = useMemo(() => new Set(Object.keys(myFilled).map(Number)), [myFilled]);
     const myForeignersPicked = Object.values(myFilled).filter((f) => f.player.country !== 'India').length;
     const myForeignersLocked = myForeignersPicked >= MAX_FOREIGNERS;
@@ -50,13 +63,13 @@ export default function DuelDraftBoard({ room, myUid, seasonSquads, picks, onSub
 
     useEffect(() => {
         if (isMyTurn) {
-            setCurrentYear(pickPlayableYear(years, seasonSquads, allPickedNames, myFilledSlots, myForeignersLocked));
+            setCurrentYear(pickPlayableYear(years, mySeasonSquads, allPickedNames, myFilledSlots, myForeignersLocked));
             setSelectedPlayer(null);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isMyTurn, room.currentTurnIndex]);
 
-    const currentSquad = currentYear ? seasonSquads[String(currentYear)] || [] : [];
+    const currentSquad = currentYear ? mySeasonSquads[String(currentYear)] || [] : [];
     const eligibleSlotsForSelection = selectedPlayer ? eligibleEmptySlots(selectedPlayer, myFilledSlots) : [];
 
     function isForeignLocked(player) {
@@ -105,7 +118,7 @@ export default function DuelDraftBoard({ room, myUid, seasonSquads, picks, onSub
             </div>
 
             <div>
-                <p className="text-xs text-textMuted uppercase tracking-wide mb-2">{myName}'s {room.team}</p>
+                <p className="text-xs text-textMuted uppercase tracking-wide mb-2">{myName}'s {myTeam}</p>
                 <BattingOrderStrip
                     filled={myFilled}
                     eligibleSlots={isMyTurn ? eligibleSlotsForSelection : []}
@@ -155,7 +168,7 @@ export default function DuelDraftBoard({ room, myUid, seasonSquads, picks, onSub
             )}
 
             <div>
-                <p className="text-xs text-textMuted uppercase tracking-wide mb-2">{opponentName}'s {room.team}</p>
+                <p className="text-xs text-textMuted uppercase tracking-wide mb-2">{opponentName}'s {opponentTeam}</p>
                 <BattingOrderStrip filled={opponentFilled} eligibleSlots={[]} onSlotClick={() => {}} />
             </div>
         </div>
