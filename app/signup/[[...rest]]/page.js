@@ -3,18 +3,7 @@
 import { SignUp } from '@clerk/nextjs';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-
-const clerkAppearance = {
-    variables: {
-        colorPrimary: '#ff6b1a',
-        colorBackground: '#1a2332',
-        colorText: '#e8ecf1',
-        colorTextSecondary: '#8b96a8',
-        colorInputBackground: '#0f1419',
-        colorInputText: '#e8ecf1',
-        borderRadius: '10px',
-    },
-};
+import { clerkAppearance } from '../../../lib/clerkAppearance';
 
 export default function SignUpPage() {
   return (
@@ -57,7 +46,13 @@ export default function SignUpPage() {
         >
           <div className="w-full max-w-md">
             <h2 className="text-2xl md:text-3xl font-display text-text mb-4">Don&apos;t have an Account?</h2>
-            <SignUp path="/signup" routing="path" signInUrl="/signin" appearance={clerkAppearance} />
+            <SignUp
+              path="/signup"
+              routing="path"
+              signInUrl="/signin"
+              fallbackRedirectUrl="/"
+              appearance={clerkAppearance}
+            />
           </div>
         </motion.div>
       </motion.div>

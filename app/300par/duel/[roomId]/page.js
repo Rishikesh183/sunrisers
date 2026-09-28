@@ -132,6 +132,7 @@ export default function DuelRoomPage({ params }) {
             await submitPick(roomId, payload);
         } catch (err) {
             setActionError(err.message);
+            throw err; // let DuelDraftBoard roll back its optimistic pick on failure
         }
     }
 

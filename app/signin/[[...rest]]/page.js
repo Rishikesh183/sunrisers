@@ -3,18 +3,7 @@
 import { SignIn } from '@clerk/nextjs';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-
-const clerkAppearance = {
-    variables: {
-        colorPrimary: '#ff6b1a',
-        colorBackground: '#1a2332',
-        colorText: '#e8ecf1',
-        colorTextSecondary: '#8b96a8',
-        colorInputBackground: '#0f1419',
-        colorInputText: '#e8ecf1',
-        borderRadius: '10px',
-    },
-};
+import { clerkAppearance } from '../../../lib/clerkAppearance';
 
 export default function SignInPage() {
     return (
@@ -39,7 +28,13 @@ export default function SignInPage() {
                     <div>
                         <h2 className="text-2xl md:text-3xl font-display text-text mb-4">Welcome Back</h2>
                         <div className="w-full max-w-md">
-                            <SignIn path="/signin" routing="path" signUpUrl="/signup" appearance={clerkAppearance} />
+                            <SignIn
+                                path="/signin"
+                                routing="path"
+                                signUpUrl="/signup"
+                                fallbackRedirectUrl="/"
+                                appearance={clerkAppearance}
+                            />
                         </div>
                     </div>
                 </motion.div>

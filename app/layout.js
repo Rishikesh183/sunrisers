@@ -2,6 +2,7 @@ import './globals.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import Navbar from '../components/Navbar';
+import { clerkAppearance } from '../lib/clerkAppearance';
 
 export const metadata = {
   title: 'Srh',
@@ -10,7 +11,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider afterSignOutUrl="/">
+    <ClerkProvider afterSignOutUrl="/" appearance={clerkAppearance}>
       <html lang="en">
         <body className="bg-bg text-text">
           <div className="app min-h-screen bg-bg">

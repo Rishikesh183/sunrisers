@@ -43,18 +43,34 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
     const otherUid = otherPlayerUid(room, room.firstPickerUid);
     const isMyTurn = turnUid(room.currentTurnIndex, room.firstPickerUid, otherUid) === myUid;
 
-    const myFilled = useMemo(() => buildFilled(picks, myUid, mySeasonSquads), [picks, myUid, mySeasonSquads]);
+    // Optimistic pick: applied to the local view the instant you click a slot, before the
+    // Firestore transaction round-trip confirms it - reconciled away once the real `picks`
+    // subcollection reflects this turnIndex, or rolled back if the submit fails. This is what
+    // makes your own board/turn update feel instant instead of waiting out the network latency.
+    const [optimisticPick, setOptimisticPick] = useState(null);
+    useEffect(() => {
+        if (optimisticPick && picks.some((p) => p.turnIndex === optimisticPick.turnIndex)) {
+            setOptimisticPick(null);
+        }
+    }, [picks, optimisticPick]);
+    const effectivePicks = useMemo(
+        () => (optimisticPick ? [...picks, optimisticPick] : picks),
+        [picks, optimisticPick]
+    );
+    const isMyTurnDisplay = isMyTurn && !optimisticPick;
+
+    const myFilled = useMemo(() => buildFilled(effectivePicks, myUid, mySeasonSquads), [effectivePicks, myUid, mySeasonSquads]);
     const opponentFilled = useMemo(
-        () => buildFilled(picks, opponentUid, opponentSeasonSquads),
-        [picks, opponentUid, opponentSeasonSquads]
+        () => buildFilled(effectivePicks, opponentUid, opponentSeasonSquads),
+        [effectivePicks, opponentUid, opponentSeasonSquads]
     );
     // Picks only need to stay exclusive when both players drafted the SAME franchise - if they
     // picked different teams, the rosters are already disjoint, so cross-checking names would
     // wrongly block, say, a player who appears in both franchises' histories in different years.
     const allPickedNames = useMemo(() => {
-        const names = picks.filter((p) => sameTeam || p.uid === myUid).map((p) => p.playerName);
+        const names = effectivePicks.filter((p) => sameTeam || p.uid === myUid).map((p) => p.playerName);
         return new Set(names);
-    }, [picks, sameTeam, myUid]);
+    }, [effectivePicks, sameTeam, myUid]);
     const myFilledSlots = useMemo(() => new Set(Object.keys(myFilled).map(Number)), [myFilled]);
     const myForeignersPicked = Object.values(myFilled).filter((f) => f.player.country !== 'India').length;
     const myForeignersLocked = myForeignersPicked >= MAX_FOREIGNERS;
@@ -82,17 +98,23 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
         setSelectedPlayer((prev) => (prev?.name === player.name ? null : player));
     }
 
-    function handleSlotClick(slot) {
-        if (!isMyTurn || !selectedPlayer || myFilled[slot]) return;
+    async function handleSlotClick(slot) {
+        if (!isMyTurnDisplay || !selectedPlayer || myFilled[slot]) return;
         if (!selectedPlayer.slots.includes(slot)) return;
-        onSubmitPick({
+        const payload = {
             uid: myUid,
             turnIndex: room.currentTurnIndex,
             year: currentYear,
             playerName: selectedPlayer.name,
             slot,
-        });
+        };
+        setOptimisticPick(payload);
         setSelectedPlayer(null);
+        try {
+            await onSubmitPick(payload);
+        } catch {
+            setOptimisticPick(null); // roll back - the pick didn't actually go through
+        }
     }
 
     return (
@@ -102,12 +124,12 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                     <p className="font-display text-text text-sm">
                         Turn {room.currentTurnIndex + 1} / {TOTAL_SLOTS * 2}
                     </p>
-                    <p className={`font-display text-sm ${isMyTurn ? 'text-accent' : 'text-textMuted'}`}>
-                        {isMyTurn ? 'Your pick' : `${opponentName}'s pick`}
+                    <p className={`font-display text-sm ${isMyTurnDisplay ? 'text-accent' : 'text-textMuted'}`}>
+                        {optimisticPick ? 'Saving your pick…' : isMyTurnDisplay ? 'Your pick' : `${opponentName}'s pick`}
                     </p>
                 </div>
                 <div className="flex flex-wrap justify-between items-center gap-2">
-                    {isMyTurn && currentYear ? (
+                    {isMyTurnDisplay && currentYear ? (
                         <p className="text-accent font-display text-base sm:text-lg">{currentYear} Squad</p>
                     ) : (
                         <div />
@@ -122,7 +144,7 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                 <p className="text-xs text-textMuted uppercase tracking-wide mb-2">{myName}'s {myTeam}</p>
                 <BattingOrderStrip
                     filled={myFilled}
-                    eligibleSlots={isMyTurn ? eligibleSlotsForSelection : []}
+                    eligibleSlots={isMyTurnDisplay ? eligibleSlotsForSelection : []}
                     onSlotClick={handleSlotClick}
                 />
             </div>
@@ -158,7 +180,7 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                 </div>
             )}
 
-            {isMyTurn && (
+            {isMyTurnDisplay && (
                 <div className="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
                     {currentSquad.map((player) => {
                         const alreadyPicked = allPickedNames.has(player.name);
