@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
-import SeasonPlayerCard from './SeasonPlayerCard';
+import Panel from './Panel';
+import SquadPanel from './SquadPanel';
 import BattingOrderStrip from './BattingOrderStrip';
 import ScoreBoard from './ScoreBoard';
 import LivePlayback from './LivePlayback';
@@ -18,7 +19,7 @@ import { getBestScore, saveResult } from '../../lib/game/localHistory';
 
 const MAX_FOREIGNERS = 4;
 
-export default function DraftGame({ teams, seasonSquadsByTeam }) {
+export default function DraftGame({ teams, seasonSquadsByTeam, onActiveChange }) {
     const [teamCode, setTeamCode] = useState(teams.length === 1 ? teams[0].code : null);
     const seasonSquads = teamCode ? seasonSquadsByTeam[teamCode] : {};
     const years = useMemo(() => Object.keys(seasonSquads).map(Number).sort(), [seasonSquads]);
@@ -39,13 +40,22 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
         : undefined;
 
     useEffect(() => {
-        if (teamCode && years.length) {
-            setCurrentYear(pickPlayableYear(years, seasonSquads, new Set(), new Set(), false));
-        }
+        onActiveChange?.(teamCode);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [teamCode]);
 
+
     const pickedCount = Object.keys(filled).length;
+
+    // A season is rolled automatically at the start and after every pick (year is cleared to null
+    // whenever a pick lands or the draft resets, which re-triggers this).
+    useEffect(() => {
+        if (teamCode && years.length && !currentYear && pickedCount < TOTAL_SLOTS && phase === 'drafting') {
+            setCurrentYear(pickPlayableYear(years, seasonSquads, pickedNames, filledSlots, foreignersLocked));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [teamCode, currentYear, pickedCount, phase]);
+
     const currentSquad = seasonSquads[String(currentYear)] || [];
     const filledSlots = useMemo(() => new Set(Object.keys(filled).map(Number)), [filled]);
     const battingOrder = useMemo(
@@ -77,12 +87,7 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
         setPickedNames(nextPickedNames);
         setSelectedPlayer(null);
 
-        if (Object.keys(nextFilled).length < TOTAL_SLOTS) {
-            const nextFilledSlots = new Set(Object.keys(nextFilled).map(Number));
-            const nextForeignersPicked = Object.values(nextFilled).filter((f) => f.player.country !== 'India').length;
-            const nextForeignersLocked = nextForeignersPicked >= MAX_FOREIGNERS;
-            setCurrentYear(pickPlayableYear(years, seasonSquads, nextPickedNames, nextFilledSlots, nextForeignersLocked));
-        }
+        setCurrentYear(null); // next season is rolled by the effect above
     }
 
     function handleSimulate() {
@@ -103,7 +108,7 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
     }
 
     function handleSkipYear() {
-        if (skipUsed) return;
+        if (skipUsed || !currentYear) return;
         setSkipUsed(true);
         setSelectedPlayer(null);
         setCurrentYear(pickPlayableYear(years, seasonSquads, pickedNames, filledSlots, foreignersLocked, currentYear));
@@ -120,7 +125,7 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
 
     function handlePlayAgain() {
         resetDraft();
-        setCurrentYear(pickPlayableYear(years, seasonSquads, new Set(), new Set(), false));
+        setCurrentYear(null);
     }
 
     function handleChangeTeam() {
@@ -142,7 +147,7 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
         setDifficulty(pendingDifficulty);
         setPendingDifficulty(null);
         resetDraft();
-        setCurrentYear(pickPlayableYear(years, seasonSquads, new Set(), new Set(), false));
+        setCurrentYear(null);
     }
 
     if (!teamCode) {
@@ -189,62 +194,29 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
         );
     }
 
+
     const eligibleSlotsForSelection = selectedPlayer ? eligibleEmptySlots(selectedPlayer, filledSlots) : [];
     const draftComplete = pickedCount === TOTAL_SLOTS;
 
+    function getCardState(player) {
+        const alreadyPicked = pickedNames.has(player.name);
+        const noSlot = !isPlayerPickable(player, filledSlots);
+        const foreignLocked = isForeignLocked(player);
+        let reason = null;
+        if (foreignLocked && !alreadyPicked && !noSlot) {
+            reason = `Foreigner limit reached (${MAX_FOREIGNERS}/${MAX_FOREIGNERS})`;
+        }
+        return { disabled: alreadyPicked || noSlot || foreignLocked, reason };
+    }
+
+    const statPills = [
+        `Bowlers ${bowlersPicked}/4`,
+        `Keeper: ${keeperPicked ? 'Yes' : 'No'}`,
+        `Foreigners ${foreignersPicked}/${MAX_FOREIGNERS}`,
+    ];
+
     return (
         <div className="flex flex-col gap-5" style={themeStyle}>
-            <div className="flex flex-col gap-3 bg-surface border border-border rounded-xl p-3 sm:p-4">
-                <div className="flex flex-wrap justify-between items-center gap-2">
-                    <div className="flex items-center gap-3">
-                        <p className="font-display text-text text-sm">
-                            {team.name} · {draftComplete ? 'Squad complete' : `Turn ${pickedCount + 1} / ${TOTAL_SLOTS}`}
-                        </p>
-                        {teams.length > 1 && (
-                            <button
-                                onClick={handleChangeTeam}
-                                className="text-xs px-3 py-1 rounded-lg border border-border text-textMuted hover:text-text hover:border-accent transition-colors font-semibold"
-                            >
-                                Change Team
-                            </button>
-                        )}
-                    </div>
-                    <label className="flex items-center gap-2 text-xs text-textMuted">
-                        Difficulty:
-                        <select
-                            value={difficulty}
-                            onChange={(e) => handleDifficultyChange(e.target.value)}
-                            className="bg-bg border border-border rounded-lg px-2 py-1 text-xs text-text font-semibold capitalize cursor-pointer"
-                        >
-                            <option value="hard">Hard</option>
-                            <option value="easy">Easy</option>
-                        </select>
-                    </label>
-                </div>
-                <div className="flex flex-wrap justify-between items-center gap-2">
-                    {!draftComplete ? (
-                        <div className="flex items-center gap-3">
-                            <p className="text-accent font-display text-base sm:text-lg">{currentYear} Squad</p>
-                            <button
-                                onClick={handleSkipYear}
-                                disabled={skipUsed}
-                                className={`text-xs px-3 py-1 rounded-lg border transition-colors font-semibold
-                                    ${skipUsed ? 'border-border text-textMuted opacity-40 cursor-not-allowed' : 'border-accent text-accent hover:bg-accentMuted cursor-pointer'}`}
-                            >
-                                {skipUsed ? 'Skip Used' : 'Skip Year'}
-                            </button>
-                        </div>
-                    ) : (
-                        <div />
-                    )}
-                    <p className="text-xs text-textMuted">
-                        Bowlers: {bowlersPicked}/4 · Keeper: {keeperPicked ? 'Yes' : 'No'} · Foreigners: {foreignersPicked}/{MAX_FOREIGNERS}
-                    </p>
-                </div>
-            </div>
-
-            <BattingOrderStrip filled={filled} eligibleSlots={eligibleSlotsForSelection} onSlotClick={handleSlotClick} />
-
             {selectedPlayer && (
                 <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-4 sm:pb-6 pointer-events-none">
                     <div className="pointer-events-auto w-full max-w-md bg-surface border-2 border-accent rounded-xl shadow-2xl px-4 py-3 flex flex-col items-center gap-3">
@@ -300,40 +272,101 @@ export default function DraftGame({ teams, seasonSquadsByTeam }) {
                 </div>
             )}
 
-            {!draftComplete && (
-                <div className="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
-                    {currentSquad.map((player) => {
-                        const alreadyPicked = pickedNames.has(player.name);
-                        const noSlot = !isPlayerPickable(player, filledSlots);
-                        const foreignLocked = isForeignLocked(player);
-                        let disabledReason = null;
-                        if (foreignLocked && !alreadyPicked && !noSlot) {
-                            disabledReason = `Foreigner limit reached (${MAX_FOREIGNERS}/${MAX_FOREIGNERS})`;
-                        }
-                        return (
-                            <SeasonPlayerCard
-                                key={player.name}
-                                player={player}
-                                selected={selectedPlayer?.name === player.name}
-                                disabled={alreadyPicked || noSlot || foreignLocked}
-                                disabledReason={disabledReason}
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:h-[calc(100vh-9.5rem)] lg:min-h-[520px]">
+                <Panel title="Your XI" badge={`${pickedCount} / ${TOTAL_SLOTS}`} className="order-2 lg:order-1">
+                    <div className="flex flex-wrap gap-2">
+                        {statPills.map((label) => (
+                            <span key={label} className="px-3 py-1 rounded-full border border-border bg-bg/50 text-xs text-textMuted">
+                                {label}
+                            </span>
+                        ))}
+                    </div>
+
+                    <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto no-scrollbar">
+                        <BattingOrderStrip filled={filled} eligibleSlots={eligibleSlotsForSelection} onSlotClick={handleSlotClick} />
+                    </div>
+
+                    {draftComplete ? (
+                        <button
+                            onClick={handleSimulate}
+                            className="w-full py-3 rounded-xl font-semibold text-lg transition-colors bg-accent hover:bg-accentHover text-white cursor-pointer"
+                        >
+                            Simulate the Chase
+                        </button>
+                    ) : (
+                        <button
+                            disabled
+                            className="w-full py-3 rounded-xl font-semibold text-lg bg-border text-textMuted cursor-not-allowed"
+                        >
+                            {`Fill all ${TOTAL_SLOTS} spots to simulate`}
+                        </button>
+                    )}
+                </Panel>
+
+                <Panel
+                    className="order-1 lg:order-2"
+                    title={
+                        <>
+                            Pick from <span className="text-accent">{team.code}</span> Players
+                        </>
+                    }
+                    right={
+                        <div className="flex flex-wrap items-center gap-2">
+                            {teams.length > 1 && (
+                                <button
+                                    onClick={handleChangeTeam}
+                                    className="text-xs px-3 py-1.5 rounded-lg border border-border text-textMuted hover:text-text hover:border-accent transition-colors font-semibold"
+                                >
+                                    Change Team
+                                </button>
+                            )}
+                            <label className="flex items-center gap-2 text-xs text-textMuted">
+                                Difficulty
+                                <select
+                                    value={difficulty}
+                                    onChange={(e) => handleDifficultyChange(e.target.value)}
+                                    className="bg-bg border border-border rounded-lg px-2 py-1.5 text-xs text-text font-semibold cursor-pointer"
+                                >
+                                    <option value="hard">Hard</option>
+                                    <option value="easy">Easy</option>
+                                </select>
+                            </label>
+                        </div>
+                    }
+                >
+                    {draftComplete ? (
+                        <p className="text-center text-textMuted py-10">
+                            Squad complete — hit <span className="text-accent font-semibold">Simulate the Chase</span> to see how your XI does.
+                        </p>
+                    ) : (
+                        !currentYear ? null : (
+                        <>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <span className="px-4 py-1.5 rounded-full bg-accentMuted border border-accent/40 text-accent font-display">
+                                    {currentYear} Squad
+                                </span>
+                                <button
+                                    onClick={handleSkipYear}
+                                    disabled={skipUsed}
+                                    className={`text-xs px-3 py-1.5 rounded-lg border transition-colors font-semibold
+                                        ${skipUsed ? 'border-border text-textMuted opacity-40 cursor-not-allowed' : 'border-accent text-accent hover:bg-accentMuted cursor-pointer'}`}
+                                >
+                                    {skipUsed ? 'Skip Used' : 'Skip Year'}
+                                </button>
+                                <span className="text-xs text-textMuted">{team.name} · Turn {pickedCount + 1} / {TOTAL_SLOTS}</span>
+                            </div>
+                            <SquadPanel
+                                squad={currentSquad}
+                                year={currentYear}
+                                selectedPlayer={selectedPlayer}
+                                getState={getCardState}
                                 onSelect={handleSelectPlayer}
                             />
-                        );
-                    })}
-                </div>
-            )}
-
-            {draftComplete && (
-                <div className="flex justify-center">
-                    <button
-                        onClick={handleSimulate}
-                        className="py-3 px-8 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold text-lg"
-                    >
-                        Simulate the Chase
-                    </button>
-                </div>
-            )}
+                        </>
+                        )
+                    )}
+                </Panel>
+            </div>
         </div>
     );
 }

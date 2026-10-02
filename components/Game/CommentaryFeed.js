@@ -1,6 +1,19 @@
 'use client';
 
+const EXTRA_LABELS = { wd: 'wide', nb: 'no-ball', b: 'bye', lb: 'leg-bye' };
+
+// Extras ride on a normal delivery - appended so the batter's own runs and the extras both read clearly.
+function extrasSuffix(entry) {
+    if (!entry.extras) return '';
+    const label = EXTRA_LABELS[entry.extraType] || 'extra';
+    return ` +${entry.extras} ${label}${entry.extras > 1 && entry.extraType !== 'wd' && entry.extraType !== 'nb' ? 's' : ''}`;
+}
+
 function ballCommentary(entry) {
+    return baseCommentary(entry) + extrasSuffix(entry);
+}
+
+function baseCommentary(entry) {
     if (entry.isWicket) return `OUT! ${entry.batter} departs for ${entry.batterRuns}(${entry.batterBalls}).`;
     if (entry.runs === 0) return `${entry.batter} — no run.`;
     if (entry.runs === 4) return `${entry.batter} — FOUR!`;

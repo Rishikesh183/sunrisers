@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
-import SeasonPlayerCard from '../Game/SeasonPlayerCard';
+import Panel from '../Game/Panel';
+import Spinner from './Spinner';
+import SquadPanel from '../Game/SquadPanel';
 import BattingOrderStrip from '../Game/BattingOrderStrip';
 import {
     TOTAL_SLOTS,
@@ -117,38 +119,24 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
         }
     }
 
+    function getCardState(player) {
+        const alreadyPicked = allPickedNames.has(player.name);
+        const noSlot = !isPlayerPickable(player, myFilledSlots);
+        const foreignLocked = isForeignLocked(player);
+        let reason = null;
+        if (foreignLocked && !alreadyPicked && !noSlot) {
+            reason = `Foreigner limit reached (${MAX_FOREIGNERS}/${MAX_FOREIGNERS})`;
+        } else if (alreadyPicked) {
+            reason = 'Already drafted this match';
+        }
+        return { disabled: alreadyPicked || noSlot || foreignLocked, reason };
+    }
+
+    const statPills = [`Foreigners ${myForeignersPicked}/${MAX_FOREIGNERS}`];
+    const turnLabel = optimisticPick ? 'Saving your pick…' : isMyTurnDisplay ? 'Your pick' : `${opponentName}'s pick`;
+
     return (
         <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-2 bg-surface border border-border rounded-xl p-3 sm:p-4">
-                <div className="flex flex-wrap justify-between items-center gap-2">
-                    <p className="font-display text-text text-sm">
-                        Turn {room.currentTurnIndex + 1} / {TOTAL_SLOTS * 2}
-                    </p>
-                    <p className={`font-display text-sm ${isMyTurnDisplay ? 'text-accent' : 'text-textMuted'}`}>
-                        {optimisticPick ? 'Saving your pick…' : isMyTurnDisplay ? 'Your pick' : `${opponentName}'s pick`}
-                    </p>
-                </div>
-                <div className="flex flex-wrap justify-between items-center gap-2">
-                    {isMyTurnDisplay && currentYear ? (
-                        <p className="text-accent font-display text-base sm:text-lg">{currentYear} Squad</p>
-                    ) : (
-                        <div />
-                    )}
-                    <p className="text-xs text-textMuted">
-                        {myName}: {myFilledSlots.size}/{TOTAL_SLOTS} · Foreigners: {myForeignersPicked}/{MAX_FOREIGNERS}
-                    </p>
-                </div>
-            </div>
-
-            <div>
-                <p className="text-xs text-textMuted uppercase tracking-wide mb-2">{myName}'s {myTeam}</p>
-                <BattingOrderStrip
-                    filled={myFilled}
-                    eligibleSlots={isMyTurnDisplay ? eligibleSlotsForSelection : []}
-                    onSlotClick={handleSlotClick}
-                />
-            </div>
-
             {selectedPlayer && (
                 <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-4 sm:pb-6 pointer-events-none">
                     <div className="pointer-events-auto w-full max-w-md bg-surface border-2 border-accent rounded-xl shadow-2xl px-4 py-3 flex flex-col items-center gap-3">
@@ -180,35 +168,72 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                 </div>
             )}
 
-            {isMyTurnDisplay && (
-                <div className="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
-                    {currentSquad.map((player) => {
-                        const alreadyPicked = allPickedNames.has(player.name);
-                        const noSlot = !isPlayerPickable(player, myFilledSlots);
-                        const foreignLocked = isForeignLocked(player);
-                        let disabledReason = null;
-                        if (foreignLocked && !alreadyPicked && !noSlot) {
-                            disabledReason = `Foreigner limit reached (${MAX_FOREIGNERS}/${MAX_FOREIGNERS})`;
-                        } else if (alreadyPicked) {
-                            disabledReason = 'Already drafted this match';
-                        }
-                        return (
-                            <SeasonPlayerCard
-                                key={player.name}
-                                player={player}
-                                selected={selectedPlayer?.name === player.name}
-                                disabled={alreadyPicked || noSlot || foreignLocked}
-                                disabledReason={disabledReason}
+            <div className="flex flex-wrap justify-between items-center gap-2 bg-surface/85 backdrop-blur-sm border border-border rounded-2xl px-4 py-3">
+                <p className="font-display text-text text-sm">
+                    Turn {room.currentTurnIndex + 1} / {TOTAL_SLOTS * 2}
+                </p>
+                <p className={`font-display text-sm flex items-center gap-2 ${isMyTurnDisplay ? 'text-accent' : 'text-textMuted'}`}>
+                    {(optimisticPick || !isMyTurnDisplay) && <Spinner />}
+                    {turnLabel}
+                </p>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:h-[calc(100vh-15rem)] lg:min-h-[540px]">
+                <Panel title={`${myName}'s ${myTeam}`} badge={`${myFilledSlots.size} / ${TOTAL_SLOTS}`}>
+                    <div className="flex flex-wrap gap-2">
+                        {statPills.map((label) => (
+                            <span key={label} className="px-3 py-1 rounded-full border border-border bg-bg/50 text-xs text-textMuted">
+                                {label}
+                            </span>
+                        ))}
+                    </div>
+                    <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto no-scrollbar">
+                        <BattingOrderStrip
+                            filled={myFilled}
+                            eligibleSlots={isMyTurnDisplay ? eligibleSlotsForSelection : []}
+                            onSlotClick={handleSlotClick}
+                        />
+                    </div>
+                </Panel>
+
+                <div className="flex flex-col gap-4 min-h-0">
+                    {isMyTurnDisplay ? (
+                        <Panel
+                            title={
+                                <>
+                                    Pick from <span className="text-accent">{myTeam}</span> Players
+                                </>
+                            }
+                            className="lg:flex-1"
+                        >
+                            {currentYear && (
+                                <div className="flex items-center gap-3">
+                                    <span className="px-4 py-1.5 rounded-full bg-accentMuted border border-accent/40 text-accent font-display">
+                                        {currentYear} Squad
+                                    </span>
+                                </div>
+                            )}
+                            <SquadPanel
+                                squad={currentSquad}
+                                year={currentYear}
+                                selectedPlayer={selectedPlayer}
+                                getState={getCardState}
                                 onSelect={handleSelectPlayer}
                             />
-                        );
-                    })}
-                </div>
-            )}
+                        </Panel>
+                    ) : (
+                        <Panel title="Waiting for the other pick">
+                            <div className="flex flex-col items-center gap-3 py-6 text-sm text-textMuted text-center">
+                                <Spinner size={22} label={optimisticPick ? 'Saving your pick…' : `Waiting for ${opponentName}…`} />
+                                {!optimisticPick && <p>You can watch their XI fill up below.</p>}
+                            </div>
+                        </Panel>
+                    )}
 
-            <div>
-                <p className="text-xs text-textMuted uppercase tracking-wide mb-2">{opponentName}'s {opponentTeam}</p>
-                <BattingOrderStrip filled={opponentFilled} eligibleSlots={[]} onSlotClick={() => {}} />
+                    <Panel title={`${opponentName}'s ${opponentTeam}`} badge={`${Object.keys(opponentFilled).length} / ${TOTAL_SLOTS}`}>
+                        <BattingOrderStrip filled={opponentFilled} eligibleSlots={[]} onSlotClick={() => {}} compact />
+                    </Panel>
+                </div>
             </div>
         </div>
     );

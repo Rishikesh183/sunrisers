@@ -277,7 +277,6 @@ const seasons = {
         player('Kartik Sharma', 'India', 'Batsman', [3, 4, 5, 6], false, { avg: 22, sr: 135, innings: 10 }),
         player('Shivam Dube', 'India', 'Batsman', [5, 6, 7], false, { avg: 24, sr: 145, innings: 11 }),
         player('Ayush Mhatre', 'India', 'Batsman', [1, 2, 3], false, { avg: 18, sr: 150, innings: 7 }),
-        player('MS Dhoni', 'India', 'Wicketkeeper Batsman', [4, 5, 6, 7], true, { avg: 20, sr: 150, innings: 9 }),
         player('Dewald Brevis', 'South Africa', 'Batsman', [3, 4, 5, 6], false, { avg: 18, sr: 148, innings: 6 }),
         player('Anshul Kamboj', 'India', 'Bowler', [8, 9, 10, 11], false, { avg: 4, sr: 40, innings: 2 }, { avg: 20, eco: 8.2, wkts: 21, primary: true }),
         player('Jamie Overton', 'England', 'Bowler', [8, 9, 10, 11], false, { avg: 6, sr: 55, innings: 3 }, { avg: 24, eco: 8.6, wkts: 14, primary: true }),

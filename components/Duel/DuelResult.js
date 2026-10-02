@@ -6,8 +6,26 @@ import ScoreBoard from '../Game/ScoreBoard';
 
 const TARGET_REVEAL_MS = 2200;
 
+// Replaying the live simulation every time the result page is opened (e.g. coming back from the
+// dashboard) is noise - remember per room, per browser, that it's already been watched.
+const watchedKey = (roomId) => `duelWatched:${roomId}`;
+function hasWatched(roomId) {
+    try {
+        return localStorage.getItem(watchedKey(roomId)) === '1';
+    } catch {
+        return false;
+    }
+}
+function markWatched(roomId) {
+    try {
+        localStorage.setItem(watchedKey(roomId), '1');
+    } catch {
+        // storage unavailable - worst case the replay plays again
+    }
+}
+
 export default function DuelResult({ room, myUid }) {
-    const [stage, setStage] = useState('first'); // 'first' | 'targetReveal' | 'second' | 'final'
+    const [stage, setStage] = useState(() => (hasWatched(room.id) ? 'final' : 'first')); // 'first' | 'targetReveal' | 'second' | 'final'
 
     const isHostFirst = room.firstPickerUid === room.hostUid;
     const firstUid = room.firstPickerUid;
@@ -28,6 +46,10 @@ export default function DuelResult({ room, myUid }) {
     const target = firstResult.finalScore + 1;
 
     useEffect(() => {
+        if (stage === 'final') markWatched(room.id);
+    }, [stage, room.id]);
+
+    useEffect(() => {
         if (stage !== 'targetReveal') return;
         const t = setTimeout(() => setStage('second'), TARGET_REVEAL_MS);
         return () => clearTimeout(t);
@@ -41,6 +63,8 @@ export default function DuelResult({ room, myUid }) {
                 inningsLabel="First Innings"
                 subtitle={`${firstName}'s ${firstTeam} — batting first`}
                 canSkip={myUid === firstUid}
+                isChase={false}
+                parPause={false}
                 onDone={() => setStage('targetReveal')}
             />
         );
@@ -68,6 +92,7 @@ export default function DuelResult({ room, myUid }) {
                 inningsLabel="Second Innings"
                 subtitle={`${secondName}'s ${secondTeam} — bowling first, now chasing ${target}`}
                 canSkip={myUid === secondUid}
+                parPause={false}
                 onDone={() => setStage('final')}
             />
         );
@@ -79,9 +104,8 @@ export default function DuelResult({ room, myUid }) {
         ? `${secondName} won by ${10 - secondResult.wickets} wicket${10 - secondResult.wickets === 1 ? '' : 's'}`
         : `${firstName} won by ${firstResult.finalScore - secondResult.finalScore} run${firstResult.finalScore - secondResult.finalScore === 1 ? '' : 's'}`;
 
-    // firstResult.won reflects "beat the 300 baseline", not the duel outcome (only
-    // secondResult.won IS the duel outcome, since the second side's target is the first side's
-    // score) - override so the first side's scorecard color/copy matches who actually won.
+    // The first innings has no target of its own (won is null) - derive it from the duel outcome
+    // so the first side's scorecard color/copy matches who actually won.
     const firstDisplayResult = { ...firstResult, won: room.winnerUid === firstUid };
 
     return (
@@ -118,8 +142,8 @@ export default function DuelResult({ room, myUid }) {
                     result={secondResult}
                     resultText={
                         secondResult.won
-                            ? `Chased down ${firstResult.finalScore} to win.`
-                            : `Fell short of the ${firstResult.finalScore} target.`
+                            ? `Chased down the target of ${target} to win.`
+                            : `Fell short of the ${target} target.`
                     }
                 />
             </div>

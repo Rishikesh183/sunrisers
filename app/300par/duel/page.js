@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import Spinner from '../../../components/Duel/Spinner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SignedIn, SignedOut, useUser } from '@clerk/nextjs';
 import OpponentList from '../../../components/Duel/OpponentList';
 import { createRoom } from '../../../lib/duel/room';
 import { getTeams } from '../../../lib/data/seasonSquads';
+import { friendlyError } from '../../../lib/firebaseErrors';
 
 export default function DuelLobby() {
     const { user } = useUser();
@@ -28,9 +30,10 @@ export default function DuelLobby() {
                 opponentUid: opponent.uid,
                 opponentName: opponent.displayName,
             });
+            window.dispatchEvent(new Event('srh:navigate'));
             router.push(`/300par/duel/${roomId}`);
         } catch (err) {
-            setError(err.message);
+            setError(friendlyError(err));
             setCreating(false);
         }
     }
@@ -74,7 +77,7 @@ export default function DuelLobby() {
 
                     <h2 className="font-display text-text uppercase tracking-wide text-sm">Choose an opponent</h2>
                     {user && <OpponentList currentUid={user.id} onChallenge={handleChallenge} />}
-                    {creating && <p className="text-xs text-textMuted text-center">Creating room…</p>}
+                    {creating && <Spinner label="Creating room…" className="text-xs text-textMuted justify-center w-full" />}
                     {error && <p className="text-xs text-loss text-center">{error}</p>}
                 </div>
             </SignedIn>

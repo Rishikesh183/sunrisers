@@ -2,6 +2,7 @@ import './globals.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import Navbar from '../components/Navbar';
+import PageLoader from '../components/PageLoader';
 import { clerkAppearance } from '../lib/clerkAppearance';
 
 export const metadata = {
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <body className="bg-bg text-text">
           <div className="app min-h-screen bg-bg">
+            <PageLoader />
             <Navbar />
             {children}
           </div>

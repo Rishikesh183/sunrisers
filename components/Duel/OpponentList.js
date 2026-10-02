@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Spinner from './Spinner';
 import { getOpponentCandidates } from '../../lib/data/users';
+import { friendlyError } from '../../lib/firebaseErrors';
 
 const DEBOUNCE_MS = 200;
 
@@ -29,7 +31,7 @@ export default function OpponentList({ currentUid, onChallenge }) {
                 if (!cancelled) setCandidates(users);
             })
             .catch((err) => {
-                if (!cancelled) setError(err.message);
+                if (!cancelled) setError(friendlyError(err));
             });
         return () => {
             cancelled = true;
@@ -48,7 +50,7 @@ export default function OpponentList({ currentUid, onChallenge }) {
     }
 
     if (candidates === null) {
-        return <p className="text-sm text-textMuted text-center">Loading opponents…</p>;
+        return <Spinner label="Loading opponents…" className="text-sm text-textMuted justify-center w-full" />;
     }
 
     return (

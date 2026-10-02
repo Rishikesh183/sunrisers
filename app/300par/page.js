@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import DraftGame from '../../components/Game/DraftGame';
+import GameShell from '../../components/Game/GameShell';
 import { getSeasonSquads, getTeams } from '../../lib/data/seasonSquads';
 
 export const metadata = {
@@ -10,27 +9,7 @@ export const metadata = {
 export default function ThreeHundredPar() {
     const teams = getTeams();
     const seasonSquadsByTeam = Object.fromEntries(teams.map((t) => [t.code, getSeasonSquads(t.code)]));
+    const seasonCount = new Set(teams.flatMap((t) => Object.keys(seasonSquadsByTeam[t.code]))).size;
 
-    return (
-        <div className="max-w-5xl mx-auto p-4 sm:p-6 md:p-10 bg-bg min-h-screen">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-display text-text text-center uppercase tracking-wide mb-2">
-                300 Par
-            </h1>
-            <p className="text-center text-textMuted text-sm sm:text-base mb-4 max-w-2xl mx-auto">
-                Pick a franchise, then draft its XI from across its history, one random season at a time.
-                Fill all 11 spots, then simulate the chase. No team has ever scored 300 in a T20 innings — can yours?
-            </p>
-
-            <div className="flex justify-center mb-6">
-                <Link
-                    href="/300par/duel"
-                    className="text-sm px-4 py-2 rounded-lg border border-accent text-accent hover:bg-accentMuted transition-colors font-semibold"
-                >
-                    Try 1v1 Duel →
-                </Link>
-            </div>
-
-            <DraftGame teams={teams} seasonSquadsByTeam={seasonSquadsByTeam} />
-        </div>
-    );
+    return <GameShell teams={teams} seasonSquadsByTeam={seasonSquadsByTeam} seasonCount={seasonCount} />;
 }

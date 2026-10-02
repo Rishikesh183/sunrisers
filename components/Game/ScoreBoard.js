@@ -20,11 +20,6 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                             ? `Impossible? Not for this XI. ${result.target} chased down.`
                             : `Fell short of the ${result.target} par score.`)}
                 </p>
-                {result.moraleBonus !== 0 && (
-                    <p className="text-xs text-textMuted mt-1">
-                        {result.moraleBonus > 0 ? '+' : ''}{result.moraleBonus} bowler-morale bonus applied
-                    </p>
-                )}
                 {bestScore != null && (
                     <p className="text-xs text-textMuted mt-2">Your best: {bestScore}/300</p>
                 )}
@@ -44,6 +39,14 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                             </span>
                         </div>
                     ))}
+                    <div className="flex justify-between items-center py-2 text-sm">
+                        <span className="text-textMuted">Extras</span>
+                        <span className="text-textMuted shrink-0">{result.extras ?? 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 text-sm font-semibold">
+                        <span className="text-text">Total</span>
+                        <span className="text-text shrink-0">{result.finalScore}/{result.wickets} ({Math.floor(result.ballsFaced / 6)}.{result.ballsFaced % 6} ov)</span>
+                    </div>
                 </div>
             </div>
 

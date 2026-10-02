@@ -17,6 +17,12 @@ function isHighlight(entry, fast) {
     return entry.isWicket || entry.runs === 6 || (!fast && entry.runs === 4);
 }
 
+const EXTRA_LABELS = { wd: 'wide', nb: 'no-ball', b: 'bye', lb: 'leg-bye' };
+// Extras are scattered through the innings; surface them in the ticker as a one-line note.
+function extrasNote(entry) {
+    return entry.extras ? ` (+${entry.extras} ${EXTRA_LABELS[entry.extraType] || 'extras'})` : '';
+}
+
 // Attaches each ball's batter with their cumulative runs(balls) at that point, so the "departs
 // for X(Y)" ticker line matches CommentaryFeed's ball-by-ball breakdown exactly.
 function annotateBallLog(ballLog) {
@@ -66,7 +72,7 @@ function computeLiveState(ballLog, uptoIndex, openers) {
     };
 }
 
-export default function LivePlayback({ result, battingOrder, teamName, subtitle, inningsLabel, canSkip = true, onDone }) {
+export default function LivePlayback({ result, battingOrder, teamName, subtitle, inningsLabel, canSkip = true, isChase = true, parPause = true, onDone }) {
     const ballLog = useMemo(() => annotateBallLog(result.ballLog), [result.ballLog]);
     const [ballIdx, setBallIdx] = useState(-1);
     const [ticker, setTicker] = useState([]);
@@ -86,7 +92,7 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
         // Once the 300 par score is reached, pause for a celebratory checkpoint instead of
         // auto-continuing - only fires once (hasPausedRef), and only for an actual 300 chase
         // (not a duel guest chasing some other target).
-        if (!hasPausedRef.current && result.target === 300 && ballIdx >= 0 && ballLog[ballIdx].score >= 300) {
+        if (isChase && parPause && !hasPausedRef.current && result.target === 300 && ballIdx >= 0 && ballLog[ballIdx].score >= 300) {
             hasPausedRef.current = true;
             setPausedAt300(true);
             return;
@@ -117,7 +123,7 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
     const ballsRemaining = Math.max(0, 120 - ballsBowled);
     const runsRequired = result.target - live.score;
     const oversRemaining = ballsRemaining / 6;
-    const showChaseStats = ballIdx >= 0 && ballsRemaining > 0 && live.wickets < 10 && runsRequired > 0;
+    const showChaseStats = isChase && ballIdx >= 0 && ballsRemaining > 0 && live.wickets < 10 && runsRequired > 0;
     const rrr = showChaseStats ? runsRequired / oversRemaining : null;
 
     return (
@@ -127,7 +133,7 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
                     <p className="text-[11px] text-accent uppercase tracking-widest font-semibold">{inningsLabel}</p>
                 )}
                 <p className="text-xs text-textMuted uppercase tracking-wide">{subtitle || `${teamName} chasing ${result.target}`}</p>
-                <p className="font-display text-text uppercase tracking-wide text-sm">Simulating the chase…</p>
+                <p className="font-display text-text uppercase tracking-wide text-sm">{isChase ? 'Simulating the chase…' : 'Simulating the innings…'}</p>
             </div>
 
             <div className="flex flex-col items-center gap-1">
@@ -186,14 +192,14 @@ export default function LivePlayback({ result, battingOrder, teamName, subtitle,
                 <>
                     <div className="w-full max-w-md flex flex-col gap-2 min-h-[9rem]">
                         {ticker.length === 0 && (
-                            <p className="text-sm text-textMuted text-center">Quiet start to the chase…</p>
+                            <p className="text-sm text-textMuted text-center">{isChase ? 'Quiet start to the chase…' : 'Quiet start to the innings…'}</p>
                         )}
                         {ticker.map((entry) => (
                             <p
                                 key={`${entry.over}.${entry.ballInOver}`}
                                 className={`text-sm text-center font-semibold ${entry.isWicket ? 'text-loss' : 'text-win'}`}
                             >
-                                {entry.over}.{entry.ballInOver} — {highlightText(entry)}
+                                {entry.over}.{entry.ballInOver} — {highlightText(entry)}{extrasNote(entry)}
                             </p>
                         ))}
                     </div>

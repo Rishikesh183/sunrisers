@@ -18,6 +18,8 @@ import { getSeasonSquads, getTeams } from '../../../../lib/data/seasonSquads';
 import { simulateChase } from '../../../../lib/game/simulate';
 import { TOTAL_SLOTS } from '../../../../lib/game/positions';
 import { TEAMS } from '../../../../data/teams';
+import { friendlyError } from '../../../../lib/firebaseErrors';
+import Spinner from '../../../../components/Duel/Spinner';
 import TossPanel from '../../../../components/Duel/TossPanel';
 import DuelDraftBoard from '../../../../components/Duel/DuelDraftBoard';
 import DuelResult from '../../../../components/Duel/DuelResult';
@@ -42,15 +44,18 @@ export default function DuelRoomPage({ params }) {
     const [room, setRoom] = useState(undefined); // undefined = loading, null = not found
     const [picks, setPicks] = useState([]);
     const [actionError, setActionError] = useState(null);
+    const [loadError, setLoadError] = useState(null);
     const [guestTeamChoice, setGuestTeamChoice] = useState(null);
     const [copied, setCopied] = useState(false);
     const [closing, setClosing] = useState(false);
+    const [joining, setJoining] = useState(false);
     const simulateAttempted = useRef(false);
     const teams = getTeams();
 
     useEffect(() => {
-        const unsubRoom = subscribeToRoom(roomId, setRoom);
-        const unsubPicks = subscribeToPicks(roomId, setPicks);
+        const onListenError = (err) => setLoadError(friendlyError(err));
+        const unsubRoom = subscribeToRoom(roomId, setRoom, onListenError);
+        const unsubPicks = subscribeToPicks(roomId, setPicks, onListenError);
         return () => {
             unsubRoom();
             unsubPicks();
@@ -88,8 +93,10 @@ export default function DuelRoomPage({ params }) {
 
         const firstOrder = buildBattingOrder(picks, firstUid, firstSeasonSquads);
         const secondOrder = buildBattingOrder(picks, secondUid, secondSeasonSquads);
-        const firstResult = simulateChase(firstOrder);
-        const secondResult = simulateChase(secondOrder, Math.random, firstResult.finalScore);
+        // No target for the first innings - it just sets the score the second side has to beat.
+        const firstResult = simulateChase(firstOrder, Math.random, null);
+        // Must beat (not just match) the first innings - target is score + 1, and the chase ends the ball it's reached.
+        const secondResult = simulateChase(secondOrder, Math.random, firstResult.finalScore + 1, 'hard', true);
         const winnerUid = secondResult.won ? secondUid : firstUid;
 
         const hostResult = isHostFirst ? firstResult : secondResult;
@@ -103,11 +110,15 @@ export default function DuelRoomPage({ params }) {
             guestUid: room.guestUid,
             hostTeam: room.hostTeam,
             guestTeam: room.guestTeam,
-        }).catch((err) => setActionError(err.message));
+            hostName: room.hostName,
+            guestName: room.guestName,
+            battedFirstUid: firstUid,
+        }).catch((err) => setActionError(friendlyError(err)));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [room?.status]);
 
     async function handleJoin() {
+        setJoining(true);
         try {
             await joinRoom(roomId, {
                 guestUid: myUid,
@@ -115,7 +126,9 @@ export default function DuelRoomPage({ params }) {
                 guestTeam: guestTeamChoice || room.hostTeam,
             });
         } catch (err) {
-            setActionError(err.message);
+            setActionError(friendlyError(err));
+        } finally {
+            setJoining(false);
         }
     }
 
@@ -123,7 +136,7 @@ export default function DuelRoomPage({ params }) {
         try {
             await chooseFirstPicker(roomId, uid);
         } catch (err) {
-            setActionError(err.message);
+            setActionError(friendlyError(err));
         }
     }
 
@@ -131,7 +144,7 @@ export default function DuelRoomPage({ params }) {
         try {
             await submitPick(roomId, payload);
         } catch (err) {
-            setActionError(err.message);
+            setActionError(friendlyError(err));
             throw err; // let DuelDraftBoard roll back its optimistic pick on failure
         }
     }
@@ -141,7 +154,7 @@ export default function DuelRoomPage({ params }) {
         try {
             await closeRoom(roomId, myUid);
         } catch (err) {
-            setActionError(err.message);
+            setActionError(friendlyError(err));
             setClosing(false);
         }
     }
@@ -156,8 +169,10 @@ export default function DuelRoomPage({ params }) {
 
     let body;
 
-    if (!isLoaded || room === undefined) {
-        body = <p className="text-sm text-textMuted text-center">Loading room…</p>;
+    if (loadError) {
+        body = <p className="text-sm text-loss text-center">{loadError}</p>;
+    } else if (!isLoaded || room === undefined) {
+        body = <Spinner label="Loading room…" className="text-sm text-textMuted justify-center w-full" />;
     } else if (room === null) {
         body = <p className="text-sm text-loss text-center">This room doesn't exist.</p>;
     } else if (room.status === 'closed') {
@@ -202,7 +217,7 @@ export default function DuelRoomPage({ params }) {
             ) : (
                 <div className="flex flex-col items-center gap-4 bg-surface border border-border rounded-xl p-6 sm:p-10">
                     <p className="text-text text-center">
-                        {room.hostName} has challenged you to a 300 Par duel — {room.hostName} picked {teamName(room.hostTeam)}.
+                        {room.hostName} has challenged you to a 1v1 duel — {room.hostName} picked {teamName(room.hostTeam)}.
                     </p>
                     <label className="flex items-center gap-2 text-sm text-textMuted">
                         Your franchise:
@@ -218,9 +233,10 @@ export default function DuelRoomPage({ params }) {
                     </label>
                     <button
                         onClick={handleJoin}
-                        className="py-2 px-6 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold"
+                        disabled={joining}
+                        className="py-2 px-6 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                        Join Duel
+                        {joining ? 'Joining…' : 'Join Duel'}
                     </button>
                 </div>
             );
@@ -238,7 +254,7 @@ export default function DuelRoomPage({ params }) {
             />
         );
     } else if (room.status === 'simulating') {
-        body = <p className="text-sm text-textMuted text-center">Both squads are set — simulating the duel…</p>;
+        body = <Spinner label="Both squads are set — simulating the duel…" className="text-sm text-textMuted justify-center w-full" />;
     } else if (room.status === 'complete') {
         body = <DuelResult room={room} myUid={myUid} />;
     }
@@ -246,7 +262,7 @@ export default function DuelRoomPage({ params }) {
     return (
         <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-10 bg-bg min-h-screen" style={themeStyle}>
             <h1 className="text-2xl sm:text-3xl font-display text-text text-center uppercase tracking-wide mb-2">
-                300 Par · 1v1 Duel
+                1v1 Duel
             </h1>
             {room && room.hostName && room.guestName && (
                 <p className="text-sm text-textMuted text-center mb-6">

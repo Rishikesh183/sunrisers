@@ -20,8 +20,8 @@ task, not a code task — see "Adding a new team" below.
 |---|---|
 | `data/teams/index.js` | Team registry — `{ code, name, founded, lastYear }`. Add a team here once its JSON exists |
 | `data/teams/SRH.json`, `data/teams/RCB.json`, `data/teams/CSK.json`, `data/teams/MI.json` | Static per-team datasets: real per-season players with ratings and slot eligibility |
-| `scripts/gen-srh-squads.mjs`, `scripts/gen-rcb-squads.mjs`, `scripts/gen-csk-squads.mjs`, `scripts/gen-mi-squads.mjs` | **Source of truth for the datasets.** Turn raw researched stats into `data/teams/<CODE>.json` |
-| `lib/game/ratingFormula.mjs` | Shared BAT/POW/BWL formula used by every `gen-*-squads.mjs` script — one place to change the scale for all teams |
+| `data/playerStats/*.csv`, `scripts/build-squads-from-stats.mjs` | **Source of truth for the datasets.** Real per-season stats, turned into `data/teams/<CODE>.json` |
+| `lib/game/ratingFormula.mjs` | Shared BAT/POW/BWL formula used by the squad build script — one place to change the scale for all teams |
 | `lib/data/seasonSquads.js` | Loader: `getTeams()`, `getSeasonSquads(teamCode)`, `getSquadForYear(teamCode, year)` |
 | `lib/game/positions.js` | Batting-order slot labels (1-11) + slot-eligibility helpers |
 | `lib/game/simulate.js` | Pure function `simulateChase(battingOrder)` — the ball-by-ball chase sim |
@@ -35,38 +35,25 @@ task, not a code task — see "Adding a new team" below.
 
 ## Data: where the numbers come from
 
-Each `data/teams/<CODE>.json` is **generated**, not hand-edited. To change a rating or add
-a player, edit the raw stats in that team's `scripts/gen-<code>-squads.mjs` and regenerate:
+Each `data/teams/<CODE>.json` is **generated** from real per-season stats in
+`data/playerStats/` (`<team>_batters_stats.csv`, `<team>_bowling_stats.csv`, plus a
+`<team>_notes.md` with method and source notes). Those stats are Cricsheet ball-by-ball
+aggregates cross-checked against published tables, so every rating is sourced - nothing is
+estimated, and a player who didn't play a season is absent from that season's squad. To
+change data, edit the CSVs and regenerate all four teams:
 
 ```bash
-node scripts/gen-srh-squads.mjs > data/teams/SRH.json
-node scripts/gen-rcb-squads.mjs > data/teams/RCB.json
-node scripts/gen-csk-squads.mjs > data/teams/CSK.json
-node scripts/gen-mi-squads.mjs > data/teams/MI.json
+node scripts/build-squads-from-stats.mjs
 ```
 
-Each entry is real per-season data researched from Wikipedia's `20XX <Team> season` pages /
-ESPNcricinfo / IPLT20stats / web search — batting average, strike rate, bowling average,
-economy, wickets, innings played. Sourcing confidence varies by year and is noted at the
-top of each generator script:
+The CSVs only carry stats. Country, role, batting slots and the keeper flag come from the
+previous dataset where the player already existed, otherwise from the `FOREIGN` / `KEEPERS` /
+`OPENERS` lists at the top of the build script (or are inferred from the stats). Slots are a
+judgement call, not a sourced number - worth a glance when adding new players.
 
-- **SRH**: 2013-2017, 2019-2022, 2024 are fully-sourced exact tables. 2018, 2023, 2025,
-  2026 are weaker — those seasons' pages only published top-line totals, so average/strike
-  rate is estimated from real run/innings/boundary counts rather than pulled directly.
-- **RCB**: 2011, 2018-2021, 2023-2026 are fully (or mostly, for the top order) sourced
-  exact tables. 2008-2010, 2012-2017, 2022 are weaker — real season totals (runs, wickets)
-  plus known per-year strike rates for the headline players (Kohli, Gayle, de Villiers),
-  with the rest of the squad's average/SR estimated.
-- **CSK**: 2008-2012, 2018-2021, 2023 are fully-sourced exact tables. 2013-2015, 2024-2026
-  are partial-exact (top order runs/avg/SR solid; bowling economy estimated where the
-  source only gave averages). 2022 is the weakest — only 4 batters and 1 bowler had
-  published figures for the whole season.
-- **MI**: 2010, 2019-2022 are fully-sourced exact tables. 2013-2018, 2023-2026 are
-  partial-exact (top order runs/avg/SR solid, rest estimated). 2008, 2009, 2011, 2012 are
-  the weakest — only top-line runs/wickets were published, so most ratings there lean on
-  role/reputation rather than a sourced number.
+The old hand-typed `scripts/gen-<team>-squads.mjs` generators are superseded and no longer
+used (their data was partly estimated).
 
-Worth re-sourcing the weak years properly if better tables surface later.
 
 **A caught bug worth knowing about**: Zaheer Khan was initially (wrongly) placed on RCB for
 five seasons (2008, 2010-2013) — he was actually at Mumbai Indians that entire span (his
@@ -183,7 +170,7 @@ literal historical chemistry, per the original design tradeoff. `simulateChase(b
 takes the 11 picked players **in slot order** (index 0 = slot 1) and returns:
 
 ```js
-{ batsmen, overSummaries, totalRuns, moraleBonus, finalScore, wickets, oversUsed, ballsFaced, target, won }
+{ batsmen, overSummaries, totalRuns, extras, finalScore, wickets, oversUsed, ballsFaced, target, won }
 ```
 
 **Per ball**, for the current striker:
@@ -200,10 +187,15 @@ takes the 11 picked players **in slot order** (index 0 = slot 1) and returns:
 4. A wicket brings in the next player in slot order; 10 wickets ends the innings early
    (remaining players marked `dnb: true`).
 
-**After the innings**: a flat one-time **bowler-morale bonus** is added —
-`moraleBonus = round((avgBWL(slots 8-11) - 50) / 50 × 15)`, i.e. a strong bowling unit
-adds a small confidence bonus to the whole chase, a weak one subtracts. `finalScore =
-totalRuns + moraleBonus`, floored at 0. `won = finalScore >= 300`.
+**Extras**: a strong bowling unit earns extras (wides, no-balls, byes, leg-byes) —
+`budget = max(0, round((avgBWL(slots 8-11) - 50) / 50 × 15))`. The budget is split into small
+chunks and dropped on random mid-innings balls (balls 8-105), riding on a normal delivery as
+`extras`/`extraType` on that ball-log entry (not credited to the batter, deferred past wicket
+balls). So the ball-by-ball score, scorecard (batters + Extras row) and final score always
+agree: `finalScore = totalRuns` (batter runs + extras). `won = finalScore >= target`.
+(This replaced an end-of-innings "bowler morale" bonus that made the final score differ from
+the last ball-log score, and could go negative.) The duel's second innings passes
+`stopAtTarget` so the chase ends the ball the target is reached.
 
 Every call is stochastic (`Math.random()` by default, but the function accepts an
 injectable `rng` for testing) — **the same XI in the same slots will score differently
