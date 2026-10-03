@@ -372,3 +372,24 @@ succeed on all five collections and `npm run build` is clean.
 - Ball-by-ball commentary feed using `overSummaries` (currently computed but unused in the UI).
 - Per-team theming (logo, accent color) — currently every team uses the site's fixed
   orange/dark theme; `data/teams/index.js` would be the place to add a `color` field.
+
+## Leaderboard (300+ scores)
+
+`/300par/leaderboard` ranks players who scored 300 or more in solo mode, filterable by **Today /
+All time**, **Highest score / Most 300s** and **Hard / Easy**. Playing never needs an account; a
+signed-in player's 300+ is saved automatically at the result screen, and a signed-out player is
+offered "Sign in to save" - the score is parked in `localStorage` (`lib/game/pendingScore.js`) and
+saved by `components/Game/PendingScoreSaver.js` as soon as they sign in.
+
+Storage (`lib/data/leaderboard.js`) is one small doc per player per board, only ever written on a 300+:
+
+- `leaderboard/{difficulty}/entries/{uid}` - all-time best score/wickets/balls + `count300`
+- `leaderboardDaily/{date}_{difficulty}/entries/{uid}` - the same for one day (India time)
+
+A view reads at most 25 docs and sorts by a single field, so no composite index is needed. Rules
+are open like the rest of the app (client-trusted); add to the Firestore rules:
+
+```
+match /leaderboard/{difficulty}/entries/{uid} { allow read, write: if true; }
+match /leaderboardDaily/{key}/entries/{uid} { allow read, write: if true; }
+```

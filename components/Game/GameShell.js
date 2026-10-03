@@ -52,12 +52,20 @@ export default function GameShell({ teams, seasonSquadsByTeam, seasonCount }) {
                             <span className="text-3xl pr-1.5 text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-accent to-red-600">300</span>
                             <span className="text-xl text-white pb-0.5">PAR</span>
                         </h1>
-                        <Link
-                            href="/300par/duel"
-                            className="px-4 py-2 rounded-lg bg-accent hover:bg-accentHover text-white text-sm font-semibold transition-colors"
-                        >
-                            Try 1v1 Duel →
-                        </Link>
+                        <div className="flex items-center gap-2">
+                            <Link
+                                href="/300par/leaderboard"
+                                className="px-3 py-2 rounded-lg border border-white/25 bg-bg/60 text-white text-sm font-semibold hover:border-accent transition-colors"
+                            >
+                                🏆 Leaderboard
+                            </Link>
+                            <Link
+                                href="/300par/duel"
+                                className="px-4 py-2 rounded-lg bg-accent hover:bg-accentHover text-white text-sm font-semibold transition-colors"
+                            >
+                                Try 1v1 Duel →
+                            </Link>
+                        </div>
                     </div>
                 ) : (
                     <section className="flex flex-col gap-5 pt-8 md:pt-12 mb-8 md:mb-10">
@@ -78,12 +86,20 @@ export default function GameShell({ teams, seasonSquadsByTeam, seasonCount }) {
                                 <StatChip icon={Users} value={seasonCount} label="Seasons of Players" />
                                 <StatChip icon={Zap} value={300} label="The Target" />
                             </div>
-                            <Link
-                                href="/300par/duel"
-                                className="px-6 py-3 rounded-xl bg-accent hover:bg-accentHover text-white font-semibold transition-colors shadow-lg shadow-accent/30"
-                            >
-                                Try 1v1 Duel →
-                            </Link>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <Link
+                                    href="/300par/leaderboard"
+                                    className="px-6 py-3 rounded-xl border border-white/25 bg-bg/60 text-white font-semibold hover:border-accent transition-colors"
+                                >
+                                    🏆 Leaderboard
+                                </Link>
+                                <Link
+                                    href="/300par/duel"
+                                    className="px-6 py-3 rounded-xl bg-accent hover:bg-accentHover text-white font-semibold transition-colors shadow-lg shadow-accent/30"
+                                >
+                                    Try 1v1 Duel →
+                                </Link>
+                            </div>
                         </div>
                     </section>
                 )}

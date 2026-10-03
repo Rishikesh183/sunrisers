@@ -3,6 +3,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import Navbar from '../components/Navbar';
 import PageLoader from '../components/PageLoader';
+import PendingScoreSaver from '../components/Game/PendingScoreSaver';
 import { Analytics } from '@vercel/analytics/next';
 import { clerkAppearance } from '../lib/clerkAppearance';
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
         <body className="bg-bg text-text">
           <div className="app min-h-screen bg-bg">
             <PageLoader />
+            <PendingScoreSaver />
             <Navbar />
             {children}
           </div>

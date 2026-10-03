@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { slotLabel } from '../../lib/game/positions';
 import CommentaryFeed from './CommentaryFeed';
+import LeaderboardSave from './LeaderboardSave';
 
-export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgain, resultText }) {
+export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgain, resultText, leaderboardEntry }) {
     const [showCommentary, setShowCommentary] = useState(false);
 
     return (
@@ -24,6 +25,8 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                     <p className="text-xs text-textMuted mt-2">Your best: {bestScore}/300</p>
                 )}
             </div>
+
+            {leaderboardEntry && <LeaderboardSave entry={leaderboardEntry} />}
 
             <div className="bg-surface border border-border rounded-xl p-3 sm:p-5">
                 <h3 className="font-display text-text mb-3 uppercase tracking-wide text-sm">Scorecard</h3>

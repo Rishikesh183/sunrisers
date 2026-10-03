@@ -209,6 +209,13 @@ export default function DraftGame({ teams, seasonSquadsByTeam, onActiveChange })
                     result={simResult}
                     bestScore={getBestScore()}
                     onPlayAgain={handlePlayAgain}
+                    leaderboardEntry={{
+                        score: simResult.finalScore,
+                        wickets: simResult.wickets,
+                        balls: simResult.ballsFaced,
+                        team: teamCode,
+                        difficulty,
+                    }}
                 />
             </div>
         );
