@@ -3,6 +3,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import Navbar from '../components/Navbar';
 import PageLoader from '../components/PageLoader';
+import { Analytics } from '@vercel/analytics/next';
 import { clerkAppearance } from '../lib/clerkAppearance';
 
 export const metadata = {
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
             <Navbar />
             {children}
           </div>
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>

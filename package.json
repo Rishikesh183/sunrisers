@@ -19,6 +19,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@mui/icons-material": "^6.1.1",
     "@mui/material": "^6.1.1",
+    "@vercel/analytics": "^2.0.1",
     "firebase": "^11.4.0",
     "firebase-admin": "^14.4.0",
     "framer-motion": "^12.4.10",
