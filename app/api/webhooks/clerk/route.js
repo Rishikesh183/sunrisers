@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { verifyWebhook } from '@clerk/nextjs/webhooks';
 import { getAdminDb } from '../../../../lib/firebaseAdmin';
+import { pickDisplayName } from '../../../../lib/userName';
 
 // Mirrors every Clerk sign-up into Firestore's `users` collection, so the 1v1 duel opponent
 // list has something to query without ever calling Clerk's Backend API from a request handler.
@@ -18,16 +19,21 @@ export async function POST(request) {
     }
 
     const user = event.data;
-    const displayName =
-        [user.first_name, user.last_name].filter(Boolean).join(' ') ||
-        user.username ||
-        user.email_addresses?.[0]?.email_address ||
-        'Anonymous';
+    const primaryEmail =
+        user.email_addresses?.find((e) => e.id === user.primary_email_address_id)?.email_address ||
+        user.email_addresses?.[0]?.email_address;
+    const displayName = pickDisplayName({
+        username: user.username,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: primaryEmail,
+    });
 
     await getAdminDb()
         .collection('users')
         .doc(user.id)
         .set({
+            username: user.username || null,
             displayName,
             displayNameLower: displayName.toLowerCase(),
             photoURL: user.image_url || null,

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { SignedIn, SignedOut, useUser } from '@clerk/nextjs';
 import { getDuelHistory } from '../../lib/data/duelResults';
+import { getDisplayNames } from '../../lib/data/users';
 import { friendlyError } from '../../lib/firebaseErrors';
 import { TEAMS } from '../../data/teams';
 
@@ -24,13 +25,13 @@ function teamColor(code) {
 // Normalises a stored duel doc into two innings rows from the viewer's perspective. Older docs
 // (saved before wickets/names/batting-order were stored) just lack those fields - every extra
 // is optional so they still render as a plain score line.
-function describeDuel(duel, uid) {
+function describeDuel(duel, uid, names = {}) {
     const isHost = duel.hostUid === uid;
     const side = (host) => {
         const sideUid = host ? duel.hostUid : duel.guestUid;
         return {
             uid: sideUid,
-            name: (host ? duel.hostName : duel.guestName) || (sideUid === uid ? 'You' : 'Opponent'),
+            name: names[sideUid] || (host ? duel.hostName : duel.guestName) || (sideUid === uid ? 'You' : 'Opponent'),
             team: (host ? duel.hostTeam : duel.guestTeam) || duel.team,
             score: host ? duel.hostScore : duel.guestScore,
             wickets: host ? duel.hostWickets : duel.guestWickets,
@@ -87,8 +88,8 @@ function InningsRow({ row, isWinner, isMe, label }) {
     );
 }
 
-function DuelCard({ duel, uid }) {
-    const { won, me, rows, hasOrder, margin } = describeDuel(duel, uid);
+function DuelCard({ duel, uid, names }) {
+    const { won, me, rows, hasOrder, margin } = describeDuel(duel, uid, names);
     return (
         <div className="bg-bg border border-border rounded-xl overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2 bg-surface border-b border-border">
@@ -143,11 +144,16 @@ function SummaryStrip({ history, uid }) {
 
 function DuelHistory({ uid }) {
     const [history, setHistory] = useState(null);
+    const [names, setNames] = useState({});
     const [error, setError] = useState(null);
 
     useEffect(() => {
         getDuelHistory(uid)
-            .then(setHistory)
+            .then((list) => {
+                setHistory(list);
+                // Show players' current usernames rather than whatever name was saved with the duel.
+                getDisplayNames(list.flatMap((d) => [d.hostUid, d.guestUid])).then(setNames);
+            })
             .catch((err) => setError(friendlyError(err)));
     }, [uid]);
 
@@ -160,7 +166,7 @@ function DuelHistory({ uid }) {
             <SummaryStrip history={history} uid={uid} />
             <div className="flex flex-col gap-3">
                 {history.map((duel) => (
-                    <DuelCard key={duel.id} duel={duel} uid={uid} />
+                    <DuelCard key={duel.id} duel={duel} uid={uid} names={names} />
                 ))}
             </div>
         </>

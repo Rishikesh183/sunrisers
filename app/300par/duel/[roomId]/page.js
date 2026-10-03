@@ -15,7 +15,8 @@ import {
     ROOM_TTL_MS,
 } from '../../../../lib/duel/room';
 import { getSeasonSquads, getTeams } from '../../../../lib/data/seasonSquads';
-import { simulateChase } from '../../../../lib/game/simulate';
+import { displayNameFromClerkUser } from '../../../../lib/userName';
+import { simulateChase, bowlingStrength } from '../../../../lib/game/simulate';
 import { TOTAL_SLOTS } from '../../../../lib/game/positions';
 import { TEAMS } from '../../../../data/teams';
 import { friendlyError } from '../../../../lib/firebaseErrors';
@@ -94,9 +95,9 @@ export default function DuelRoomPage({ params }) {
         const firstOrder = buildBattingOrder(picks, firstUid, firstSeasonSquads);
         const secondOrder = buildBattingOrder(picks, secondUid, secondSeasonSquads);
         // No target for the first innings - it just sets the score the second side has to beat.
-        const firstResult = simulateChase(firstOrder, Math.random, null);
+        const firstResult = simulateChase(firstOrder, Math.random, null, 'hard', false, bowlingStrength(secondOrder));
         // Must beat (not just match) the first innings - target is score + 1, and the chase ends the ball it's reached.
-        const secondResult = simulateChase(secondOrder, Math.random, firstResult.finalScore + 1, 'hard', true);
+        const secondResult = simulateChase(secondOrder, Math.random, firstResult.finalScore + 1, 'hard', true, bowlingStrength(firstOrder));
         const winnerUid = secondResult.won ? secondUid : firstUid;
 
         const hostResult = isHostFirst ? firstResult : secondResult;
@@ -122,7 +123,7 @@ export default function DuelRoomPage({ params }) {
         try {
             await joinRoom(roomId, {
                 guestUid: myUid,
-                guestName: user.fullName || user.username || 'Player',
+                guestName: displayNameFromClerkUser(user),
                 guestTeam: guestTeamChoice || room.hostTeam,
             });
         } catch (err) {
@@ -260,7 +261,10 @@ export default function DuelRoomPage({ params }) {
     }
 
     return (
-        <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-10 bg-bg min-h-screen" style={themeStyle}>
+        <div
+            className={`mx-auto p-4 sm:p-6 md:p-10 bg-bg min-h-screen ${room?.status === 'drafting' ? 'max-w-3xl lg:max-w-7xl' : 'max-w-3xl'}`}
+            style={themeStyle}
+        >
             <h1 className="text-2xl sm:text-3xl font-display text-text text-center uppercase tracking-wide mb-2">
                 1v1 Duel
             </h1>

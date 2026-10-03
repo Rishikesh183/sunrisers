@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { displayNameFromClerkUser } from '../../../lib/userName';
 import Spinner from '../../../components/Duel/Spinner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -25,7 +26,7 @@ export default function DuelLobby() {
         try {
             const roomId = await createRoom({
                 hostUid: user.id,
-                hostName: user.fullName || user.username || 'Player',
+                hostName: displayNameFromClerkUser(user),
                 hostTeam: team,
                 opponentUid: opponent.uid,
                 opponentName: opponent.displayName,

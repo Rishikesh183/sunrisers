@@ -180,7 +180,7 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                 </p>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:h-[calc(100vh-15rem)] lg:min-h-[540px]">
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)] lg:h-[calc(100vh-15rem)] lg:min-h-[540px]">
                 <Panel title={`${myName}'s ${myTeam}`} badge={`${myFilledSlots.size} / ${TOTAL_SLOTS}`}>
                     <div className="flex flex-wrap gap-2">
                         {statPills.map((label) => (
@@ -203,7 +203,8 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                     </div>
                 </Panel>
 
-                <div className="flex flex-col gap-4 min-h-0">
+                {/* lg:contents -> the picker and opponent panels become their own grid columns on laptop. */}
+                <div className="flex flex-col gap-4 min-h-0 lg:contents">
                     {isMyTurnDisplay ? (
                         <Panel
                             title={
@@ -211,7 +212,6 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                                     Pick from <span className="text-accent">{myTeam}</span> Players
                                 </>
                             }
-                            className="lg:flex-1"
                         >
                             {currentYear && (
                                 <div className="flex items-center gap-3">
@@ -238,7 +238,9 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                     )}
 
                     <Panel title={`${opponentName}'s ${opponentTeam}`} badge={`${Object.keys(opponentFilled).length} / ${TOTAL_SLOTS}`}>
-                        <BattingOrderStrip filled={opponentFilled} eligibleSlots={[]} onSlotClick={() => {}} compact />
+                        <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto no-scrollbar">
+                            <BattingOrderStrip filled={opponentFilled} eligibleSlots={[]} onSlotClick={() => {}} compact />
+                        </div>
                     </Panel>
                 </div>
             </div>

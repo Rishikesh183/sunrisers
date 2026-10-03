@@ -43,6 +43,14 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                         <span className="text-textMuted">Extras</span>
                         <span className="text-textMuted shrink-0">{result.extras ?? 0}</span>
                     </div>
+                    {result.oppositionBowling != null && (
+                        <div className="flex justify-between items-center py-2 text-sm">
+                            <span className="text-textMuted">Opposition bowling attack</span>
+                            <span className="text-textMuted shrink-0">
+                                {result.oppositionEffect >= 0.4 ? 'Strong' : result.oppositionEffect <= -0.4 ? 'Weak' : 'Average'} ({result.oppositionBowling})
+                            </span>
+                        </div>
+                    )}
                     {result.penalty > 0 && (
                         <div className="flex justify-between items-center py-2 text-sm">
                             <span className="text-loss">Penalty (no wicketkeeper)</span>

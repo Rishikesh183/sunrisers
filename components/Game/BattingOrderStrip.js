@@ -40,7 +40,7 @@ export default function BattingOrderStrip({ filled, eligibleSlots, onSlotClick, 
     }, [eligibleKey]);
 
     return (
-        <div ref={wrapRef} className={compact ? 'grid grid-cols-1 sm:grid-cols-2 gap-1.5' : 'flex flex-col gap-1.5'}>
+        <div ref={wrapRef} className={compact ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-1.5' : 'flex flex-col gap-1.5'}>
             {slots.map((slot) => {
                 const pick = filled[slot];
                 const isEligible = eligible.has(slot) && !pick;
