@@ -43,6 +43,12 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                         <span className="text-textMuted">Extras</span>
                         <span className="text-textMuted shrink-0">{result.extras ?? 0}</span>
                     </div>
+                    {result.penalty > 0 && (
+                        <div className="flex justify-between items-center py-2 text-sm">
+                            <span className="text-loss">Penalty (no wicketkeeper)</span>
+                            <span className="text-loss shrink-0">−{result.penalty}</span>
+                        </div>
+                    )}
                     <div className="flex justify-between items-center py-2 text-sm font-semibold">
                         <span className="text-text">Total</span>
                         <span className="text-text shrink-0">{result.finalScore}/{result.wickets} ({Math.floor(result.ballsFaced / 6)}.{result.ballsFaced % 6} ov)</span>

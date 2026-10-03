@@ -207,9 +207,9 @@
       "country": "India",
       "isKeeper": false,
       "slots": [
-        1,
-        2,
-        3
+        3,
+        4,
+        5
       ],
       "BAT": 36,
       "POW": 38,
@@ -225,8 +225,7 @@
       "slots": [
         3,
         4,
-        5,
-        6
+        5
       ],
       "BAT": 35,
       "POW": 36,
@@ -302,16 +301,15 @@
     },
     {
       "name": "Ankit Sharma",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 20,
       "POW": 20,
@@ -2508,15 +2506,15 @@
     },
     {
       "name": "Mitchell Marsh",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "Australia",
       "isKeeper": false,
       "slots": [
-        1,
-        2,
-        3
+        6,
+        7,
+        8
       ],
       "BAT": 24,
       "POW": 15,
@@ -3144,16 +3142,16 @@
     },
     {
       "name": "Shreyas Gopal",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 35,
       "POW": 41,
@@ -3161,16 +3159,15 @@
     },
     {
       "name": "Sean Abbott",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "Australia",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 35,
       "POW": 41,
@@ -3381,16 +3378,15 @@
     },
     {
       "name": "Vivrant Sharma",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 56,
       "POW": 51,
@@ -3563,15 +3559,15 @@
     },
     {
       "name": "Sanvir Singh",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        1,
-        2,
-        3
+        6,
+        7,
+        8
       ],
       "BAT": 35,
       "POW": 41,
@@ -3613,16 +3609,15 @@
     },
     {
       "name": "Mayank Dagar",
-      "role": "Bowler",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        8,
-        9,
-        10,
-        11
+        6,
+        7,
+        8
       ],
       "BAT": 20,
       "POW": 20,
@@ -3896,15 +3891,15 @@
     },
     {
       "name": "Sanvir Singh",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        1,
-        2,
-        3
+        6,
+        7,
+        8
       ],
       "BAT": 36,
       "POW": 41,
@@ -4240,8 +4235,7 @@
       "isKeeper": false,
       "slots": [
         1,
-        2,
-        3
+        2
       ],
       "BAT": 36,
       "POW": 42,
@@ -4404,16 +4398,16 @@
     },
     {
       "name": "Salil Arora",
-      "role": "Batsman",
+      "role": "Wicketkeeper Batsman",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
-      "isKeeper": false,
+      "isKeeper": true,
       "slots": [
-        3,
         4,
         5,
-        6
+        6,
+        7
       ],
       "BAT": 45,
       "POW": 97,
@@ -4523,16 +4517,14 @@
     },
     {
       "name": "Shivang Kumar",
-      "role": "Bowler",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
         8,
-        9,
-        10,
-        11
+        9
       ],
       "BAT": 34,
       "POW": 42,
@@ -4557,16 +4549,16 @@
     },
     {
       "name": "David Payne",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "England",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 35,
       "POW": 40,
@@ -4625,16 +4617,16 @@
     },
     {
       "name": "Dilshan Madushanka",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "Sri Lanka",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 20,
       "POW": 20,

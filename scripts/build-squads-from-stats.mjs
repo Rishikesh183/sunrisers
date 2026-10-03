@@ -8,7 +8,7 @@
 //
 // The CSVs only carry stats. Static player info (country, role, batting slots, keeper flag) is
 // carried over from the existing data/teams/<CODE>.json where the player already exists, and
-// otherwise comes from NEW_PLAYER_INFO below / is inferred from the stats.
+// otherwise is inferred from the stats; OVERRIDES (below) wins over both.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -49,6 +49,36 @@ const OPENERS = new Set([
     'Vijay Zol', 'Srikkanth Anirudha', 'Anirudha Srikkanth', 'Dwaraka Ravi Teja', 'Atharva Taide',
     'Sanvir Singh', 'Urvil Patel', 'Mitchell Marsh',
 ]);
+
+// Hand-checked role / slot overrides (win over both the carried-over and the inferred info).
+// The stats CSVs have no batting positions, so these come from reviewing the inferred players.
+const B = [8, 9, 10, 11];
+const AR = [6, 7, 8];
+const OVERRIDES = {};
+const setRole = (names, role, slots, isKeeper = false) => names.forEach((n) => { OVERRIDES[n] = { role, slots, isKeeper }; });
+setRole([
+    'David Payne', 'Dilshan Madushanka', 'Nathan Ellis', 'Mark Wood', 'Adam Milne', 'Akila Dananjaya', 'Marchant de Lange',
+    'Richard Gleeson', 'Ankit Rajpoot', 'Pradeep Sangwan', 'Ramesh Powar', 'Ray Price', 'Nayan Doshi', 'Ashley Noffke',
+    'Abdur Razzak', 'Raghav Goyal', 'Satyanarayana Raju', 'Shreyas Gopal', 'Rahul Shukla', 'Pawan Suyal', 'Abu Nechim', 'Himanshu Sharma',
+], 'Bowler', B);
+setRole([
+    'Sean Abbott', 'John Hastings', 'Duan Jansen', 'Graham Napier', 'Shams Mulani', 'Raj Angad Bawa', 'Sanjay Yadav', 'Mayank Rawat',
+    'Anukul Roy', 'Prashant Veer', 'Ramakrishna Ghosh', 'Rishi Dhawan', 'Jayant Yadav', 'Hrithik Shokeen', 'Ramandeep Singh',
+    'Arshad Khan', 'Andrew Flintoff', 'Justin Kemp', 'Gurkeerat Singh Mann', 'Jesse Ryder', 'Michael Bracewell', 'Jacob Bethell',
+    'Mayank Dagar', 'Mitchell Marsh', 'Ankit Sharma', 'Vivrant Sharma', 'Sanvir Singh', 'Manoj Bhandage', 'Abrar Kazi',
+    'Rajesh Bishnoi', 'Dominic Thornely',
+], 'All-rounder', AR);
+setRole(['Chidhambaram Gautam', 'Salil Arora'], 'Wicketkeeper Batsman', [4, 5, 6, 7], true);
+// Confirmed by the project owner:
+setRole(['Abhinav Mukund', 'Atharva Taide'], 'Batsman', [1, 2]);
+setRole(['Unmukt Chand', 'Srikkanth Anirudha', 'Anirudha Srikkanth'], 'Batsman', [1, 2, 3]);
+setRole(['Vijay Zol'], 'Batsman', [3, 4]);
+setRole(['Dwaraka Ravi Teja', 'Thalaivan Sargunam'], 'Batsman', [3, 4, 5]);
+setRole(['Siddharth Chitnis'], 'All-rounder', [5, 6, 7]);
+setRole(['Chandrasekar Ganapathy', 'Syed Mohammad'], 'All-rounder', [7, 8]);
+setRole(['Rohan Raje'], 'All-rounder', [7, 8, 9]);
+setRole(['Musavir Khote', 'Shivang Kumar'], 'All-rounder', [8, 9]);
+setRole(['Chetanya Nanda', 'Prasanth Parameswaran'], 'Bowler', [10, 11]);
 
 function parseCsv(file) {
     const [head, ...rows] = fs.readFileSync(file, 'utf8').trim().split(/\r?\n/);
@@ -120,7 +150,8 @@ for (const code of TEAMS) {
         const year = Number(yearStr);
         const b = batBy.get(k);
         const w = bowlBy.get(k);
-        const info = lookupInfo(name, code, year) || inferInfo(name, b, w);
+        const base = lookupInfo(name, code, year) || inferInfo(name, b, w);
+        const info = OVERRIDES[name] ? { ...base, ...OVERRIDES[name] } : base;
 
         let bat = null;
         if (b) {

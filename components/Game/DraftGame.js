@@ -14,7 +14,7 @@ import {
     pickPlayableYear,
     slotLabel,
 } from '../../lib/game/positions';
-import { simulateChase } from '../../lib/game/simulate';
+import { simulateChase, NO_KEEPER_PENALTY } from '../../lib/game/simulate';
 import { getBestScore, saveResult } from '../../lib/game/localHistory';
 
 const MAX_FOREIGNERS = 4;
@@ -152,18 +152,38 @@ export default function DraftGame({ teams, seasonSquadsByTeam, onActiveChange })
 
     if (!teamCode) {
         return (
-            <div className="flex flex-col items-center gap-4 bg-surface border border-border rounded-xl p-6 sm:p-10 max-w-md mx-auto">
-                <p className="font-display text-text text-lg uppercase tracking-wide">Choose a franchise</p>
-                <select
-                    onChange={(e) => setTeamCode(e.target.value)}
-                    defaultValue=""
-                    className="form-select bg-accent text-white border-none rounded-lg px-4 py-2 text-base font-medium cursor-pointer transition-colors hover:bg-accentHover w-full"
-                >
-                    <option value="" disabled>Select a team…</option>
+            <div className="flex flex-col gap-4 bg-surface/90 backdrop-blur-sm border border-border rounded-2xl p-4 sm:p-8 max-w-2xl mx-auto w-full">
+                <div className="text-center">
+                    <p className="font-display text-white text-xl sm:text-2xl uppercase tracking-wide">Choose a franchise</p>
+                    <p className="text-sm text-text/80 mt-1">Pick the team whose history you want to draft from.</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {teams.map((t) => (
-                        <option key={t.code} value={t.code}>{t.name} ({t.founded}-{t.lastYear})</option>
+                        <button
+                            key={t.code}
+                            type="button"
+                            onClick={() => setTeamCode(t.code)}
+                            style={{ '--tc': t.color }}
+                            className="group relative overflow-hidden text-left rounded-xl border border-border bg-bg/70 px-4 py-3.5 pl-5 transition-all
+                                hover:border-[var(--tc)] hover:-translate-y-0.5 hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tc)] active:scale-[0.99]"
+                        >
+                            <span className="absolute left-0 top-0 h-full w-1.5" style={{ background: t.color }} />
+                            <span className="flex items-center justify-between gap-3">
+                                <span className="min-w-0">
+                                    <span className="block font-display text-2xl leading-none text-white">{t.code}</span>
+                                    <span className="block mt-1 text-sm font-medium text-white/90 truncate">{t.name}</span>
+                                    <span className="block mt-0.5 text-xs text-text/70">{t.founded}–{t.lastYear}</span>
+                                </span>
+                                <span
+                                    className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white text-lg transition-transform group-hover:translate-x-0.5"
+                                    style={{ background: t.color }}
+                                >
+                                    →
+                                </span>
+                            </span>
+                        </button>
                     ))}
-                </select>
+                </div>
             </div>
         );
     }
@@ -281,6 +301,11 @@ export default function DraftGame({ teams, seasonSquadsByTeam, onActiveChange })
                             </span>
                         ))}
                     </div>
+                    {!keeperPicked && (
+                        <p className="text-[13px] text-amber-300">
+                            No wicketkeeper yet — an XI without one is docked {NO_KEEPER_PENALTY} runs.
+                        </p>
+                    )}
 
                     <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto no-scrollbar">
                         <BattingOrderStrip filled={filled} eligibleSlots={eligibleSlotsForSelection} onSlotClick={handleSlotClick} />
@@ -315,17 +340,17 @@ export default function DraftGame({ teams, seasonSquadsByTeam, onActiveChange })
                             {teams.length > 1 && (
                                 <button
                                     onClick={handleChangeTeam}
-                                    className="text-xs px-3 py-1.5 rounded-lg border border-border text-textMuted hover:text-text hover:border-accent transition-colors font-semibold"
+                                    className="text-[13px] px-3 py-1.5 rounded-lg border border-white/25 bg-bg/60 text-white hover:border-accent transition-colors font-semibold"
                                 >
                                     Change Team
                                 </button>
                             )}
-                            <label className="flex items-center gap-2 text-xs text-textMuted">
+                            <label className="flex items-center gap-2 text-[13px] font-medium text-white/85">
                                 Difficulty
                                 <select
                                     value={difficulty}
                                     onChange={(e) => handleDifficultyChange(e.target.value)}
-                                    className="bg-bg border border-border rounded-lg px-2 py-1.5 text-xs text-text font-semibold cursor-pointer"
+                                    className="bg-bg border border-white/25 rounded-lg px-2 py-1.5 text-[13px] text-white font-semibold cursor-pointer"
                                 >
                                     <option value="hard">Hard</option>
                                     <option value="easy">Easy</option>
@@ -353,7 +378,7 @@ export default function DraftGame({ teams, seasonSquadsByTeam, onActiveChange })
                                 >
                                     {skipUsed ? 'Skip Used' : 'Skip Year'}
                                 </button>
-                                <span className="text-xs text-textMuted">{team.name} · Turn {pickedCount + 1} / {TOTAL_SLOTS}</span>
+                                <span className="text-[13px] font-medium text-white/85">{team.name} · Turn {pickedCount + 1} / {TOTAL_SLOTS}</span>
                             </div>
                             <SquadPanel
                                 squad={currentSquad}

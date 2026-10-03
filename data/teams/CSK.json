@@ -311,8 +311,7 @@
       "isKeeper": false,
       "slots": [
         1,
-        2,
-        3
+        2
       ],
       "BAT": 24,
       "POW": 15,
@@ -488,16 +487,15 @@
     },
     {
       "name": "Andrew Flintoff",
-      "role": "Bowler",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "England",
       "isKeeper": false,
       "slots": [
-        8,
-        9,
-        10,
-        11
+        6,
+        7,
+        8
       ],
       "BAT": 43,
       "POW": 44,
@@ -727,16 +725,15 @@
     },
     {
       "name": "Justin Kemp",
-      "role": "Bowler",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "South Africa",
       "isKeeper": false,
       "slots": [
-        8,
-        9,
-        10,
-        11
+        6,
+        7,
+        8
       ],
       "BAT": 35,
       "POW": 41,
@@ -997,16 +994,14 @@
     },
     {
       "name": "Chandrasekar Ganapathy",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        7,
+        8
       ],
       "BAT": 24,
       "POW": 15,
@@ -1792,16 +1787,16 @@
     },
     {
       "name": "Ankit Rajpoot",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 35,
       "POW": 37,
@@ -2129,16 +2124,15 @@
     },
     {
       "name": "John Hastings",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "Australia",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 20,
       "POW": 20,
@@ -2650,16 +2644,16 @@
     },
     {
       "name": "Mark Wood",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "England",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 35,
       "POW": 39,
@@ -3996,16 +3990,16 @@
     },
     {
       "name": "Adam Milne",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "New Zealand",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 20,
       "POW": 20,
@@ -4980,16 +4974,16 @@
     },
     {
       "name": "Nathan Ellis",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "Australia",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 20,
       "POW": 20,
@@ -5171,16 +5165,15 @@
     },
     {
       "name": "Prashant Veer",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 60,
       "POW": 57,
@@ -5339,16 +5332,15 @@
     },
     {
       "name": "Ramakrishna Ghosh",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 20,
       "POW": 20,

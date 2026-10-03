@@ -4,9 +4,10 @@ const EXTRA_LABELS = { wd: 'wide', nb: 'no-ball', b: 'bye', lb: 'leg-bye' };
 
 // Extras ride on a normal delivery - appended so the batter's own runs and the extras both read clearly.
 function extrasSuffix(entry) {
-    if (!entry.extras) return '';
+    const pen = entry.penalty ? ` −${entry.penalty} penalty (no wicketkeeper)` : '';
+    if (!entry.extras) return pen;
     const label = EXTRA_LABELS[entry.extraType] || 'extra';
-    return ` +${entry.extras} ${label}${entry.extras > 1 && entry.extraType !== 'wd' && entry.extraType !== 'nb' ? 's' : ''}`;
+    return ` +${entry.extras} ${label}${entry.extras > 1 && entry.extraType !== 'wd' && entry.extraType !== 'nb' ? 's' : ''}${pen}`;
 }
 
 function ballCommentary(entry) {

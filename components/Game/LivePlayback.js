@@ -20,7 +20,8 @@ function isHighlight(entry, fast) {
 const EXTRA_LABELS = { wd: 'wide', nb: 'no-ball', b: 'bye', lb: 'leg-bye' };
 // Extras are scattered through the innings; surface them in the ticker as a one-line note.
 function extrasNote(entry) {
-    return entry.extras ? ` (+${entry.extras} ${EXTRA_LABELS[entry.extraType] || 'extras'})` : '';
+    const extra = entry.extras ? ` (+${entry.extras} ${EXTRA_LABELS[entry.extraType] || 'extras'})` : '';
+    return entry.penalty ? `${extra} (−${entry.penalty} penalty: no wicketkeeper)` : extra;
 }
 
 // Attaches each ball's batter with their cumulative runs(balls) at that point, so the "departs

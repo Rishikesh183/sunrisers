@@ -235,16 +235,16 @@
     },
     {
       "name": "Ashley Noffke",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "Australia",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 35,
       "POW": 39,
@@ -356,16 +356,16 @@
     },
     {
       "name": "Abdur Razzak",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "Bangladesh",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 24,
       "POW": 15,
@@ -525,16 +525,15 @@
     },
     {
       "name": "Jesse Ryder",
-      "role": "Bowler",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "New Zealand",
       "isKeeper": false,
       "slots": [
-        8,
-        9,
-        10,
-        11
+        6,
+        7,
+        8
       ],
       "BAT": 35,
       "POW": 42,
@@ -664,16 +663,15 @@
     },
     {
       "name": "Rajesh Bishnoi",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 34,
       "POW": 41,
@@ -1107,16 +1105,16 @@
     },
     {
       "name": "Nayan Doshi",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 20,
       "POW": 20,
@@ -1240,16 +1238,14 @@
     },
     {
       "name": "Syed Mohammad",
-      "role": "Bowler",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        8,
-        9,
-        10,
-        11
+        7,
+        8
       ],
       "BAT": 36,
       "POW": 41,
@@ -1474,16 +1470,15 @@
     },
     {
       "name": "Abrar Kazi",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 20,
       "POW": 20,
@@ -1679,8 +1674,6 @@
       "country": "India",
       "isKeeper": false,
       "slots": [
-        8,
-        9,
         10,
         11
       ],
@@ -1741,16 +1734,14 @@
     },
     {
       "name": "Syed Mohammad",
-      "role": "Bowler",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        8,
-        9,
-        10,
-        11
+        7,
+        8
       ],
       "BAT": 36,
       "POW": 41,
@@ -1979,16 +1970,14 @@
     },
     {
       "name": "Syed Mohammad",
-      "role": "Bowler",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        8,
-        9,
-        10,
-        11
+        7,
+        8
       ],
       "BAT": 35,
       "POW": 38,
@@ -2151,8 +2140,7 @@
       "isKeeper": false,
       "slots": [
         1,
-        2,
-        3
+        2
       ],
       "BAT": 36,
       "POW": 39,
@@ -2504,9 +2492,8 @@
       "country": "India",
       "isKeeper": false,
       "slots": [
-        1,
-        2,
-        3
+        3,
+        4
       ],
       "BAT": 36,
       "POW": 41,
@@ -2804,16 +2791,15 @@
     },
     {
       "name": "Sean Abbott",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "Australia",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 35,
       "POW": 41,
@@ -3224,16 +3210,16 @@
     },
     {
       "name": "Adam Milne",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "New Zealand",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 20,
       "POW": 20,
@@ -4110,16 +4096,15 @@
     },
     {
       "name": "Gurkeerat Singh Mann",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 46,
       "POW": 55,
@@ -4448,16 +4433,15 @@
     },
     {
       "name": "Gurkeerat Singh Mann",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 89,
       "POW": 28,
@@ -5305,16 +5289,15 @@
     },
     {
       "name": "Michael Bracewell",
-      "role": "Bowler",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "New Zealand",
       "isKeeper": false,
       "slots": [
-        8,
-        9,
-        10,
-        11
+        6,
+        7,
+        8
       ],
       "BAT": 45,
       "POW": 46,
@@ -5577,16 +5560,16 @@
     },
     {
       "name": "Himanshu Sharma",
-      "role": "Batsman",
+      "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10,
+        11
       ],
       "BAT": 20,
       "POW": 20,
@@ -5936,6 +5919,22 @@
     },
     {
       "name": "Mayank Dagar",
+      "role": "All-rounder",
+      "battingStyle": "-",
+      "bowlingStyle": "-",
+      "country": "India",
+      "isKeeper": false,
+      "slots": [
+        6,
+        7,
+        8
+      ],
+      "BAT": 24,
+      "POW": 15,
+      "BWL": 10
+    },
+    {
+      "name": "Himanshu Sharma",
       "role": "Bowler",
       "battingStyle": "-",
       "bowlingStyle": "-",
@@ -5946,23 +5945,6 @@
         9,
         10,
         11
-      ],
-      "BAT": 24,
-      "POW": 15,
-      "BWL": 10
-    },
-    {
-      "name": "Himanshu Sharma",
-      "role": "Batsman",
-      "battingStyle": "-",
-      "bowlingStyle": "-",
-      "country": "India",
-      "isKeeper": false,
-      "slots": [
-        3,
-        4,
-        5,
-        6
       ],
       "BAT": 20,
       "POW": 20,
@@ -6186,16 +6168,15 @@
     },
     {
       "name": "Jacob Bethell",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "England",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 41,
       "POW": 55,
@@ -6220,16 +6201,15 @@
     },
     {
       "name": "Manoj Bhandage",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "India",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 35,
       "POW": 38,
@@ -6472,16 +6452,15 @@
     },
     {
       "name": "Jacob Bethell",
-      "role": "Batsman",
+      "role": "All-rounder",
       "battingStyle": "-",
       "bowlingStyle": "-",
       "country": "England",
       "isKeeper": false,
       "slots": [
-        3,
-        4,
-        5,
-        6
+        6,
+        7,
+        8
       ],
       "BAT": 36,
       "POW": 53,

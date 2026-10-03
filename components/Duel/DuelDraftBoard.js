@@ -13,6 +13,7 @@ import {
     pickPlayableYear,
     slotLabel,
 } from '../../lib/game/positions';
+import { NO_KEEPER_PENALTY } from '../../lib/game/simulate';
 import { turnUid, otherPlayerUid, teamOf, isSameTeam } from '../../lib/duel/room';
 
 const MAX_FOREIGNERS = 4;
@@ -132,7 +133,8 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
         return { disabled: alreadyPicked || noSlot || foreignLocked, reason };
     }
 
-    const statPills = [`Foreigners ${myForeignersPicked}/${MAX_FOREIGNERS}`];
+    const myKeeperPicked = Object.values(myFilled).some((f) => f.player.isKeeper);
+    const statPills = [`Keeper: ${myKeeperPicked ? 'Yes' : 'No'}`, `Foreigners ${myForeignersPicked}/${MAX_FOREIGNERS}`];
     const turnLabel = optimisticPick ? 'Saving your pick…' : isMyTurnDisplay ? 'Your pick' : `${opponentName}'s pick`;
 
     return (
@@ -187,6 +189,11 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                             </span>
                         ))}
                     </div>
+                    {!myKeeperPicked && (
+                        <p className="text-[13px] text-amber-300">
+                            No wicketkeeper yet — an XI without one is docked {NO_KEEPER_PENALTY} runs.
+                        </p>
+                    )}
                     <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto no-scrollbar">
                         <BattingOrderStrip
                             filled={myFilled}
