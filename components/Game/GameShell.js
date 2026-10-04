@@ -21,6 +21,7 @@ function StatChip({ icon: Icon, value, label }) {
 // title bar so the two draft panels (and the score screens) start near the top of the page.
 export default function GameShell({ teams, seasonSquadsByTeam, seasonCount }) {
     const [activeTeam, setActiveTeam] = useState(null);
+    const [vivid, setVivid] = useState(false); // brighter backdrop while the live simulation plays
     const active = !!activeTeam;
 
     // Team backgrounds live in /public/images/background as {code}_bg_desktop.png / {code}_bg_mobile.png.
@@ -43,7 +44,12 @@ export default function GameShell({ teams, seasonSquadsByTeam, seasonCount }) {
                 style={bgVars}
                 className="fixed inset-0 z-0 bg-cover bg-no-repeat bg-[position:70%_center] md:bg-[position:88%_center] bg-[image:var(--bg-m)] md:bg-[image:var(--bg-d)]"
             />
-            <div aria-hidden className="fixed inset-0 z-0 bg-gradient-to-b from-black/50 via-bg/60 to-bg/90" />
+            <div
+                aria-hidden
+                className={`fixed inset-0 z-0 bg-gradient-to-b ${
+                    vivid ? 'from-black/15 via-black/20 to-bg/60' : 'from-black/50 via-bg/60 to-bg/90'
+                }`}
+            />
 
             <div className="relative z-10 max-w-6xl mx-auto px-3 sm:px-6 pb-8">
                 {active ? (
@@ -104,7 +110,10 @@ export default function GameShell({ teams, seasonSquadsByTeam, seasonCount }) {
                     </section>
                 )}
 
-                <DraftGame teams={teams} seasonSquadsByTeam={seasonSquadsByTeam} onActiveChange={setActiveTeam} />
+                <DraftGame teams={teams} seasonSquadsByTeam={seasonSquadsByTeam} onActiveChange={(code, playing) => {
+                        setActiveTeam(code);
+                        setVivid(!!playing);
+                    }} />
             </div>
         </div>
     );

@@ -1,26 +1,7 @@
 'use client';
 
-const EXTRA_LABELS = { wd: 'wide', nb: 'no-ball', b: 'bye', lb: 'leg-bye' };
-
-// Extras ride on a normal delivery - appended so the batter's own runs and the extras both read clearly.
-function extrasSuffix(entry) {
-    const pen = entry.penalty ? ` −${entry.penalty} penalty (no wicketkeeper)` : '';
-    if (!entry.extras) return pen;
-    const label = EXTRA_LABELS[entry.extraType] || 'extra';
-    return ` +${entry.extras} ${label}${entry.extras > 1 && entry.extraType !== 'wd' && entry.extraType !== 'nb' ? 's' : ''}${pen}`;
-}
-
-function ballCommentary(entry) {
-    return baseCommentary(entry) + extrasSuffix(entry);
-}
-
-function baseCommentary(entry) {
-    if (entry.isWicket) return `OUT! ${entry.batter} departs for ${entry.batterRuns}(${entry.batterBalls}).`;
-    if (entry.runs === 0) return `${entry.batter} — no run.`;
-    if (entry.runs === 4) return `${entry.batter} — FOUR!`;
-    if (entry.runs === 6) return `${entry.batter} — SIX!`;
-    return `${entry.batter} — ${entry.runs} run${entry.runs > 1 ? 's' : ''}.`;
-}
+import { useMemo, useState } from 'react';
+import FeedRow from './FeedRow';
 
 // Single forward pass to attach each ball's batter with their cumulative runs(balls) at that
 // point (for the "departs for X(Y)" line) and to snapshot the score + not-out batters at the
@@ -67,50 +48,73 @@ function groupByOver(annotated) {
     return overs.filter(Boolean).reverse();
 }
 
+const isKeyMoment = (e) => e.isWicket || e.runs === 4 || e.runs === 6;
+
 export default function CommentaryFeed({ ballLog }) {
-    const { annotated, overSnapshots } = annotate(ballLog);
-    const overs = groupByOver(annotated);
+    const [tab, setTab] = useState('full'); // 'full' | 'moments'
+    const { annotated, overSnapshots } = useMemo(() => annotate(ballLog), [ballLog]);
+    const overs = useMemo(() => groupByOver(annotated), [annotated]);
+    const moments = useMemo(() => annotated.filter(isKeyMoment).reverse(), [annotated]);
 
     return (
-        <div className="max-h-96 overflow-y-auto flex flex-col gap-4 pr-1">
-            {overs.map((group) => {
-                const snap = overSnapshots[group.over];
-                return (
-                    <div key={group.over}>
-                        <div className="flex justify-between items-baseline mb-1">
-                            <p className="text-xs text-textMuted uppercase tracking-wide">Over {group.over + 1}</p>
-                            {snap && (
-                                <p className="text-xs text-textMuted tabular-nums">
-                                    {snap.score}/{snap.wickets}
-                                    {snap.batters.length > 0 && (
-                                        <span className="ml-2">
-                                            {snap.batters.map((b) => `${b.name} ${b.runs}(${b.balls})`).join(', ')}
-                                        </span>
-                                    )}
-                                </p>
-                            )}
-                        </div>
-                        <div className="flex flex-col divide-y divide-border">
-                            {group.balls.slice().reverse().map((entry) => (
-                                <div
-                                    key={entry.ballInOver}
-                                    className={`flex justify-between items-center gap-2 py-1.5 text-sm ${
-                                        entry.isWicket
-                                            ? 'text-loss font-semibold'
-                                            : entry.runs === 4 || entry.runs === 6
-                                            ? 'text-accent font-semibold'
-                                            : 'text-text'
-                                    }`}
-                                >
-                                    <span className="text-textMuted text-xs w-10 shrink-0">{entry.over}.{entry.ballInOver}</span>
-                                    <span className="flex-1 truncate">{ballCommentary(entry)}</span>
-                                    <span className="text-textMuted text-xs shrink-0">{entry.score}/{entry.wickets}</span>
-                                </div>
+        <div className="flex flex-col gap-3">
+            <div className="inline-flex self-start rounded-xl bg-black/40 p-1">
+                {[
+                    { key: 'full', label: 'Full Commentary' },
+                    { key: 'moments', label: 'Key Moments' },
+                ].map((t) => (
+                    <button
+                        key={t.key}
+                        type="button"
+                        onClick={() => setTab(t.key)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                            tab === t.key ? 'bg-accent text-white' : 'text-white/80 hover:text-white'
+                        }`}
+                    >
+                        {t.label}
+                    </button>
+                ))}
+            </div>
+
+            <div className="max-h-[28rem] no-scrollbar overflow-y-auto flex flex-col gap-4 pr-1">
+                {tab === 'moments' ? (
+                    moments.length === 0 ? (
+                        <p className="text-sm text-white/70 text-center py-4">No boundaries or wickets.</p>
+                    ) : (
+                        <ul className="flex flex-col gap-1.5">
+                            {moments.map((entry) => (
+                                <FeedRow key={`${entry.over}.${entry.ballInOver}`} entry={entry} />
                             ))}
-                        </div>
-                    </div>
-                );
-            })}
+                        </ul>
+                    )
+                ) : (
+                    overs.map((group) => {
+                        const snap = overSnapshots[group.over];
+                        return (
+                            <div key={group.over}>
+                                <div className="flex justify-between items-baseline mb-1.5 px-1">
+                                    <p className="text-xs text-white/70 uppercase tracking-widest">Over {group.over + 1}</p>
+                                    {snap && (
+                                        <p className="text-xs text-white/70 tabular-nums">
+                                            {snap.score}/{snap.wickets}
+                                            {snap.batters.length > 0 && (
+                                                <span className="ml-2 hidden sm:inline">
+                                                    {snap.batters.map((b) => `${b.name} ${b.runs}(${b.balls})`).join(', ')}
+                                                </span>
+                                            )}
+                                        </p>
+                                    )}
+                                </div>
+                                <ul className="flex flex-col gap-1.5">
+                                    {group.balls.slice().reverse().map((entry) => (
+                                        <FeedRow key={entry.ballInOver} entry={entry} />
+                                    ))}
+                                </ul>
+                            </div>
+                        );
+                    })
+                )}
+            </div>
         </div>
     );
 }

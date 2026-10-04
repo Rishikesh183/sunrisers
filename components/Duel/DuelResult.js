@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import LivePlayback from '../Game/LivePlayback';
 import ScoreBoard from '../Game/ScoreBoard';
+import TeamBackground from '../TeamBackground';
+import { TEAMS } from '../../data/teams';
 
 const TARGET_REVEAL_MS = 2200;
 
@@ -25,6 +27,7 @@ function markWatched(roomId) {
 }
 
 export default function DuelResult({ room, myUid }) {
+    const [tab, setTab] = useState(null); // 'first' | 'second'; defaults to the viewer's own innings below
     const [stage, setStage] = useState(() => (hasWatched(room.id) ? 'final' : 'first')); // 'first' | 'targetReveal' | 'second' | 'final'
 
     const isHostFirst = room.firstPickerUid === room.hostUid;
@@ -55,8 +58,17 @@ export default function DuelResult({ room, myUid }) {
         return () => clearTimeout(t);
     }, [stage]);
 
+    // Each innings is themed in its own team's colour (accent bar, score, progress), not the viewer's.
+    const themeFor = (code) => {
+        const t = TEAMS.find((x) => x.code === code);
+        return t ? { '--accent': t.color, '--accent-hover': t.colorHover, '--accent-muted': t.colorMuted } : undefined;
+    };
+
     if (stage === 'first') {
         return (
+            <div style={themeFor(firstTeam)}>
+            <TeamBackground code={firstTeam} vivid />
+            <div className="relative z-10">
             <LivePlayback
                 result={firstResult}
                 battingOrder={firstOpeners}
@@ -67,12 +79,14 @@ export default function DuelResult({ room, myUid }) {
                 parPause={false}
                 onDone={() => setStage('targetReveal')}
             />
+            </div>
+            </div>
         );
     }
 
     if (stage === 'targetReveal') {
         return (
-            <div className="flex flex-col items-center gap-3 bg-surface border border-border rounded-xl p-6 sm:p-10">
+            <div style={themeFor(firstTeam)} className="flex flex-col items-center gap-3 bg-surface border border-border rounded-xl p-6 sm:p-10">
                 <p className="text-xs text-textMuted uppercase tracking-wide">{matchup}</p>
                 <p className="font-display text-text text-lg">
                     {firstName} posted <span className="text-accent">{firstResult.finalScore}/{firstResult.wickets}</span>
@@ -86,6 +100,9 @@ export default function DuelResult({ room, myUid }) {
 
     if (stage === 'second') {
         return (
+            <div style={themeFor(secondTeam)}>
+            <TeamBackground code={secondTeam} vivid />
+            <div className="relative z-10">
             <LivePlayback
                 result={secondResult}
                 battingOrder={secondOpeners}
@@ -95,6 +112,8 @@ export default function DuelResult({ room, myUid }) {
                 parPause={false}
                 onDone={() => setStage('final')}
             />
+            </div>
+            </div>
         );
     }
 
@@ -108,45 +127,67 @@ export default function DuelResult({ room, myUid }) {
     // so the first side's scorecard color/copy matches who actually won.
     const firstDisplayResult = { ...firstResult, won: room.winnerUid === firstUid };
 
+    const innings = [
+        { key: 'first', uid: firstUid, name: firstName, team: firstTeam, result: firstDisplayResult, order: firstOrder,
+          text: `Set a target of ${firstResult.finalScore}.`, label: 'Batted first' },
+        { key: 'second', uid: secondUid, name: secondName, team: secondTeam, result: secondResult, order: secondOrder,
+          text: secondResult.won ? `Chased down the target of ${target} to win.` : `Fell short of the ${target} target.`, label: `Chased ${target}` },
+    ];
+    const active = innings.find((i) => i.key === tab) || innings.find((i) => i.uid === myUid) || innings[0];
+    const activeTeam = TEAMS.find((t) => t.code === active.team);
+    const themeStyle = activeTeam
+        ? { '--accent': activeTeam.color, '--accent-hover': activeTeam.colorHover, '--accent-muted': activeTeam.colorMuted }
+        : undefined;
+
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex flex-col items-center gap-2 bg-surface border border-border rounded-xl p-6 sm:p-10">
-                <p className="text-xs text-textMuted uppercase tracking-wide">{matchup}</p>
-                <p className="font-display text-accent uppercase tracking-wide text-lg">{winnerName} wins!</p>
-                <p className="text-sm text-textMuted">{marginText}</p>
-                <div className="w-full max-w-sm flex flex-col gap-3 mt-2">
-                    <div className={`flex justify-between items-center rounded-lg border p-3 ${room.winnerUid === firstUid ? 'border-win bg-win/10' : 'border-border'}`}>
-                        <span className="text-text font-semibold">{firstName}</span>
-                        <span className="font-display text-text tabular-nums">{firstResult.finalScore}/{firstResult.wickets}</span>
-                    </div>
-                    <div className={`flex justify-between items-center rounded-lg border p-3 ${room.winnerUid === secondUid ? 'border-win bg-win/10' : 'border-border'}`}>
-                        <span className="text-text font-semibold">{secondName}</span>
-                        <span className="font-display text-text tabular-nums">{secondResult.finalScore}/{secondResult.wickets}</span>
-                    </div>
+        <>
+            <TeamBackground code={active.team} />
+            <div className="relative z-10 flex flex-col gap-4" style={themeStyle}>
+                <div className="flex flex-col items-center gap-1 bg-bg/70 backdrop-blur-sm border border-border rounded-2xl px-4 py-4 text-center">
+                    <p className="text-xs text-white/70 uppercase tracking-wide">{matchup}</p>
+                    <p className="font-display text-white uppercase tracking-wide text-xl">{winnerName} wins!</p>
+                    <p className="text-sm text-white/80">{marginText}</p>
+                </div>
+
+                <div role="tablist" className="grid grid-cols-2 gap-2">
+                    {innings.map((i) => {
+                        const selected = i.key === active.key;
+                        const color = TEAMS.find((t) => t.code === i.team)?.color || '#8b96a8';
+                        return (
+                            <button
+                                key={i.key}
+                                role="tab"
+                                aria-selected={selected}
+                                onClick={() => setTab(i.key)}
+                                style={selected ? { borderColor: color } : undefined}
+                                className={`text-left rounded-xl border-2 px-3 py-2.5 transition-colors backdrop-blur-sm ${
+                                    selected ? 'bg-bg/85' : 'bg-bg/50 border-white/15 hover:border-white/40'
+                                }`}
+                            >
+                                <span className="flex items-center justify-between gap-2">
+                                    <span className="min-w-0">
+                                        <span className="block text-sm font-semibold text-white truncate">
+                                            {i.name}
+                                            {i.uid === myUid && <span className="ml-1.5 text-[10px] uppercase tracking-wide" style={{ color }}>you</span>}
+                                        </span>
+                                        <span className="block text-[11px] text-white/70 truncate">{i.team} · {i.label}</span>
+                                    </span>
+                                    <span className="text-right shrink-0">
+                                        <span className="block font-display text-lg text-white tabular-nums leading-none">
+                                            {i.result.finalScore}/{i.result.wickets}
+                                        </span>
+                                        {room.winnerUid === i.uid && <span className="block text-[10px] uppercase tracking-wide text-win mt-0.5">Winner</span>}
+                                    </span>
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                <div role="tabpanel">
+                    <ScoreBoard battingOrder={active.order} result={active.result} resultText={active.text} />
                 </div>
             </div>
-
-            <div>
-                <p className="text-xs text-textMuted uppercase tracking-wide mb-2">{firstName}'s innings</p>
-                <ScoreBoard
-                    battingOrder={firstOrder}
-                    result={firstDisplayResult}
-                    resultText={`Set a target of ${firstResult.finalScore}.`}
-                />
-            </div>
-
-            <div>
-                <p className="text-xs text-textMuted uppercase tracking-wide mb-2">{secondName}'s innings</p>
-                <ScoreBoard
-                    battingOrder={secondOrder}
-                    result={secondResult}
-                    resultText={
-                        secondResult.won
-                            ? `Chased down the target of ${target} to win.`
-                            : `Fell short of the ${target} target.`
-                    }
-                />
-            </div>
-        </div>
+        </>
     );
 }

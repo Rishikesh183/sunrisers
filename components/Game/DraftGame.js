@@ -40,9 +40,9 @@ export default function DraftGame({ teams, seasonSquadsByTeam, onActiveChange })
         : undefined;
 
     useEffect(() => {
-        onActiveChange?.(teamCode);
+        onActiveChange?.(teamCode, phase === 'playback');
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [teamCode]);
+    }, [teamCode, phase]);
 
 
     const pickedCount = Object.keys(filled).length;

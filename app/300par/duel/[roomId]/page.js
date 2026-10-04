@@ -255,20 +255,24 @@ export default function DuelRoomPage({ params }) {
             />
         );
     } else if (room.status === 'simulating') {
-        body = <Spinner label="Both squads are set — simulating the duel…" className="text-sm text-textMuted justify-center w-full" />;
+        body = <Spinner label="Both squads are set — Lets start the game…" className="text-sm text-textMuted justify-center w-full" />;
     } else if (room.status === 'complete') {
         body = <DuelResult room={room} myUid={myUid} />;
     }
 
     return (
         <div
-            className={`mx-auto p-4 sm:p-6 md:p-10 bg-bg min-h-screen ${room?.status === 'drafting' ? 'max-w-3xl lg:max-w-7xl' : 'max-w-3xl'}`}
+            className={`mx-auto bg-bg min-h-screen ${
+                room?.status === 'complete' ? 'px-4 sm:px-6 md:px-10 pt-3 pb-6' : 'p-4 sm:p-6 md:p-10'
+            } ${room?.status === 'drafting' ? 'max-w-3xl lg:max-w-7xl' : 'max-w-3xl'}`}
             style={themeStyle}
         >
-            <h1 className="text-2xl sm:text-3xl font-display text-text text-center uppercase tracking-wide mb-2">
-                1v1 Duel
-            </h1>
-            {room && room.hostName && room.guestName && (
+            {room?.status !== 'complete' && (
+                <h1 className="text-2xl sm:text-3xl font-display text-text text-center uppercase tracking-wide mb-2">
+                    1v1 Duel
+                </h1>
+            )}
+            {room && room.hostName && room.guestName && room.status !== 'complete' && (
                 <p className="text-sm text-textMuted text-center mb-6">
                     {room.hostName}'s {room.hostTeam} vs {room.guestName}'s {room.guestTeam}
                 </p>

@@ -135,7 +135,7 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
 
     const myKeeperPicked = Object.values(myFilled).some((f) => f.player.isKeeper);
     const statPills = [`Keeper: ${myKeeperPicked ? 'Yes' : 'No'}`, `Foreigners ${myForeignersPicked}/${MAX_FOREIGNERS}`];
-    const turnLabel = optimisticPick ? 'Saving your pick…' : isMyTurnDisplay ? 'Your pick' : `${opponentName}'s pick`;
+    const turnLabel = optimisticPick ? 'That was a great pick…' : isMyTurnDisplay ? 'Your pick' : `${opponentName}'s pick`;
 
     return (
         <div className="flex flex-col gap-5">
@@ -231,7 +231,7 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                     ) : (
                         <Panel title="Waiting for the other pick">
                             <div className="flex flex-col items-center gap-3 py-6 text-sm text-textMuted text-center">
-                                <Spinner size={22} label={optimisticPick ? 'Saving your pick…' : `Waiting for ${opponentName}…`} />
+                                <Spinner size={22} label={optimisticPick ? 'That was a good pick…' : `${opponentName}is cooking something…`} />
                                 {!optimisticPick && <p>You can watch their XI fill up below.</p>}
                             </div>
                         </Panel>

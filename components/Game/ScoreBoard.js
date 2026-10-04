@@ -5,51 +5,62 @@ import { slotLabel } from '../../lib/game/positions';
 import CommentaryFeed from './CommentaryFeed';
 import LeaderboardSave from './LeaderboardSave';
 
+// Glass card shared with the live playback so the result reads as part of the same screen.
+const GLASS = 'rounded-2xl border border-white/15 bg-bg/70 backdrop-blur-md';
+
 export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgain, resultText, leaderboardEntry }) {
     const [showCommentary, setShowCommentary] = useState(false);
 
     return (
-        <div className="flex flex-col gap-5">
-            <div className={`rounded-xl border p-5 sm:p-6 text-center ${result.won ? 'border-win bg-win/10' : 'border-loss bg-loss/10'}`}>
-                <p className="text-sm text-textMuted uppercase tracking-wide mb-1">Final Score</p>
-                <p className={`font-display text-4xl sm:text-5xl ${result.won ? 'text-win' : 'text-loss'}`}>
-                    {result.finalScore}/{result.wickets} <span className="text-lg text-textMuted">({result.oversUsed} ov)</span>
-                </p>
-                <p className="mt-2 font-semibold text-text">
-                    {resultText ||
-                        (result.won
-                            ? `Impossible? Not for this XI. ${result.target} chased down.`
-                            : `Fell short of the ${result.target} par score.`)}
-                </p>
-                {bestScore != null && (
-                    <p className="text-xs text-textMuted mt-2">Your best: {bestScore}/300</p>
-                )}
+        <div className="flex flex-col gap-4">
+            <div
+                className={`relative overflow-hidden text-center p-5 sm:p-6 ${GLASS} ${
+                    result.won ? 'border-win/70' : 'border-loss/70'
+                }`}
+            >
+                <span aria-hidden className={`absolute inset-0 ${result.won ? 'bg-win/10' : 'bg-loss/10'}`} />
+                <div className="relative">
+                    <p className="text-[11px] text-white/70 uppercase tracking-widest mb-1">Final Score</p>
+                    <p className={`font-display text-5xl sm:text-6xl leading-none ${result.won ? 'text-win' : 'text-loss'}`}>
+                        {result.finalScore}/{result.wickets} <span className="text-lg text-white/70">({result.oversUsed} ov)</span>
+                    </p>
+                    <p className="mt-3 font-semibold text-white">
+                        {resultText ||
+                            (result.won
+                                ? `Impossible? Not for this XI. ${result.target} chased down.`
+                                : `Fell short of the ${result.target} par score.`)}
+                    </p>
+                    {bestScore != null && <p className="text-xs text-white/70 mt-2">Your best: {bestScore}/300</p>}
+                </div>
             </div>
 
             {leaderboardEntry && <LeaderboardSave entry={leaderboardEntry} />}
 
-            <div className="bg-surface border border-border rounded-xl p-3 sm:p-5">
-                <h3 className="font-display text-text mb-3 uppercase tracking-wide text-sm">Scorecard</h3>
-                <div className="flex flex-col divide-y divide-border">
+            <div className={`${GLASS} p-3 sm:p-5`}>
+                <div className="flex items-center gap-3 mb-3">
+                    <span className="w-1 h-6 rounded-full bg-accent" />
+                    <h3 className="font-display text-white text-base sm:text-lg">Scorecard</h3>
+                </div>
+                <div className="flex flex-col divide-y divide-white/10">
                     {result.batsmen.map((b, i) => (
                         <div key={i} className="flex justify-between items-center py-2 text-sm">
                             <div className="flex items-center gap-2 min-w-0">
-                                <span className="text-textMuted text-xs w-16 shrink-0">#{i + 1} {slotLabel(i + 1)}</span>
-                                <span className="text-text truncate">{battingOrder[i].name}</span>
+                                <span className="text-white/60 text-xs w-16 shrink-0">#{i + 1} {slotLabel(i + 1)}</span>
+                                <span className="text-white truncate">{battingOrder[i].name}</span>
                             </div>
-                            <span className="text-textMuted shrink-0">
+                            <span className="text-white/80 tabular-nums shrink-0">
                                 {b.dnb ? 'DNB' : `${b.runs}(${b.balls})${b.out ? '' : '*'}`}
                             </span>
                         </div>
                     ))}
                     <div className="flex justify-between items-center py-2 text-sm">
-                        <span className="text-textMuted">Extras</span>
-                        <span className="text-textMuted shrink-0">{result.extras ?? 0}</span>
+                        <span className="text-white/70">Extras</span>
+                        <span className="text-white/80 shrink-0">{result.extras ?? 0}</span>
                     </div>
                     {result.oppositionBowling != null && (
                         <div className="flex justify-between items-center py-2 text-sm">
-                            <span className="text-textMuted">Opposition bowling attack</span>
-                            <span className="text-textMuted shrink-0">
+                            <span className="text-white/70">Opposition bowling attack</span>
+                            <span className="text-white/80 shrink-0">
                                 {result.oppositionEffect >= 0.4 ? 'Strong' : result.oppositionEffect <= -0.4 ? 'Weak' : 'Average'} ({result.oppositionBowling})
                             </span>
                         </div>
@@ -61,19 +72,24 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                         </div>
                     )}
                     <div className="flex justify-between items-center py-2 text-sm font-semibold">
-                        <span className="text-text">Total</span>
-                        <span className="text-text shrink-0">{result.finalScore}/{result.wickets} ({Math.floor(result.ballsFaced / 6)}.{result.ballsFaced % 6} ov)</span>
+                        <span className="text-white">Total</span>
+                        <span className="text-white shrink-0 tabular-nums">
+                            {result.finalScore}/{result.wickets} ({Math.floor(result.ballsFaced / 6)}.{result.ballsFaced % 6} ov)
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <div className="bg-surface border border-border rounded-xl p-3 sm:p-5">
+            <div className={`${GLASS} p-3 sm:p-5`}>
                 <button
                     onClick={() => setShowCommentary((v) => !v)}
-                    className="w-full flex justify-between items-center font-display text-text uppercase tracking-wide text-sm"
+                    className="w-full flex justify-between items-center"
                 >
-                    Ball-by-Ball Commentary
-                    <span className="text-textMuted text-xs normal-case tracking-normal">{showCommentary ? 'Hide' : 'Show'}</span>
+                    <span className="flex items-center gap-3">
+                        <span className="w-1 h-6 rounded-full bg-accent" />
+                        <span className="font-display text-white text-base sm:text-lg">Ball by Ball</span>
+                    </span>
+                    <span className="text-white/70 text-xs">{showCommentary ? 'Hide' : 'Show'}</span>
                 </button>
                 {showCommentary && (
                     <div className="mt-3">
@@ -86,7 +102,7 @@ export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgai
                 <div className="flex justify-center">
                     <button
                         onClick={onPlayAgain}
-                        className="py-2 px-5 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold"
+                        className="py-2.5 px-6 rounded-xl text-white bg-accent hover:bg-accentHover transition-colors font-semibold"
                     >
                         Play Again
                     </button>
