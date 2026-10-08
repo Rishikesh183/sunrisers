@@ -95,9 +95,10 @@ export default function DuelRoomPage({ params }) {
         const firstOrder = buildBattingOrder(picks, firstUid, firstSeasonSquads);
         const secondOrder = buildBattingOrder(picks, secondUid, secondSeasonSquads);
         // No target for the first innings - it just sets the score the second side has to beat.
-        const firstResult = simulateChase(firstOrder, Math.random, null, 'hard', false, bowlingStrength(secondOrder));
+        // 'duel' scoring sits a little below solo Hard - the aim here is to win, not to reach 300.
+        const firstResult = simulateChase(firstOrder, Math.random, null, 'duel', false, bowlingStrength(secondOrder));
         // Must beat (not just match) the first innings - target is score + 1, and the chase ends the ball it's reached.
-        const secondResult = simulateChase(secondOrder, Math.random, firstResult.finalScore + 1, 'hard', true, bowlingStrength(firstOrder));
+        const secondResult = simulateChase(secondOrder, Math.random, firstResult.finalScore + 1, 'duel', true, bowlingStrength(firstOrder));
         const winnerUid = secondResult.won ? secondUid : firstUid;
 
         const hostResult = isHostFirst ? firstResult : secondResult;
