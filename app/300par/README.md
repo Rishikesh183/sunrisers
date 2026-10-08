@@ -179,19 +179,21 @@ takes the 11 picked players **in slot order** (index 0 = slot 1) and returns:
    rolled against `Math.random()`. The multiplier and bounds come from the difficulty setting
    (`DIFFICULTY` in `simulate.js`):
 
-   | Difficulty | `dismissMult` | `dismissFloor` | `dismissCeil` | `powerBoost` |
-   |---|---|---|---|---|
-   | Hard | 0.80 | 0.017 | 0.064 | 1.06 |
-   | Easy | 0.56 | 0.012 | 0.047 | 1.17 |
+   | Difficulty | `dismissMult` | `dismissFloor` | `dismissCeil` | `powerBoost` | `dotBias` |
+   |---|---|---|---|---|---|
+   | Hard | 0.80 | 0.017 | 0.064 | 1.06 | 0 |
+   | Easy | 0.56 | 0.012 | 0.047 | 1.17 | 0 |
+   | Duel (both innings of a duel) | 0.80 | 0.017 | 0.064 | 0.88 | 0.035 |
 
    On Hard, elite BAT (~96) → ~1.8% chance/ball (about one wicket every 56 balls), BAT 90 →
    ~2.1%, tail-ender (~20) → ~5.3%/ball (about one wicket every 19 balls). Easy is about 30%
    lower across the board (BAT 90 → ~1.4%, BAT 20 → ~3.7%). With BAT clamped to 15-96 the
    floor and ceiling never actually clip today; they are safety bounds. In duels the result
    is multiplied again by the opposition-bowling factor (±10% at the extremes).
-2. If not out: runs come from `ballRuns(POW, pairSynergy, rng, powerBoost)` — a weighted
-   random pick over `{0,1,2,3,4,6}` where the weight on 4s/6s scales with `POW` (times the
-   difficulty's `powerBoost`) and a small **partnership synergy** multiplier (`pairSynergy`, the current striker+non-striker's
+2. If not out: runs come from `ballRuns(POW, pairSynergy, rng, powerBoost, dotBias)` — a
+   weighted random pick over `{0,1,2,3,4,6}` where the weight on 4s/6s scales with `POW`
+   (times the difficulty's `powerBoost`), `dotBias` adds extra weight to the dot ball (duel
+   scoring and the struggle rule below; 0 otherwise), and a small **partnership synergy** multiplier (`pairSynergy`, the current striker+non-striker's
    combined BAT+POW average, clamped to 0.85-1.2×). This is the "who's batting with whom"
    effect the original brief asked for, kept intentionally lightweight rather than a full
    pairwise table.
@@ -208,6 +210,33 @@ agree: `finalScore = totalRuns` (batter runs + extras). `won = finalScore >= tar
 (This replaced an end-of-innings "bowler morale" bonus that made the final score differ from
 the last ball-log score, and could go negative.) The duel's second innings passes
 `stopAtTarget` so the chase ends the ball the target is reached.
+
+**Struggle (very weak batting sides)**: `battingQuality(order)` = mean `(BAT + POW) / 2` over
+slots 1-7. Below `STRUGGLE.threshold` (45) a struggle factor ramps from 0 at the threshold to 1
+at `STRUGGLE.floor` (20, about the worst XI the real franchise data can produce). At full
+strength it adds `dotBias` 0.45 to the dot ball and raises the dismissal chance by 20%. A
+self-drafted XI lands around 66-83 (the best-on-offer draft never went below ~54 in a
+1000-draft check), so normal teams are untouched: at struggle 0 every probability is
+unchanged and no extra random numbers are drawn, which keeps seeded results byte-identical to
+before the rule existed. Effect on each franchise's worst-ever XI (Hard): median ~170 → ~115,
+about 90% of runs land in 60-140, roughly 1 in 10 still gets past 140 and none passed 200 in
+20,000 runs. A merely bad draft (quality ~37) gets a smaller nudge (median ~193 → ~165).
+
+**Duel scoring**: duels are about beating the other side, not reaching 300, so both innings
+use the `duel` difficulty row above instead of `hard`. Solo Hard/Easy are unchanged. Measured
+over 40,000 simulated duels between draft-style XIs from all four franchises:
+
+| | Hard (before) | Duel |
+|---|---|---|
+| 1st innings p10 / median / p90 | 227 / 265 / 304 | 206 / 240 / 276 |
+| 300+ first innings | ~1 in 8 duels | ~1 in 50 duels |
+| Chasing side wins | ~50% | ~50% |
+| Top-quartile XI beats bottom-quartile XI | ~77% | ~75% |
+
+The opposition-bowling nudge, extras and the no-keeper penalty apply in duels exactly as
+before. A median near 230 and a 300 about once in 50 can't both be hit with this rule: lowering
+the middle pulls the tail down with it, so the tuning favours the 1-in-50 tail and lands the
+median near 240.
 
 Every call is stochastic (`Math.random()` by default, but the function accepts an
 injectable `rng` for testing) — **the same XI in the same slots will score differently
