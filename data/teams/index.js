@@ -7,5 +7,5 @@ export const TEAMS = [
     { code: 'SRH', name: 'Sunrisers Hyderabad', founded: 2013, lastYear: 2026, color: '#ff6b1a', colorHover: '#ff8433', colorMuted: '#ff6b1a1a' },
     { code: 'RCB', name: 'Royal Challengers Bengaluru', founded: 2008, lastYear: 2026, color: '#e01e26', colorHover: '#ff3b3b', colorMuted: '#e01e261a' },
     { code: 'CSK', name: 'Chennai Super Kings', founded: 2008, lastYear: 2026, color: '#ffc72c', colorHover: '#ffd966', colorMuted: '#ffc72c1a' },
-    { code: 'MI', name: 'Mumbai Indians', founded: 2008, lastYear: 2026, color: '#045093', colorHover: '#1c6fc4', colorMuted: '#0450931a' },
+    { code: 'MI', name: 'Mumbai Indians', founded: 2008, lastYear: 2026, color: '#2b8cff', colorHover: '#5aa6ff', colorMuted: '#2b8cff1a' },
 ];

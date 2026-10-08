@@ -15,11 +15,19 @@ import {
 } from '../../lib/game/positions';
 import { NO_KEEPER_PENALTY } from '../../lib/game/simulate';
 import { turnUid, otherPlayerUid, teamOf, isSameTeam } from '../../lib/duel/room';
+import { TEAMS } from '../../data/teams';
 
 const MAX_FOREIGNERS = 4;
 
 function findPlayer(seasonSquads, year, name) {
     return (seasonSquads[String(year)] || []).find((p) => p.name === name);
+}
+
+// Each XI panel wears its own franchise's colour (accent bar, badge, avatars) instead of the
+// viewer's team colour leaking onto the opponent's side.
+function teamTheme(code) {
+    const t = TEAMS.find((x) => x.code === code);
+    return t ? { '--accent': t.color, '--accent-hover': t.colorHover, '--accent-muted': t.colorMuted } : undefined;
 }
 
 function buildFilled(picks, uid, seasonSquads) {
@@ -61,6 +69,15 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
         [picks, optimisticPick]
     );
     const isMyTurnDisplay = isMyTurn && !optimisticPick;
+
+    // On phones the picker sits above both XIs, but you may have scrolled down to watch the
+    // opponent's XI fill up - bring the picker back into view when it becomes your turn.
+    useEffect(() => {
+        if (!isMyTurnDisplay || typeof window === 'undefined') return;
+        if (!window.matchMedia('(max-width: 1023px)').matches) return;
+        const el = document.getElementById('duel-picker');
+        if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, [isMyTurnDisplay]);
 
     const myFilled = useMemo(() => buildFilled(effectivePicks, myUid, mySeasonSquads), [effectivePicks, myUid, mySeasonSquads]);
     const opponentFilled = useMemo(
@@ -181,7 +198,14 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)] lg:h-[calc(100vh-15rem)] lg:min-h-[540px]">
-                <Panel title={`${myName}'s ${myTeam}`} badge={`${myFilledSlots.size} / ${TOTAL_SLOTS}`}>
+                {/* Laptop: three columns in source order (my XI | picker | opponent). Phone: one
+                    column with the picker first, so a new player sees what to do right away. */}
+                <Panel
+                    title={`${myName}'s ${myTeam}`}
+                    badge={`${myFilledSlots.size} / ${TOTAL_SLOTS}`}
+                    style={teamTheme(myTeam)}
+                    className="order-2 lg:order-none"
+                >
                     <div className="flex flex-wrap gap-2">
                         {statPills.map((label) => (
                             <span key={label} className="px-3 py-1 rounded-full border border-border bg-bg/50 text-xs text-textMuted">
@@ -203,46 +227,51 @@ export default function DuelDraftBoard({ room, myUid, hostSeasonSquads, guestSea
                     </div>
                 </Panel>
 
-                {/* lg:contents -> the picker and opponent panels become their own grid columns on laptop. */}
-                <div className="flex flex-col gap-4 min-h-0 lg:contents">
-                    {isMyTurnDisplay ? (
-                        <Panel
-                            title={
-                                <>
-                                    Pick from <span className="text-accent">{myTeam}</span> Players
-                                </>
-                            }
-                        >
-                            {currentYear && (
-                                <div className="flex items-center gap-3">
-                                    <span className="px-4 py-1.5 rounded-full bg-accentMuted border border-accent/40 text-accent font-display">
-                                        {currentYear} Squad
-                                    </span>
-                                </div>
-                            )}
-                            <SquadPanel
-                                squad={currentSquad}
-                                year={currentYear}
-                                selectedPlayer={selectedPlayer}
-                                getState={getCardState}
-                                onSelect={handleSelectPlayer}
-                            />
-                        </Panel>
-                    ) : (
-                        <Panel title="Waiting for the other pick">
-                            <div className="flex flex-col items-center gap-3 py-6 text-sm text-textMuted text-center">
-                                <Spinner size={22} label={optimisticPick ? 'That was a good pick…' : `${opponentName}is cooking something…`} />
-                                {!optimisticPick && <p>You can watch their XI fill up below.</p>}
+                {isMyTurnDisplay ? (
+                    <Panel
+                        id="duel-picker"
+                        style={teamTheme(myTeam)}
+                        className="order-1 lg:order-none scroll-mt-4"
+                        title={
+                            <>
+                                Pick from <span className="text-accent">{myTeam}</span> Players
+                            </>
+                        }
+                    >
+                        {currentYear && (
+                            <div className="flex items-center gap-3">
+                                <span className="px-4 py-1.5 rounded-full bg-accentMuted border border-accent/40 text-accent font-display">
+                                    {currentYear} Squad
+                                </span>
                             </div>
-                        </Panel>
-                    )}
-
-                    <Panel title={`${opponentName}'s ${opponentTeam}`} badge={`${Object.keys(opponentFilled).length} / ${TOTAL_SLOTS}`}>
-                        <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto no-scrollbar">
-                            <BattingOrderStrip filled={opponentFilled} eligibleSlots={[]} onSlotClick={() => {}} compact />
+                        )}
+                        <SquadPanel
+                            squad={currentSquad}
+                            year={currentYear}
+                            selectedPlayer={selectedPlayer}
+                            getState={getCardState}
+                            onSelect={handleSelectPlayer}
+                        />
+                    </Panel>
+                ) : (
+                    <Panel id="duel-picker" title="Waiting for the other pick" style={teamTheme(opponentTeam)} className="order-1 lg:order-none scroll-mt-4">
+                        <div className="flex flex-col items-center gap-3 py-6 text-sm text-textMuted text-center">
+                            <Spinner size={22} label={optimisticPick ? 'That was a good pick…' : `${opponentName} is cooking something…`} />
+                            {!optimisticPick && <p>You can watch their XI fill up below.</p>}
                         </div>
                     </Panel>
-                </div>
+                )}
+
+                <Panel
+                    title={`${opponentName}'s ${opponentTeam}`}
+                    badge={`${Object.keys(opponentFilled).length} / ${TOTAL_SLOTS}`}
+                    style={teamTheme(opponentTeam)}
+                    className="order-3 lg:order-none"
+                >
+                    <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto no-scrollbar">
+                        <BattingOrderStrip filled={opponentFilled} eligibleSlots={[]} onSlotClick={() => {}} compact />
+                    </div>
+                </Panel>
             </div>
         </div>
     );
