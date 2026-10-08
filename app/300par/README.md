@@ -174,12 +174,24 @@ takes the 11 picked players **in slot order** (index 0 = slot 1) and returns:
 ```
 
 **Per ball**, for the current striker:
-1. Dismissal check: `dismissalChance(BAT) = clamp(0.085 - BAT/100 × 0.062, 0.014, 0.075)`.
-   Rolled against `Math.random()`. Elite BAT (~90+) → ~2.3% chance/ball; tail-ender
-   (~20) → ~7.2%/ball.
-2. If not out: runs come from `ballRuns(POW, pairSynergy, rng)` — a weighted random pick
-   over `{0,1,2,3,4,6}` where the weight on 4s/6s scales with `POW` and a small
-   **partnership synergy** multiplier (`pairSynergy`, the current striker+non-striker's
+1. Dismissal check:
+   `dismissalChance(BAT) = clamp((0.078 - BAT/100 × 0.058) × dismissMult, dismissFloor, dismissCeil)`,
+   rolled against `Math.random()`. The multiplier and bounds come from the difficulty setting
+   (`DIFFICULTY` in `simulate.js`):
+
+   | Difficulty | `dismissMult` | `dismissFloor` | `dismissCeil` | `powerBoost` |
+   |---|---|---|---|---|
+   | Hard | 0.80 | 0.017 | 0.064 | 1.06 |
+   | Easy | 0.56 | 0.012 | 0.047 | 1.17 |
+
+   On Hard, elite BAT (~96) → ~1.8% chance/ball (about one wicket every 56 balls), BAT 90 →
+   ~2.1%, tail-ender (~20) → ~5.3%/ball (about one wicket every 19 balls). Easy is about 30%
+   lower across the board (BAT 90 → ~1.4%, BAT 20 → ~3.7%). With BAT clamped to 15-96 the
+   floor and ceiling never actually clip today; they are safety bounds. In duels the result
+   is multiplied again by the opposition-bowling factor (±10% at the extremes).
+2. If not out: runs come from `ballRuns(POW, pairSynergy, rng, powerBoost)` — a weighted
+   random pick over `{0,1,2,3,4,6}` where the weight on 4s/6s scales with `POW` (times the
+   difficulty's `powerBoost`) and a small **partnership synergy** multiplier (`pairSynergy`, the current striker+non-striker's
    combined BAT+POW average, clamped to 0.85-1.2×). This is the "who's batting with whom"
    effect the original brief asked for, kept intentionally lightweight rather than a full
    pairwise table.
