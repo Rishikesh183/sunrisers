@@ -10,6 +10,7 @@ import {
     chooseFirstPicker,
     submitPick,
     finalizeResult,
+    markResultSeen,
     closeRoom,
     isRoomExpired,
     ROOM_TTL_MS,
@@ -20,6 +21,7 @@ import { simulateChase, bowlingStrength } from '../../../../lib/game/simulate';
 import { TOTAL_SLOTS } from '../../../../lib/game/positions';
 import { TEAMS } from '../../../../data/teams';
 import { friendlyError } from '../../../../lib/firebaseErrors';
+import { saveLocalResult, loadLocalResult, pruneLocalResults } from '../../../../lib/duel/localResults';
 import Spinner from '../../../../components/Duel/Spinner';
 import TossPanel from '../../../../components/Duel/TossPanel';
 import DuelDraftBoard from '../../../../components/Duel/DuelDraftBoard';
@@ -42,7 +44,13 @@ function teamName(code) {
 export default function DuelRoomPage({ params }) {
     const { roomId } = params;
     const { user, isSignedIn, isLoaded } = useUser();
-    const [room, setRoom] = useState(undefined); // undefined = loading, null = not found
+    const [liveRoom, setRoom] = useState(undefined); // Firestore copy: undefined = loading, null = not found
+    // A finished room is deleted from Firestore once both players have it, so the result screen
+    // falls back to the copy kept in memory this visit, then to this browser's localStorage copy.
+    const [finishedRoom, setFinishedRoom] = useState(null);
+    const [cachedRoom, setCachedRoom] = useState(null);
+    const room = liveRoom || finishedRoom || cachedRoom || liveRoom;
+    const seenReported = useRef(false);
     const [picks, setPicks] = useState([]);
     const [actionError, setActionError] = useState(null);
     const [loadError, setLoadError] = useState(null);
@@ -64,6 +72,11 @@ export default function DuelRoomPage({ params }) {
     }, [roomId]);
 
     useEffect(() => {
+        pruneLocalResults();
+        setCachedRoom(loadLocalResult(roomId));
+    }, [roomId]);
+
+    useEffect(() => {
         if (room && room.hostTeam && guestTeamChoice === null) {
             setGuestTeamChoice(room.hostTeam);
         }
@@ -71,6 +84,22 @@ export default function DuelRoomPage({ params }) {
     }, [room?.hostTeam]);
 
     const myUid = user?.id;
+
+    // Once this player has the finished room, keep a local copy and tell Firestore - the second
+    // player to do so deletes the room (the dashboard's duelResults summary stays).
+    useEffect(() => {
+        if (!liveRoom || liveRoom.status !== 'complete' || !myUid) return;
+        if (myUid !== liveRoom.hostUid && myUid !== liveRoom.guestUid) return;
+        setFinishedRoom(liveRoom);
+        saveLocalResult(liveRoom);
+        if (seenReported.current) return;
+        seenReported.current = true;
+        markResultSeen(roomId, myUid).catch(() => {
+            // cleanup only - the room's deleteAt TTL removes it later if this fails
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [liveRoom?.status, myUid]);
+
     const hostSeasonSquads = room ? getSeasonSquads(room.hostTeam) : {};
     const guestSeasonSquads = room && room.guestTeam ? getSeasonSquads(room.guestTeam) : {};
     const myTeamCode = room ? (myUid === room.hostUid ? room.hostTeam : room.guestTeam) : null;
@@ -176,7 +205,13 @@ export default function DuelRoomPage({ params }) {
     } else if (!isLoaded || room === undefined) {
         body = <Spinner label="Loading room…" className="text-sm text-textMuted justify-center w-full" />;
     } else if (room === null) {
-        body = <p className="text-sm text-loss text-center">This room doesn't exist.</p>;
+        body = (
+            <div className="flex flex-col items-center gap-3 bg-surface border border-border rounded-xl p-6 sm:p-10 text-center">
+                <p className="text-text">This room doesn't exist, or it's a finished duel whose replay has been cleared.</p>
+                <p className="text-sm text-textMuted">Finished duels stay on your dashboard.</p>
+                <Link href="/dashboard" className="text-accent text-sm underline">Go to dashboard</Link>
+            </div>
+        );
     } else if (room.status === 'closed') {
         body = (
             <div className="flex flex-col items-center gap-3 bg-surface border border-border rounded-xl p-6 sm:p-10">
