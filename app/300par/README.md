@@ -370,6 +370,44 @@ concurrent `finalizeResult` race) passed against the live rules; only a composit
   `where('participants', 'array-contains', uid)`. New "Dashboard" nav link in
   `components/Navbar.js`, shown only when signed in.
 
+### Storage cleanup — finished duels don't stay in Firestore
+
+Only the small `duelResults` summary (~0.5 KB, what the dashboard reads) is kept for good.
+Everything heavy is transient:
+
+| Data | Size | Removed when |
+|---|---|---|
+| `duelRooms/{id}/picks/*` (22 docs) | ~3-4 KB | In the same `finalizeResult` transaction that saves the result - the results already hold both batting orders |
+| `duelRooms/{id}` with both full innings (ball-by-ball) | ~26 KB | `markResultSeen()`: each player's browser checks in once it has the finished room; the second check-in deletes the room |
+| `duelResults/{id}` | ~0.5 KB | Never (dashboard history) |
+
+Each browser keeps its own copy of the finished room in `localStorage`
+(`lib/duel/localResults.js`, key `duelRoom:{id}`), so the result screen and replay still work
+after the room is gone - including mid-replay, when the other player's check-in deletes it. Local
+copies expire after 3 days and are capped at 10 (oldest dropped first), so they never grow
+large enough to slow the page. After that, the room link shows a "replay cleared - see your
+dashboard" message.
+
+**Safety net (one-time console setup):** every room and pick carries a `deleteAt` timestamp (2
+days out; refreshed when a game completes or an invite is closed). To clean up rooms nobody
+finishes - abandoned invites, abandoned drafts, or a result one player never opens - add two
+TTL policies in Firebase console → Firestore → TTL: collection group `duelRooms`, field
+`deleteAt`; and collection group `picks`, field `deleteAt`. (TTL deletes only the document it's
+on, never subcollections - which is why picks get their own field and policy.) Without the
+policies, normal games still clean up after themselves; only abandoned rooms would linger.
+
+**Old games (one-time):** rooms and picks from games played before this change have no
+`deleteAt`, so neither the cleanup above nor TTL touches them. `scripts/cleanup-old-duels.mjs`
+removes them: picks and room docs for finished games, closed or expired invites, and drafts
+abandoned more than `--older-than-hours` (default 24) ago, plus any orphaned picks. Rooms still
+in play are skipped. It never touches `duelResults`, `leaderboard*` or `users`, and if a finished
+room is missing its `duelResults` summary it writes one first so the game stays on the
+dashboard. Dry run by default:
+```
+node scripts/cleanup-old-duels.mjs            # lists what would be deleted
+node scripts/cleanup-old-duels.mjs --apply    # deletes (Firebase Admin creds from .env.local)
+```
+
 ### Rules — published, with one regression caught and fixed
 
 Confirmed empirically (not just "no rules file exists") that an unauthenticated Firestore

@@ -10,6 +10,7 @@ import {
     chooseFirstPicker,
     submitPick,
     finalizeResult,
+    markResultSeen,
     closeRoom,
     isRoomExpired,
     ROOM_TTL_MS,
@@ -20,10 +21,12 @@ import { simulateChase, bowlingStrength } from '../../../../lib/game/simulate';
 import { TOTAL_SLOTS } from '../../../../lib/game/positions';
 import { TEAMS } from '../../../../data/teams';
 import { friendlyError } from '../../../../lib/firebaseErrors';
+import { saveLocalResult, loadLocalResult, pruneLocalResults } from '../../../../lib/duel/localResults';
 import Spinner from '../../../../components/Duel/Spinner';
 import TossPanel from '../../../../components/Duel/TossPanel';
 import DuelDraftBoard from '../../../../components/Duel/DuelDraftBoard';
 import DuelResult from '../../../../components/Duel/DuelResult';
+import TeamPicker from '../../../../components/Duel/TeamPicker';
 
 function buildBattingOrder(picks, uid, seasonSquads) {
     const bySlot = {};
@@ -42,7 +45,13 @@ function teamName(code) {
 export default function DuelRoomPage({ params }) {
     const { roomId } = params;
     const { user, isSignedIn, isLoaded } = useUser();
-    const [room, setRoom] = useState(undefined); // undefined = loading, null = not found
+    const [liveRoom, setRoom] = useState(undefined); // Firestore copy: undefined = loading, null = not found
+    // A finished room is deleted from Firestore once both players have it, so the result screen
+    // falls back to the copy kept in memory this visit, then to this browser's localStorage copy.
+    const [finishedRoom, setFinishedRoom] = useState(null);
+    const [cachedRoom, setCachedRoom] = useState(null);
+    const room = liveRoom || finishedRoom || cachedRoom || liveRoom;
+    const seenReported = useRef(false);
     const [picks, setPicks] = useState([]);
     const [actionError, setActionError] = useState(null);
     const [loadError, setLoadError] = useState(null);
@@ -64,17 +73,32 @@ export default function DuelRoomPage({ params }) {
     }, [roomId]);
 
     useEffect(() => {
-        if (room && room.hostTeam && guestTeamChoice === null) {
-            setGuestTeamChoice(room.hostTeam);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [room?.hostTeam]);
+        pruneLocalResults();
+        setCachedRoom(loadLocalResult(roomId));
+    }, [roomId]);
 
     const myUid = user?.id;
+
+    // Once this player has the finished room, keep a local copy and tell Firestore - the second
+    // player to do so deletes the room (the dashboard's duelResults summary stays).
+    useEffect(() => {
+        if (!liveRoom || liveRoom.status !== 'complete' || !myUid) return;
+        if (myUid !== liveRoom.hostUid && myUid !== liveRoom.guestUid) return;
+        setFinishedRoom(liveRoom);
+        saveLocalResult(liveRoom);
+        if (seenReported.current) return;
+        seenReported.current = true;
+        markResultSeen(roomId, myUid).catch(() => {
+            // cleanup only - the room's deleteAt TTL removes it later if this fails
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [liveRoom?.status, myUid]);
+
     const hostSeasonSquads = room ? getSeasonSquads(room.hostTeam) : {};
     const guestSeasonSquads = room && room.guestTeam ? getSeasonSquads(room.guestTeam) : {};
     const myTeamCode = room ? (myUid === room.hostUid ? room.hostTeam : room.guestTeam) : null;
-    const teamInfo = TEAMS.find((t) => t.code === (myTeamCode || room?.hostTeam));
+    // Before joining, a guest's page takes the colour of the franchise they've just tapped.
+    const teamInfo = TEAMS.find((t) => t.code === (myTeamCode || guestTeamChoice || room?.hostTeam));
     const themeStyle = teamInfo
         ? { '--accent': teamInfo.color, '--accent-hover': teamInfo.colorHover, '--accent-muted': teamInfo.colorMuted }
         : undefined;
@@ -120,12 +144,13 @@ export default function DuelRoomPage({ params }) {
     }, [room?.status]);
 
     async function handleJoin() {
+        if (!guestTeamChoice) return;
         setJoining(true);
         try {
             await joinRoom(roomId, {
                 guestUid: myUid,
                 guestName: displayNameFromClerkUser(user),
-                guestTeam: guestTeamChoice || room.hostTeam,
+                guestTeam: guestTeamChoice,
             });
         } catch (err) {
             setActionError(friendlyError(err));
@@ -176,7 +201,13 @@ export default function DuelRoomPage({ params }) {
     } else if (!isLoaded || room === undefined) {
         body = <Spinner label="Loading room…" className="text-sm text-textMuted justify-center w-full" />;
     } else if (room === null) {
-        body = <p className="text-sm text-loss text-center">This room doesn't exist.</p>;
+        body = (
+            <div className="flex flex-col items-center gap-3 bg-surface border border-border rounded-xl p-6 sm:p-10 text-center">
+                <p className="text-text">This room doesn't exist, or it's a finished duel whose replay has been cleared.</p>
+                <p className="text-sm text-textMuted">Finished duels stay on your dashboard.</p>
+                <Link href="/dashboard" className="text-accent text-sm underline">Go to dashboard</Link>
+            </div>
+        );
     } else if (room.status === 'closed') {
         body = (
             <div className="flex flex-col items-center gap-3 bg-surface border border-border rounded-xl p-6 sm:p-10">
@@ -221,24 +252,15 @@ export default function DuelRoomPage({ params }) {
                     <p className="text-text text-center">
                         {room.hostName} has challenged you to a 1v1 duel — {room.hostName} picked {teamName(room.hostTeam)}.
                     </p>
-                    <label className="flex items-center gap-2 text-sm text-textMuted">
-                        Your franchise:
-                        <select
-                            value={guestTeamChoice || room.hostTeam}
-                            onChange={(e) => setGuestTeamChoice(e.target.value)}
-                            className="bg-bg border border-border rounded-lg px-3 py-1.5 text-sm text-text"
-                        >
-                            {teams.map((t) => (
-                                <option key={t.code} value={t.code}>{t.name}</option>
-                            ))}
-                        </select>
-                    </label>
+                    <div className="w-full">
+                        <TeamPicker teams={teams} value={guestTeamChoice} onChange={setGuestTeamChoice} />
+                    </div>
                     <button
                         onClick={handleJoin}
-                        disabled={joining}
-                        className="py-2 px-6 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                        disabled={joining || !guestTeamChoice}
+                        className="py-2 px-6 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold disabled:bg-border disabled:text-textMuted disabled:cursor-not-allowed"
                     >
-                        {joining ? 'Joining…' : 'Join Duel'}
+                        {joining ? 'Joining…' : guestTeamChoice ? 'Join Duel' : 'Pick a franchise to join'}
                     </button>
                 </div>
             );

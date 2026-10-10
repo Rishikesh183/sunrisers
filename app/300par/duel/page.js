@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SignedIn, SignedOut, useUser } from '@clerk/nextjs';
 import OpponentList from '../../../components/Duel/OpponentList';
+import TeamPicker from '../../../components/Duel/TeamPicker';
 import { createRoom } from '../../../lib/duel/room';
 import { getTeams } from '../../../lib/data/seasonSquads';
 import { friendlyError } from '../../../lib/firebaseErrors';
@@ -15,12 +16,12 @@ export default function DuelLobby() {
     const { user } = useUser();
     const router = useRouter();
     const teams = getTeams();
-    const [team, setTeam] = useState(teams[0]?.code || '');
+    const [team, setTeam] = useState(null); // no default - the player must pick one
     const [creating, setCreating] = useState(false);
     const [error, setError] = useState(null);
 
     async function handleChallenge(opponent) {
-        if (!user || creating) return;
+        if (!user || creating || !team) return;
         setCreating(true);
         setError(null);
         try {
@@ -63,21 +64,11 @@ export default function DuelLobby() {
 
             <SignedIn>
                 <div className="bg-surface border border-border rounded-xl p-4 sm:p-6 flex flex-col gap-4">
-                    <div className="flex items-center gap-3">
-                        <label className="text-xs text-textMuted uppercase tracking-wide shrink-0">Franchise</label>
-                        <select
-                            value={team}
-                            onChange={(e) => setTeam(e.target.value)}
-                            className="form-select bg-bg border border-border rounded-lg px-3 py-1.5 text-sm text-text flex-1"
-                        >
-                            {teams.map((t) => (
-                                <option key={t.code} value={t.code}>{t.name}</option>
-                            ))}
-                        </select>
-                    </div>
+                    <TeamPicker teams={teams} value={team} onChange={setTeam} />
 
                     <h2 className="font-display text-text uppercase tracking-wide text-sm">Choose an opponent</h2>
-                    {user && <OpponentList currentUid={user.id} onChallenge={handleChallenge} />}
+                    {!team && <p className="text-xs text-textMuted -mt-2">Pick your franchise above to challenge someone.</p>}
+                    {user && <OpponentList currentUid={user.id} onChallenge={handleChallenge} disabled={!team || creating} />}
                     {creating && <Spinner label="Creating room…" className="text-xs text-textMuted justify-center w-full" />}
                     {error && <p className="text-xs text-loss text-center">{error}</p>}
                 </div>
