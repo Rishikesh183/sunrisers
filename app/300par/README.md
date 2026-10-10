@@ -396,8 +396,17 @@ TTL policies in Firebase console → Firestore → TTL: collection group `duelRo
 on, never subcollections - which is why picks get their own field and policy.) Without the
 policies, normal games still clean up after themselves; only abandoned rooms would linger.
 
-Rooms and picks from games played before this change have no `deleteAt` and are not touched by
-TTL; they can be deleted by hand from the console if needed.
+**Old games (one-time):** rooms and picks from games played before this change have no
+`deleteAt`, so neither the cleanup above nor TTL touches them. `scripts/cleanup-old-duels.mjs`
+removes them: picks and room docs for finished games, closed or expired invites, and drafts
+abandoned more than `--older-than-hours` (default 24) ago, plus any orphaned picks. Rooms still
+in play are skipped. It never touches `duelResults`, `leaderboard*` or `users`, and if a finished
+room is missing its `duelResults` summary it writes one first so the game stays on the
+dashboard. Dry run by default:
+```
+node scripts/cleanup-old-duels.mjs            # lists what would be deleted
+node scripts/cleanup-old-duels.mjs --apply    # deletes (Firebase Admin creds from .env.local)
+```
 
 ### Rules — published, with one regression caught and fixed
 

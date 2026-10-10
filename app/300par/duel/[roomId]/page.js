@@ -26,6 +26,7 @@ import Spinner from '../../../../components/Duel/Spinner';
 import TossPanel from '../../../../components/Duel/TossPanel';
 import DuelDraftBoard from '../../../../components/Duel/DuelDraftBoard';
 import DuelResult from '../../../../components/Duel/DuelResult';
+import TeamPicker from '../../../../components/Duel/TeamPicker';
 
 function buildBattingOrder(picks, uid, seasonSquads) {
     const bySlot = {};
@@ -76,13 +77,6 @@ export default function DuelRoomPage({ params }) {
         setCachedRoom(loadLocalResult(roomId));
     }, [roomId]);
 
-    useEffect(() => {
-        if (room && room.hostTeam && guestTeamChoice === null) {
-            setGuestTeamChoice(room.hostTeam);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [room?.hostTeam]);
-
     const myUid = user?.id;
 
     // Once this player has the finished room, keep a local copy and tell Firestore - the second
@@ -103,7 +97,8 @@ export default function DuelRoomPage({ params }) {
     const hostSeasonSquads = room ? getSeasonSquads(room.hostTeam) : {};
     const guestSeasonSquads = room && room.guestTeam ? getSeasonSquads(room.guestTeam) : {};
     const myTeamCode = room ? (myUid === room.hostUid ? room.hostTeam : room.guestTeam) : null;
-    const teamInfo = TEAMS.find((t) => t.code === (myTeamCode || room?.hostTeam));
+    // Before joining, a guest's page takes the colour of the franchise they've just tapped.
+    const teamInfo = TEAMS.find((t) => t.code === (myTeamCode || guestTeamChoice || room?.hostTeam));
     const themeStyle = teamInfo
         ? { '--accent': teamInfo.color, '--accent-hover': teamInfo.colorHover, '--accent-muted': teamInfo.colorMuted }
         : undefined;
@@ -149,12 +144,13 @@ export default function DuelRoomPage({ params }) {
     }, [room?.status]);
 
     async function handleJoin() {
+        if (!guestTeamChoice) return;
         setJoining(true);
         try {
             await joinRoom(roomId, {
                 guestUid: myUid,
                 guestName: displayNameFromClerkUser(user),
-                guestTeam: guestTeamChoice || room.hostTeam,
+                guestTeam: guestTeamChoice,
             });
         } catch (err) {
             setActionError(friendlyError(err));
@@ -256,24 +252,15 @@ export default function DuelRoomPage({ params }) {
                     <p className="text-text text-center">
                         {room.hostName} has challenged you to a 1v1 duel — {room.hostName} picked {teamName(room.hostTeam)}.
                     </p>
-                    <label className="flex items-center gap-2 text-sm text-textMuted">
-                        Your franchise:
-                        <select
-                            value={guestTeamChoice || room.hostTeam}
-                            onChange={(e) => setGuestTeamChoice(e.target.value)}
-                            className="bg-bg border border-border rounded-lg px-3 py-1.5 text-sm text-text"
-                        >
-                            {teams.map((t) => (
-                                <option key={t.code} value={t.code}>{t.name}</option>
-                            ))}
-                        </select>
-                    </label>
+                    <div className="w-full">
+                        <TeamPicker teams={teams} value={guestTeamChoice} onChange={setGuestTeamChoice} />
+                    </div>
                     <button
                         onClick={handleJoin}
-                        disabled={joining}
-                        className="py-2 px-6 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                        disabled={joining || !guestTeamChoice}
+                        className="py-2 px-6 rounded-lg text-white bg-accent hover:bg-accentHover transition-colors font-semibold disabled:bg-border disabled:text-textMuted disabled:cursor-not-allowed"
                     >
-                        {joining ? 'Joining…' : 'Join Duel'}
+                        {joining ? 'Joining…' : guestTeamChoice ? 'Join Duel' : 'Pick a franchise to join'}
                     </button>
                 </div>
             );

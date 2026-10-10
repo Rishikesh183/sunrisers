@@ -18,7 +18,7 @@ function useDebouncedValue(value, delayMs) {
     return debounced;
 }
 
-export default function OpponentList({ currentUid, onChallenge }) {
+export default function OpponentList({ currentUid, onChallenge, disabled = false }) {
     const [candidates, setCandidates] = useState(null);
     const [error, setError] = useState(null);
     const [query, setQuery] = useState('');
@@ -84,7 +84,8 @@ export default function OpponentList({ currentUid, onChallenge }) {
                         </div>
                         <button
                             onClick={() => onChallenge(user)}
-                            className="text-xs px-3 py-1.5 rounded-lg bg-accent text-white hover:bg-accentHover transition-colors font-semibold shrink-0"
+                            disabled={disabled}
+                            className="text-xs px-3 py-1.5 rounded-lg bg-accent text-white hover:bg-accentHover transition-colors font-semibold shrink-0 disabled:bg-border disabled:text-textMuted disabled:cursor-not-allowed"
                         >
                             Challenge
                         </button>
