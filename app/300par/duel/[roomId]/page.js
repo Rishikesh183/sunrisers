@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { SignedIn, SignedOut, useUser } from '@clerk/nextjs';
+import { SignedIn, SignedOut, useUser } from '../../../../lib/auth/AuthProvider';
 import {
     subscribeToRoom,
     subscribeToPicks,
@@ -16,7 +16,7 @@ import {
     ROOM_TTL_MS,
 } from '../../../../lib/duel/room';
 import { getSeasonSquads, getTeams } from '../../../../lib/data/seasonSquads';
-import { displayNameFromClerkUser } from '../../../../lib/userName';
+import { displayNameFromUser } from '../../../../lib/userName';
 import { simulateChase, bowlingStrength } from '../../../../lib/game/simulate';
 import { TOTAL_SLOTS } from '../../../../lib/game/positions';
 import { TEAMS } from '../../../../data/teams';
@@ -42,6 +42,8 @@ function teamName(code) {
     return TEAMS.find((t) => t.code === code)?.name || code;
 }
 
+const CLEANUP_DELAY_MS = 45 * 1000; // how long to wait before checking in for room cleanup
+
 export default function DuelRoomPage({ params }) {
     const { roomId } = params;
     const { user, isSignedIn, isLoaded } = useUser();
@@ -60,6 +62,9 @@ export default function DuelRoomPage({ params }) {
     const [closing, setClosing] = useState(false);
     const [joining, setJoining] = useState(false);
     const simulateAttempted = useRef(false);
+    // A room that briefly reads as missing (e.g. the moment a finished room is cleaned up) shouldn't
+    // flash "doesn't exist" - only show that once it has stayed missing for a moment.
+    const [missingConfirmed, setMissingConfirmed] = useState(false);
     const teams = getTeams();
 
     useEffect(() => {
@@ -79,6 +84,16 @@ export default function DuelRoomPage({ params }) {
 
     const myUid = user?.id;
 
+    const looksMissing = liveRoom === null && !finishedRoom && !cachedRoom;
+    useEffect(() => {
+        if (!looksMissing) {
+            setMissingConfirmed(false);
+            return undefined;
+        }
+        const t = setTimeout(() => setMissingConfirmed(true), 2000);
+        return () => clearTimeout(t);
+    }, [looksMissing]);
+
     // Once this player has the finished room, keep a local copy and tell Firestore - the second
     // player to do so deletes the room (the dashboard's duelResults summary stays).
     useEffect(() => {
@@ -86,13 +101,26 @@ export default function DuelRoomPage({ params }) {
         if (myUid !== liveRoom.hostUid && myUid !== liveRoom.guestUid) return;
         setFinishedRoom(liveRoom);
         saveLocalResult(liveRoom);
-        if (seenReported.current) return;
-        seenReported.current = true;
-        markResultSeen(roomId, myUid).catch(() => {
-            // cleanup only - the room's deleteAt TTL removes it later if this fails
-        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [liveRoom?.status, myUid]);
+
+    // Check in as "seen" only after a pause: the room is deleted when the second player checks in,
+    // and doing that the instant the result arrives made the page flicker while the screen was
+    // still switching to it. The local copy above is already saved, and if this player leaves
+    // before the timer fires the room's deleteAt TTL removes it later. (Dashboard stats live in
+    // duelResults, which cleanup never touches.)
+    const iAmDone = !!liveRoom && liveRoom.status === 'complete' && !!myUid && (myUid === liveRoom.hostUid || myUid === liveRoom.guestUid);
+    useEffect(() => {
+        if (!iAmDone || seenReported.current) return undefined;
+        const t = setTimeout(() => {
+            seenReported.current = true;
+            markResultSeen(roomId, myUid).catch(() => {
+                // cleanup only - the room's deleteAt TTL removes it later if this fails
+            });
+        }, CLEANUP_DELAY_MS);
+        return () => clearTimeout(t);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [iAmDone, myUid]);
 
     const hostSeasonSquads = room ? getSeasonSquads(room.hostTeam) : {};
     const guestSeasonSquads = room && room.guestTeam ? getSeasonSquads(room.guestTeam) : {};
@@ -149,7 +177,7 @@ export default function DuelRoomPage({ params }) {
         try {
             await joinRoom(roomId, {
                 guestUid: myUid,
-                guestName: displayNameFromClerkUser(user),
+                guestName: displayNameFromUser(user),
                 guestTeam: guestTeamChoice,
             });
         } catch (err) {
@@ -198,7 +226,7 @@ export default function DuelRoomPage({ params }) {
 
     if (loadError) {
         body = <p className="text-sm text-loss text-center">{loadError}</p>;
-    } else if (!isLoaded || room === undefined) {
+    } else if (!isLoaded || room === undefined || (room === null && !missingConfirmed)) {
         body = <Spinner label="Loading room…" className="text-sm text-textMuted justify-center w-full" />;
     } else if (room === null) {
         body = (

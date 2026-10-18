@@ -202,3 +202,54 @@ code {
     .srh-loader__logo { transform: scale(1); opacity: 1; }
     .srh-loader__word { opacity: 0.9; }
 }
+
+/* ---- Toss coin flip (components/Duel/TossPanel.js) ---- */
+.srh-coin-stage {
+    position: relative;
+    width: 150px;
+    height: 190px;
+    perspective: 900px;
+}
+.srh-coin-arc {
+    position: absolute;
+    left: 0;
+    top: 30px;
+    width: 150px;
+    height: 150px;
+    animation: srh-coin-arc 2.6s cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+.srh-coin {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    animation: srh-coin-spin 2.6s cubic-bezier(0.2, 0.6, 0.25, 1) both;
+}
+.srh-coin-shadow {
+    position: absolute;
+    left: 25px;
+    bottom: 0;
+    width: 100px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    filter: blur(5px);
+    animation: srh-coin-shadow 2.6s cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+@keyframes srh-coin-spin {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(var(--coin-end, 1800deg)); }
+}
+@keyframes srh-coin-arc {
+    0% { transform: translateY(0) scale(1); }
+    45% { transform: translateY(-26px) scale(1.18); }
+    100% { transform: translateY(0) scale(1); }
+}
+@keyframes srh-coin-shadow {
+    0% { transform: scale(1); opacity: 0.6; }
+    45% { transform: scale(0.6); opacity: 0.25; }
+    100% { transform: scale(1); opacity: 0.6; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .srh-coin, .srh-coin-arc, .srh-coin-shadow { animation-duration: 0.01s; }
+}

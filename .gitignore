@@ -30,3 +30,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# personal-data snapshots from scripts/backup-data.mjs
+backups/

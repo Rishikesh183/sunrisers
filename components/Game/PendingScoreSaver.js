@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '../../lib/auth/AuthProvider';
 import { submitScore } from '../../lib/data/leaderboard';
 import { takePendingScore, hasPendingScore } from '../../lib/game/pendingScore';
-import { displayNameFromClerkUser } from '../../lib/userName';
+import { displayNameFromUser } from '../../lib/userName';
 
 // Mounted once in the root layout: when someone signs in with a 300+ parked from before they
 // had an account, save it and say so briefly. Does nothing (no reads, no writes) otherwise.
@@ -18,7 +18,7 @@ export default function PendingScoreSaver() {
         ran.current = true;
         const entry = takePendingScore();
         if (!entry) return;
-        submitScore({ ...entry, uid: user.id, name: displayNameFromClerkUser(user) })
+        submitScore({ ...entry, uid: user.id, name: displayNameFromUser(user) })
             .then((ok) => ok && setToast(`Your ${entry.score} was saved to the 300 Par leaderboard.`))
             .catch(() => {});
     }, [isLoaded, isSignedIn, user]);

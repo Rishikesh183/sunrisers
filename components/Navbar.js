@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
-import { useUser, UserButton } from '@clerk/nextjs';
+import { useUser } from '../lib/auth/AuthProvider';
+import UserMenu from './Auth/UserMenu';
 import Link from 'next/link';
 
 const Navbar = () => {
@@ -43,7 +44,7 @@ const Navbar = () => {
 
                 <div className='md:block'>
                     {isSignedIn ? (
-                        <UserButton />
+                        <UserMenu />
                     ) : (
                         <div className='flex gap-5'>
                             <Link href="/signup">

@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '../../lib/auth/AuthProvider';
 import { PAR, dateKey, submitScore } from '../../lib/data/leaderboard';
 import { setPendingScore } from '../../lib/game/pendingScore';
-import { displayNameFromClerkUser } from '../../lib/userName';
+import { displayNameFromUser } from '../../lib/userName';
 import { friendlyError } from '../../lib/firebaseErrors';
 
 // Shown under a solo result that reached 300. Signed in: saves to the leaderboard automatically.
@@ -22,7 +22,7 @@ export default function LeaderboardSave({ entry }) {
         if (!isLoaded || !isSignedIn || started.current || entry.score < PAR) return;
         started.current = true;
         setStatus('saving');
-        submitScore({ ...entry, uid: user.id, name: displayNameFromClerkUser(user), dateKey: dayRef.current })
+        submitScore({ ...entry, uid: user.id, name: displayNameFromUser(user), dateKey: dayRef.current })
             .then(() => setStatus('saved'))
             .catch((err) => {
                 setError(friendlyError(err));

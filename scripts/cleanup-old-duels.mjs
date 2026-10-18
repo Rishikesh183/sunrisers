@@ -6,7 +6,7 @@
 // whose `duelResults` summary is missing gets that summary written first, so no game disappears
 // from anyone's dashboard. Rooms still being played (newer than --older-than-hours) are skipped.
 //
-// Usage (reads .env.local, same Firebase Admin credentials as backfill-usernames.mjs):
+// Usage (reads .env.local, same Firebase Admin credentials as the other scripts):
 //   node scripts/cleanup-old-duels.mjs                          # dry run - prints what would go
 //   node scripts/cleanup-old-duels.mjs --apply                  # deletes
 //   node scripts/cleanup-old-duels.mjs --apply --older-than-hours=48
