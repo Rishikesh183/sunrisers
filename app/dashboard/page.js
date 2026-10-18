@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { SignedIn, SignedOut, useUser } from '@clerk/nextjs';
-import { getDuelHistory } from '../../lib/data/duelResults';
+import { SignedIn, SignedOut, useUser } from '../../lib/auth/AuthProvider';
+import { HISTORY_PAGE_SIZE, getDuelPage, getDuelStats } from '../../lib/data/duelResults';
 import { getDisplayNames } from '../../lib/data/users';
 import { friendlyError } from '../../lib/firebaseErrors';
 import { TEAMS } from '../../data/teams';
@@ -120,9 +120,8 @@ function DuelCard({ duel, uid, names }) {
     );
 }
 
-function SummaryStrip({ history, uid }) {
-    const won = history.filter((d) => d.winnerUid === uid).length;
-    const played = history.length;
+function SummaryStrip({ stats: totals }) {
+    const { played, won } = totals;
     const pct = played ? Math.round((won / played) * 100) : 0;
     const stats = [
         { label: 'Played', value: played },
@@ -143,32 +142,66 @@ function SummaryStrip({ history, uid }) {
 }
 
 function DuelHistory({ uid }) {
-    const [history, setHistory] = useState(null);
+    const [games, setGames] = useState(null);
+    const [totals, setTotals] = useState(null);
+    const [cursor, setCursor] = useState(null);
+    const [hasMore, setHasMore] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [names, setNames] = useState({});
     const [error, setError] = useState(null);
 
+    // Newest games load a page at a time; the lifetime totals come from count() queries, so the
+    // numbers stay right however many games exist without downloading them all.
+    async function loadPage(after) {
+        const page = await getDuelPage(uid, after);
+        setGames((prev) => (after ? [...(prev || []), ...page.items] : page.items));
+        setCursor(page.cursor);
+        setHasMore(page.hasMore);
+        // Show players' current usernames rather than whatever name was saved with the duel.
+        getDisplayNames(page.items.flatMap((d) => [d.hostUid, d.guestUid])).then((fresh) =>
+            setNames((prev) => ({ ...prev, ...fresh }))
+        );
+    }
+
     useEffect(() => {
-        getDuelHistory(uid)
-            .then((list) => {
-                setHistory(list);
-                // Show players' current usernames rather than whatever name was saved with the duel.
-                getDisplayNames(list.flatMap((d) => [d.hostUid, d.guestUid])).then(setNames);
-            })
-            .catch((err) => setError(friendlyError(err)));
+        Promise.all([loadPage(null), getDuelStats(uid).then(setTotals)]).catch((err) => setError(friendlyError(err)));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [uid]);
 
+    async function handleLoadMore() {
+        setLoadingMore(true);
+        try {
+            await loadPage(cursor);
+        } catch (err) {
+            setError(friendlyError(err));
+        } finally {
+            setLoadingMore(false);
+        }
+    }
+
     if (error) return <p className="text-sm text-loss text-center">Couldn't load duel history: {error}</p>;
-    if (history === null) return <p className="text-sm text-textMuted text-center">Loading…</p>;
-    if (history.length === 0) return <p className="text-sm text-textMuted text-center py-6">No duels played yet.</p>;
+    if (games === null || totals === null) return <p className="text-sm text-textMuted text-center">Loading…</p>;
+    if (games.length === 0) return <p className="text-sm text-textMuted text-center py-6">No duels played yet.</p>;
 
     return (
         <>
-            <SummaryStrip history={history} uid={uid} />
+            <SummaryStrip stats={totals} />
             <div className="flex flex-col gap-3">
-                {history.map((duel) => (
+                {games.map((duel) => (
                     <DuelCard key={duel.id} duel={duel} uid={uid} names={names} />
                 ))}
             </div>
+            {hasMore && (
+                <div className="flex justify-center mt-4">
+                    <button
+                        onClick={handleLoadMore}
+                        disabled={loadingMore}
+                        className="px-5 py-2 rounded-lg border border-border text-sm font-semibold text-text hover:border-accent transition-colors disabled:opacity-60"
+                    >
+                        {loadingMore ? 'Loading…' : `Load ${HISTORY_PAGE_SIZE} more`}
+                    </button>
+                </div>
+            )}
         </>
     );
 }

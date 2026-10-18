@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useUser } from '@clerk/nextjs';
-import { getLeaderboard } from '../../../lib/data/leaderboard';
+import { useUser } from '../../../lib/auth/AuthProvider';
+import { PAGE_SIZE, getLeaderboardPage } from '../../../lib/data/leaderboard';
 import { friendlyError } from '../../../lib/firebaseErrors';
 import { TEAMS } from '../../../data/teams';
 import Spinner from '../../../components/Duel/Spinner';
@@ -48,30 +48,48 @@ export default function LeaderboardPage() {
     const [range, setRange] = useState('today');
     const [sort, setSort] = useState('score');
     const [difficulty, setDifficulty] = useState('hard');
-    const [rows, setRows] = useState(null);
+    // view = { rows, cursor, hasMore } for the selected tabs, or null while its first page loads.
+    const [view, setView] = useState(null);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState(null);
-    // Each view is fetched at most once per visit; flipping between tabs re-uses the result.
+    // Each view keeps the pages already fetched for the visit; flipping between tabs re-uses them.
     const cache = useRef(new Map());
+    const key = `${range}|${sort}|${difficulty}`;
+    const rows = view?.rows ?? null;
 
     useEffect(() => {
-        const key = `${range}|${sort}|${difficulty}`;
         setError(null);
         if (cache.current.has(key)) {
-            setRows(cache.current.get(key));
-            return;
+            setView(cache.current.get(key));
+            return undefined;
         }
-        setRows(null);
+        setView(null);
         let cancelled = false;
-        getLeaderboard({ range, sort, difficulty })
-            .then((list) => {
-                cache.current.set(key, list);
-                if (!cancelled) setRows(list);
+        getLeaderboardPage({ range, sort, difficulty })
+            .then((page) => {
+                cache.current.set(key, page);
+                if (!cancelled) setView(page);
             })
             .catch((err) => !cancelled && setError(friendlyError(err)));
         return () => {
             cancelled = true;
         };
-    }, [range, sort, difficulty]);
+    }, [key, range, sort, difficulty]);
+
+    async function loadMore() {
+        if (!view || loadingMore) return;
+        setLoadingMore(true);
+        try {
+            const page = await getLeaderboardPage({ range, sort, difficulty, cursor: view.cursor });
+            const merged = { rows: [...view.rows, ...page.rows], cursor: page.cursor, hasMore: page.hasMore };
+            cache.current.set(key, merged);
+            setView(merged);
+        } catch (err) {
+            setError(friendlyError(err));
+        } finally {
+            setLoadingMore(false);
+        }
+    }
 
     return (
         <div className="max-w-2xl mx-auto p-4 sm:p-6 md:p-10 bg-bg min-h-screen">
@@ -137,6 +155,17 @@ export default function LeaderboardPage() {
                             );
                         })}
                     </ol>
+                )}
+                {!error && view?.hasMore && (
+                    <div className="flex justify-center pt-4">
+                        <button
+                            onClick={loadMore}
+                            disabled={loadingMore}
+                            className="px-5 py-2 rounded-lg border border-white/25 bg-bg/60 text-sm font-semibold text-white hover:border-accent transition-colors disabled:opacity-60"
+                        >
+                            {loadingMore ? 'Loading…' : `Load ${PAGE_SIZE} more`}
+                        </button>
+                    </div>
                 )}
             </div>
         </div>

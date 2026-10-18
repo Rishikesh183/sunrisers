@@ -431,7 +431,7 @@ succeed on all five collections and `npm run build` is clean.
 ### Still open
 
 - **Composite index** for the dashboard's query (`array-contains` + `orderBy` on a different
-  field always needs one). The first time `getDuelHistory()` runs against live data with
+  field always needs one). The first time `getDuelPage()` runs against live data with
   enough rows to trip it, Firestore throws an error containing a direct console link to create
   the exact index needed — click it once, no manual configuration.
 - **Manual two-browser UI pass** (join via shared link, real toss/draft/result UI end to end)
@@ -472,3 +472,32 @@ are open like the rest of the app (client-trusted); add to the Firestore rules:
 match /leaderboard/{difficulty}/entries/{uid} { allow read, write: if true; }
 match /leaderboardDaily/{key}/entries/{uid} { allow read, write: if true; }
 ```
+
+## Authentication (Firebase Auth - replaced Clerk)
+
+Sign-in is Firebase Auth: Google, plus email + password (`app/signin`, `app/signup`,
+`app/signup/username`). Code lives in `lib/auth/` (`AuthProvider` exposes `useUser` /
+`SignedIn` / `SignedOut` in the same shape the app used before; `actions.js` has sign-in,
+sign-up, username claiming and friendly error text) and `components/Auth/`. The public profile
+is `users/{uid}` (`username`, `displayName`, `photoURL`, `createdAt`); usernames are unique
+case-insensitively via `usernames/{lower}` (claimed in a transaction). Anyone signed in without
+a username (e.g. a new Google sign-up) is sent to `/signup/username` by `ProfileGate`.
+
+Why: Clerk's development instance caps at 100 users and its production instance needs a custom
+domain (not `*.vercel.app`). Firebase Auth works on `vercel.app` (add the domain under
+Authentication -> Settings -> Authorized domains).
+
+**Migration of existing users** (done once, Clerk left untouched as a fallback):
+
+1. `node scripts/backup-data.mjs` - read-only snapshot of every Firestore doc + every Clerk user
+   to `backups/<timestamp>/` (git-ignored, contains personal data).
+2. `node scripts/import-clerk-users.mjs [--csv clerk-export.csv] [--apply]` - copies each Clerk user
+   into Firebase Auth **with the same uid** (the Clerk id), so every duel result / leaderboard
+   row / user doc keeps pointing at the right person. Google accounts are imported Google-linked;
+   password accounts keep their password when the Clerk dashboard CSV export (it contains the
+   bcrypt hashes) is supplied, otherwise they use "Forgot password". Dry run by default; existing
+   Firebase accounts are never overwritten. Also reserves every username in `usernames/`.
+
+`firestore.rules` holds rules that use `request.auth` (the old open rules can't, since Clerk never
+populated it). Publish them only after Firebase sign-in is verified on the deployed site.
+`app/api/webhooks/clerk` and `lib/clerkAppearance.js` are gone - there is no sign-up webhook any more.
