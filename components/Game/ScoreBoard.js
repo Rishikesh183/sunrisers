@@ -1,15 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { slotLabel } from '../../lib/game/positions';
 import CommentaryFeed from './CommentaryFeed';
 import LeaderboardSave from './LeaderboardSave';
+import { PROMPT_EVENT } from '../Follow/FollowUs';
 
 // Glass card shared with the live playback so the result reads as part of the same screen.
 const GLASS = 'rounded-2xl border border-white/15 bg-bg/70 backdrop-blur-md';
 
 export default function ScoreBoard({ battingOrder, result, bestScore, onPlayAgain, resultText, leaderboardEntry }) {
     const [showCommentary, setShowCommentary] = useState(false);
+
+    // The first time anyone reaches a result screen, offer the "Loved this game? Follow us" card
+    // (FollowUs shows it once ever, tracked in localStorage). A short pause lets the result land first.
+    useEffect(() => {
+        const t = setTimeout(() => window.dispatchEvent(new Event(PROMPT_EVENT)), 2500);
+        return () => clearTimeout(t);
+    }, []);
 
     return (
         <div className="flex flex-col gap-4">
