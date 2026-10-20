@@ -4,6 +4,8 @@ import { AuthProvider } from '../lib/auth/AuthProvider';
 import ProfileGate from '../components/Auth/ProfileGate';
 import Navbar from '../components/Navbar';
 import PageLoader from '../components/PageLoader';
+import FollowUs from '../components/Follow/FollowUs';
+import Footer from '../components/Follow/Footer';
 import PendingScoreSaver from '../components/Game/PendingScoreSaver';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -21,8 +23,10 @@ export default function RootLayout({ children }) {
             <PageLoader />
             <ProfileGate />
             <PendingScoreSaver />
+            <FollowUs />
             <Navbar />
             {children}
+            <Footer />
           </div>
           <Analytics />
         </body>
