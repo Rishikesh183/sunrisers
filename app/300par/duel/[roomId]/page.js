@@ -11,6 +11,7 @@ import {
     submitPick,
     finalizeResult,
     markResultSeen,
+    getRoomOnce,
     closeRoom,
     isRoomExpired,
     ROOM_TTL_MS,
@@ -21,6 +22,7 @@ import { simulateChase, bowlingStrength } from '../../../../lib/game/simulate';
 import { TOTAL_SLOTS } from '../../../../lib/game/positions';
 import { TEAMS } from '../../../../data/teams';
 import { friendlyError } from '../../../../lib/firebaseErrors';
+import { auth } from '../../../../lib/firebase';
 import { saveLocalResult, loadLocalResult, pruneLocalResults } from '../../../../lib/duel/localResults';
 import Spinner from '../../../../components/Duel/Spinner';
 import TossPanel from '../../../../components/Duel/TossPanel';
@@ -65,15 +67,52 @@ export default function DuelRoomPage({ params }) {
     // A room that briefly reads as missing (e.g. the moment a finished room is cleaned up) shouldn't
     // flash "doesn't exist" - only show that once it has stayed missing for a moment.
     const [missingConfirmed, setMissingConfirmed] = useState(false);
+
+    // Action errors are one-off notices: let them clear themselves instead of sticking around.
+    useEffect(() => {
+        if (!actionError) return undefined;
+        const t = setTimeout(() => setActionError(null), 8000);
+        return () => clearTimeout(t);
+    }, [actionError]);
     const teams = getTeams();
 
+    // Live listeners. A listener that errors is dead, so a one-off "permission-denied" (for example
+    // a request that went out a moment before the sign-in token was ready or refreshed) used to
+    // leave the page stuck on an error until a manual refresh. Now it refreshes the token and
+    // re-subscribes a couple of times before giving up.
     useEffect(() => {
-        const onListenError = (err) => setLoadError(friendlyError(err));
-        const unsubRoom = subscribeToRoom(roomId, setRoom, onListenError);
-        const unsubPicks = subscribeToPicks(roomId, setPicks, onListenError);
+        let cancelled = false;
+        let retries = 0;
+        let retryTimer;
+        let unsubs = [];
+
+        const start = () => {
+            const onListenError = async (err) => {
+                console.error('[duel] listener error:', err?.code, err?.message);
+                if (err?.code === 'permission-denied' && retries < 3 && !cancelled) {
+                    retries += 1;
+                    try {
+                        await auth.currentUser?.getIdToken(true);
+                    } catch {
+                        // fall through to the retry anyway
+                    }
+                    retryTimer = setTimeout(() => {
+                        if (cancelled) return;
+                        unsubs.forEach((u) => u());
+                        start();
+                    }, 700 * retries);
+                    return;
+                }
+                if (!cancelled) setLoadError(friendlyError(err));
+            };
+            unsubs = [subscribeToRoom(roomId, setRoom, onListenError), subscribeToPicks(roomId, setPicks, onListenError)];
+        };
+        start();
+
         return () => {
-            unsubRoom();
-            unsubPicks();
+            cancelled = true;
+            clearTimeout(retryTimer);
+            unsubs.forEach((u) => u());
         };
     }, [roomId]);
 
@@ -167,7 +206,18 @@ export default function DuelRoomPage({ params }) {
             hostName: room.hostName,
             guestName: room.guestName,
             battedFirstUid: firstUid,
-        }).catch((err) => setActionError(friendlyError(err)));
+        }).catch(async (err) => {
+            console.error('[duel] finalize error:', err?.code, err?.message);
+            // Both players' browsers try to finish the duel. If the other one got there first the
+            // room is already complete, and a rejected second attempt is just that race - not a problem.
+            try {
+                const latest = await getRoomOnce(roomId);
+                if (!latest || latest.status === 'complete') return;
+            } catch {
+                // fall through and show the original error
+            }
+            setActionError(friendlyError(err));
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [room?.status]);
 
@@ -181,6 +231,7 @@ export default function DuelRoomPage({ params }) {
                 guestTeam: guestTeamChoice,
             });
         } catch (err) {
+            console.error('[duel] join error:', err?.code, err?.message);
             setActionError(friendlyError(err));
         } finally {
             setJoining(false);
@@ -224,7 +275,9 @@ export default function DuelRoomPage({ params }) {
 
     let body;
 
-    if (loadError) {
+    // A listener error only takes over the page when there is nothing to show yet; once the room is
+    // on screen it is a small inline message instead (below), so a hiccup can't wipe a live duel.
+    if (loadError && !room) {
         body = <p className="text-sm text-loss text-center">{loadError}</p>;
     } else if (!isLoaded || room === undefined || (room === null && !missingConfirmed)) {
         body = <Spinner label="Loading room…" className="text-sm text-textMuted justify-center w-full" />;
@@ -343,7 +396,8 @@ export default function DuelRoomPage({ params }) {
 
             <SignedIn>
                 {body}
-                {actionError && <p className="text-xs text-loss text-center mt-3">{actionError}</p>}
+                {actionError && <p className="relative z-10 text-xs text-loss text-center mt-3">{actionError}</p>}
+                {loadError && room && <p className="relative z-10 text-xs text-loss text-center mt-3">{loadError}</p>}
             </SignedIn>
         </div>
     );
