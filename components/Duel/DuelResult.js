@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import LivePlayback from '../Game/LivePlayback';
 import ScoreBoard from '../Game/ScoreBoard';
 import TeamBackground from '../TeamBackground';
+import { groundLabel } from '../../lib/game/grounds';
 import { TEAMS } from '../../data/teams';
 
 const TARGET_REVEAL_MS = 2200;
@@ -45,7 +46,9 @@ export default function DuelResult({ room, myUid }) {
     const firstOrder = firstResult.batsmen.map((b) => ({ name: b.name }));
     const secondOrder = secondResult.batsmen.map((b) => ({ name: b.name }));
 
-    const matchup = `${firstName}'s ${firstTeam} vs ${secondName}'s ${secondTeam}`;
+    // The ground the match was actually simulated on (recorded in the result itself).
+    const ground = groundLabel(firstResult.ground);
+    const matchup = `${firstName}'s ${firstTeam} vs ${secondName}'s ${secondTeam}${ground ? ` · ${ground}` : ''}`;
     const target = firstResult.finalScore + 1;
 
     useEffect(() => {
@@ -73,7 +76,7 @@ export default function DuelResult({ room, myUid }) {
                 result={firstResult}
                 battingOrder={firstOpeners}
                 inningsLabel="First Innings"
-                subtitle={`${firstName}'s ${firstTeam} — batting first`}
+                subtitle={`${firstName}'s ${firstTeam} — batting first${ground ? ` · ${ground}` : ''}`}
                 canSkip={myUid === firstUid}
                 isChase={false}
                 parPause={false}
@@ -107,7 +110,7 @@ export default function DuelResult({ room, myUid }) {
                 result={secondResult}
                 battingOrder={secondOpeners}
                 inningsLabel="Second Innings"
-                subtitle={`${secondName}'s ${secondTeam} — bowling first, now chasing ${target}`}
+                subtitle={`${secondName}'s ${secondTeam} — bowling first, now chasing ${target}${ground ? ` · ${ground}` : ''}`}
                 canSkip={myUid === secondUid}
                 parPause={false}
                 onDone={() => setStage('final')}
