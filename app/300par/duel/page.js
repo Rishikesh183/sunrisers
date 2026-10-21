@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation';
 import { SignedIn, SignedOut, useUser } from '../../../lib/auth/AuthProvider';
 import OpponentList from '../../../components/Duel/OpponentList';
 import TeamPicker from '../../../components/Duel/TeamPicker';
+import GroundPicker from '../../../components/Duel/GroundPicker';
+import { groundsEnabled } from '../../../lib/game/grounds';
 import { createRoom } from '../../../lib/duel/room';
 import { getTeams } from '../../../lib/data/seasonSquads';
 import { friendlyError } from '../../../lib/firebaseErrors';
@@ -17,6 +19,8 @@ export default function DuelLobby() {
     const router = useRouter();
     const teams = getTeams();
     const [team, setTeam] = useState(null); // no default - the player must pick one
+    const [ground, setGround] = useState(null); // optional (beta); null = standard duel logic
+    const stadiums = groundsEnabled();
     const [creating, setCreating] = useState(false);
     const [error, setError] = useState(null);
 
@@ -31,6 +35,7 @@ export default function DuelLobby() {
                 hostTeam: team,
                 opponentUid: opponent.uid,
                 opponentName: opponent.displayName,
+                ground: stadiums ? ground : null,
             });
             window.dispatchEvent(new Event('srh:navigate'));
             router.push(`/300par/duel/${roomId}`);
@@ -65,6 +70,7 @@ export default function DuelLobby() {
             <SignedIn>
                 <div className="bg-surface border border-border rounded-xl p-4 sm:p-6 flex flex-col gap-4">
                     <TeamPicker teams={teams} value={team} onChange={setTeam} />
+                    {stadiums && <GroundPicker value={ground} onChange={setGround} />}
 
                     <h2 className="font-display text-text uppercase tracking-wide text-sm">Choose an opponent</h2>
                     {!team && <p className="text-xs text-textMuted -mt-2">Pick your franchise above to challenge someone.</p>}

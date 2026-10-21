@@ -7,6 +7,7 @@ import { HISTORY_PAGE_SIZE, getDuelPage, getDuelStats } from '../../lib/data/due
 import { getDisplayNames } from '../../lib/data/users';
 import { friendlyError } from '../../lib/firebaseErrors';
 import { TEAMS } from '../../data/teams';
+import { groundLabel } from '../../lib/game/grounds';
 
 function formatDate(timestamp) {
     if (!timestamp?.toDate) return '';
@@ -93,7 +94,7 @@ function DuelCard({ duel, uid, names }) {
     return (
         <div className="bg-bg border border-border rounded-xl overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2 bg-surface border-b border-border">
-                <p className="text-[11px] uppercase tracking-wide text-textMuted">1v1 Duel · {formatDate(duel.completedAt)}</p>
+                <p className="text-[11px] uppercase tracking-wide text-textMuted">1v1 Duel · {formatDate(duel.completedAt)}{groundLabel(duel.ground) ? ` · ${groundLabel(duel.ground)}` : ''}</p>
                 <span
                     className={`text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded ${
                         won ? 'bg-win/15 text-win' : 'bg-loss/15 text-loss'

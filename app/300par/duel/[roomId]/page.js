@@ -19,6 +19,7 @@ import {
 import { getSeasonSquads, getTeams } from '../../../../lib/data/seasonSquads';
 import { displayNameFromUser } from '../../../../lib/userName';
 import { simulateChase, bowlingStrength } from '../../../../lib/game/simulate';
+import { getGround, groundLabel, groundsEnabled } from '../../../../lib/game/grounds';
 import { TOTAL_SLOTS } from '../../../../lib/game/positions';
 import { TEAMS } from '../../../../data/teams';
 import { friendlyError } from '../../../../lib/firebaseErrors';
@@ -187,9 +188,11 @@ export default function DuelRoomPage({ params }) {
         const secondOrder = buildBattingOrder(picks, secondUid, secondSeasonSquads);
         // No target for the first innings - it just sets the score the second side has to beat.
         // 'duel' scoring sits a little below solo Hard - the aim here is to win, not to reach 300.
-        const firstResult = simulateChase(firstOrder, Math.random, null, 'duel', false, bowlingStrength(secondOrder));
+        // Ground (beta): only when the feature switch is on and the host picked one; otherwise default logic.
+        const groundKey = groundsEnabled() && getGround(room.ground) ? room.ground : null;
+        const firstResult = simulateChase(firstOrder, Math.random, null, 'duel', false, bowlingStrength(secondOrder), groundKey);
         // Must beat (not just match) the first innings - target is score + 1, and the chase ends the ball it's reached.
-        const secondResult = simulateChase(secondOrder, Math.random, firstResult.finalScore + 1, 'duel', true, bowlingStrength(firstOrder));
+        const secondResult = simulateChase(secondOrder, Math.random, firstResult.finalScore + 1, 'duel', true, bowlingStrength(firstOrder), groundKey);
         const winnerUid = secondResult.won ? secondUid : firstUid;
 
         const hostResult = isHostFirst ? firstResult : secondResult;
@@ -206,6 +209,7 @@ export default function DuelRoomPage({ params }) {
             hostName: room.hostName,
             guestName: room.guestName,
             battedFirstUid: firstUid,
+            ground: groundKey,
         }).catch(async (err) => {
             console.error('[duel] finalize error:', err?.code, err?.message);
             // Both players' browsers try to finish the duel. If the other one got there first the
@@ -273,6 +277,9 @@ export default function DuelRoomPage({ params }) {
         });
     }
 
+    // Ground name to show (only if the feature is on and the host picked one).
+    const shownGround = groundsEnabled() ? groundLabel(room?.ground) : null;
+
     let body;
 
     // A listener error only takes over the page when there is nothing to show yet; once the room is
@@ -305,6 +312,7 @@ export default function DuelRoomPage({ params }) {
                 <div className="flex flex-col items-center gap-4 bg-surface border border-border rounded-xl p-6 sm:p-10">
                     <p className="text-text text-center">
                         This is the link to play with <span className="text-accent font-semibold">{room.opponentName || 'your opponent'}</span>. Share it to start.
+                        {shownGround && (<> Ground: <span className="text-accent font-semibold">{shownGround}</span>.</>)}
                     </p>
                     <div className="flex w-full max-w-md gap-2">
                         <input
@@ -332,6 +340,7 @@ export default function DuelRoomPage({ params }) {
                 <div className="flex flex-col items-center gap-4 bg-surface border border-border rounded-xl p-6 sm:p-10">
                     <p className="text-text text-center">
                         {room.hostName} has challenged you to a 1v1 duel — {room.hostName} picked {teamName(room.hostTeam)}.
+                        {shownGround && (<> The match is at <span className="text-accent font-semibold">{shownGround}</span>.</>)}
                     </p>
                     <div className="w-full">
                         <TeamPicker teams={teams} value={guestTeamChoice} onChange={setGuestTeamChoice} />
@@ -379,6 +388,7 @@ export default function DuelRoomPage({ params }) {
             {room && room.hostName && room.guestName && room.status !== 'complete' && (
                 <p className="text-sm text-textMuted text-center mb-6">
                     {room.hostName}'s {room.hostTeam} vs {room.guestName}'s {room.guestTeam}
+                    {shownGround && <> · {shownGround}</>}
                 </p>
             )}
 

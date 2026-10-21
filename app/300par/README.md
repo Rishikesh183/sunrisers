@@ -501,3 +501,20 @@ Authentication -> Settings -> Authorized domains).
 `firestore.rules` holds rules that use `request.auth` (the old open rules can't, since Clerk never
 populated it). Publish them only after Firebase sign-in is verified on the deployed site.
 `app/api/webhooks/clerk` and `lib/clerkAppearance.js` are gone - there is no sign-up webhook any more.
+
+## Duel grounds (beta, behind a switch)
+
+`NEXT_PUBLIC_STADIUMS_ENABLED=true` turns on grounds for 1v1 duels; unset / `false` keeps the
+feature closed (no picker, no ground on rooms, standard duel logic). The value is baked in at
+build time, so redeploy after changing it on Vercel.
+
+- The host optionally picks one of four grounds in the duel lobby (`components/Duel/GroundPicker.js`,
+  images in `public/stadiums/`); the joiner only sees its name. No pick = default logic.
+- `lib/game/grounds.js` holds each ground's four numbers: `powerScale` / `dotBias` / `dismissScale`
+  move every batter's scoring together (ratings and batting logic are untouched), and `bowlWeight`
+  multiplies the existing opposition-bowling effect. `simulateChase(..., ground)` applies them.
+- The ground is one extra field on the room and on the finished-duel record - no extra Firestore
+  reads/writes, no rules change. Old rooms/results without it behave as "no ground".
+- Re-tune with `node scripts/ground-calibrate.mjs` (prints average score and the weak-vs-strong
+  attack swing per ground). Current results: averages ~252 / 233 / 183 / 266 and attack swings
+  ~12 / 16 / 27 / 12 runs for Hyderabad / Mumbai / Chennai / Bengaluru (default logic: ~253 / ~10).
