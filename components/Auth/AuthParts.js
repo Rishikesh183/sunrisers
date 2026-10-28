@@ -8,7 +8,20 @@ import { useState } from 'react';
 export function useRedirectTarget() {
     const params = useSearchParams();
     const raw = params.get('redirect_url') || params.get('redirect') || '/';
-    return raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
+    return safeInternalPath(raw);
+}
+
+// Only ever redirect to a path on THIS site. A value like "//evil.com", "/\\evil.com" or "https://evil.com"
+// would otherwise bounce someone to an attacker's page right after they sign in (phishing).
+export function safeInternalPath(raw) {
+    if (typeof raw !== 'string' || !raw.startsWith('/') || raw.startsWith('//') || raw.includes('\\')) return '/';
+    try {
+        const url = new URL(raw, window.location.origin);
+        if (url.origin !== window.location.origin) return '/';
+        return url.pathname + url.search + url.hash;
+    } catch {
+        return '/';
+    }
 }
 
 export function GoogleButton({ onClick, disabled, label = 'Continue with Google' }) {

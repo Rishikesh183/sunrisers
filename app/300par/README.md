@@ -518,3 +518,34 @@ build time, so redeploy after changing it on Vercel.
 - Re-tune with `node scripts/ground-calibrate.mjs` (prints average score and the weak-vs-strong
   attack swing per ground). Current results: averages ~252 / 233 / 183 / 266 and attack swings
   ~12 / 16 / 27 / 12 runs for Hyderabad / Mumbai / Chennai / Bengaluru (default logic: ~253 / ~10).
+
+## Security model
+
+The Firebase web config is public, so anyone can sign up and call Firestore directly with a valid
+token, ignoring the UI. **`firestore.rules` is therefore the real defence** and is covered by an
+emulator test (`scripts/rules-test`, ~110 checks: the real duel flow end to end + attacks such as a
+third person reading/joining a duel, out-of-turn picks, forged results, leaderboard spam, username
+takeover, news defacement, directory scraping). Re-run it after any change to the rules or to
+`lib/duel/room.js` / `lib/data/*`:
+
+```bash
+npx firebase-tools emulators:exec --only firestore --project demo-srh "node scripts/rules-test/run.mjs"
+```
+
+What the rules enforce: duel rooms and picks are readable only by their two players (no listing); a
+room moves through fixed steps (join -> toss -> draft -> simulate -> complete) and each step may only
+touch its own fields; a pick must be the current turn by the right player; a finished-duel record can
+only exist for a real room in the right state; leaderboard rows are shaped, bounded (300-500), +1 per
+write and 40 s apart; profiles can only carry a username the user has reserved; news is read-only
+from browsers. `/api/news` accepts only Firebase ID tokens whose uid is in `ADMIN_UIDS`.
+
+Other hardening: security headers in `next.config.js`, same-site-only post-login redirects, optional
+App Check (`NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, then enforce it in the Firebase console).
+
+**Deploying changes to the rules:** ship the matching code first, confirm the deploy, then publish the
+rules (the old code writes duel results in a way the new rules refuse).
+
+**Known limit:** duel and solo results are computed in the players' browsers. The rules stop forged
+records for games that never happened and out-of-turn play, but a determined cheater can still submit
+a believable result or choose any player/season for a pick. Closing that means running the roll and
+the simulation on the server (an API route using firebase-admin).
