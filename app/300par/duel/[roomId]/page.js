@@ -104,7 +104,13 @@ export default function DuelRoomPage({ params }) {
                     }, 700 * retries);
                     return;
                 }
-                if (!cancelled) setLoadError(friendlyError(err));
+                if (cancelled) return;
+                // Rooms are private to their two players: anyone else is simply refused.
+                setLoadError(
+                    err?.code === 'permission-denied'
+                        ? "This duel is private - it's only open to the two players. If you were invited, sign in with the invited account."
+                        : friendlyError(err)
+                );
             };
             unsubs = [subscribeToRoom(roomId, setRoom, onListenError), subscribeToPicks(roomId, setPicks, onListenError)];
         };

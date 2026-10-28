@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { auth } from '../../lib/firebase';
 
 const AddNews = () => {
   const [title, setTitle] = useState('');
@@ -15,12 +16,22 @@ const AddNews = () => {
     }
 
     try {
+      // Admin-only: the server checks this sign-in token against the ADMIN_UIDS allow-list.
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) {
+        alert('Sign in with an admin account first');
+        return;
+      }
       const res = await fetch('/api/news', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title, description, imageUrl, longDesc }),
       });
 
+      if (res.status === 403) {
+        alert('This account is not an admin');
+        return;
+      }
       if (!res.ok) throw new Error('Request failed');
 
       alert('News added successfully!');
